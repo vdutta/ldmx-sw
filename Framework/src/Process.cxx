@@ -107,7 +107,7 @@ namespace ldmx {
                             try {
                                 const RunHeader& runHeader = masterFile->getRunHeader(wasRun);
                                 std::cout << "[Process] got new run header from '" << masterFile->getFileName() << "' ..." << std::endl;
-                                runHeader.Print();
+                                //runHeader.Print();
                                 for (auto module : sequence_) {
                                     module->onNewRun(runHeader);
                                 }

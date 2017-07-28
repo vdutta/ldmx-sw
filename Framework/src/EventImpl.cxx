@@ -39,6 +39,7 @@ namespace ldmx {
         std::map<std::string, TObject*>::iterator ito = objects_.find(branchName);
         if (ito == objects_.end()) { // create a new branch
             ito = objects_.insert(std::pair<std::string, TObject*>(branchName, tca)).first;
+            objectsMade_.insert(std::pair<std::string, TObject*>(branchName, tca));
             if (outputTree_ != 0) {
                 TBranch* aBranch = outputTree_->Branch(branchName.c_str(), tca, 100000, 3);
                 newBranches_.push_back(aBranch);
@@ -70,6 +71,7 @@ namespace ldmx {
             TObject* myCopy = to->Clone();
             ito = objects_.insert(std::pair<std::string, TObject*>(branchName, myCopy)).first;
             objectsOwned_.insert(std::pair<std::string, TObject*>(branchName, myCopy));
+            objectsMade_.insert(std::pair<std::string, TObject*>(branchName, myCopy));
             if (outputTree_ != 0) {
                 TBranch* aBranch = outputTree_->Branch(branchName.c_str(), myCopy);
                 newBranches_.push_back(aBranch);
@@ -86,8 +88,8 @@ namespace ldmx {
         if (name == EventConstants::EVENT_HEADER) return; // no adding to the event header...
         branchName = makeBranchName(name);
 
-        auto location = objectsOwned_.find(branchName);
-        if (location == objectsOwned_.end()) {
+        auto location = objectsMade_.find(branchName);
+        if (location == objectsMade_.end()) {
             TClonesArray* tca = new TClonesArray(obj.ClassName(), 100);
             objectsOwned_[branchName] = tca;
             add(name, tca);
@@ -146,12 +148,10 @@ namespace ldmx {
         std::map<std::string, TBranch*>::const_iterator itb = branches_.find(branchName);
 
         // check the objects map
-        std::map<std::string, TObject*>::const_iterator ito = objects_.find(branchName);
-        if (ito != objects_.end()) {
-           if (itb!=branches_.end())
-              itb->second->GetEntry(ientry_);
+        std::map<std::string, TObject*>::const_iterator ito = objectsMade_.find(branchName);
+        if (ito != objectsMade_.end()) {
            return ito->second;
-        } else if (inputTree_ == 0) {
+        } else if (itb == branches_.end() && inputTree_ == 0) {
             EXCEPTION_RAISE("ProductNotFound", "No product found for name '" + collectionName + "' and pass '" + passName_ + "'");
         }
 
@@ -242,8 +242,9 @@ namespace ldmx {
 
     void EventImpl::Clear() {
         // clear the event objects
-        for (auto obj : objects_)
+        for (auto obj : objects_) {
             obj.second->Clear("C");
+        }
         branchesFilled_.clear();
 
     }
