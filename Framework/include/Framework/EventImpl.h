@@ -235,6 +235,11 @@ namespace ldmx {
             std::map<std::string, TObject*> objectsOwned_;
 
             /**
+             * Map of new objects in the event during this pass
+             */
+            std::map<std::string, TObject*> objectsMade_;
+
+            /**
              * List of new branches added.
              */
             std::vector<TBranch*> newBranches_;

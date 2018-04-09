@@ -114,7 +114,8 @@ namespace ldmx {
         if (ientry_ >= 0) {
             if (isOutputFile_) {
                 event_->beforeFill();
-                if (storeCurrentEvent) tree_->Fill(); // fill the clones...
+                tree_->Fill(); // fill the clones...
+                event_->Clear();
             }
             if (event_) {
                 event_->Clear();
@@ -137,7 +138,7 @@ namespace ldmx {
             // if we are reading, move the pointer
             if (!isOutputFile_) {
 
-                if (ientry_ >= entries_) {
+                if (ientry_  >= entries_) {
                     return false;
                 }
 
