@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
       xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
-
+    
     <define>
         <!-- Define the identity matrix -->
         <rotation name="identity" x="0" y="0" z="0"/>
@@ -44,7 +44,7 @@
         <!-- Dimensions of Ecal box -->
         <variable name="hcal_box_x" value="3500*mm" />
         <variable name="hcal_box_y" value="3500*mm" />
-        <variable name="hcal_box_z" value="3500*mm" />
+        <variable name="hcal_box_z" value="6500*mm" />
         <constant name="hcal_back_z" value="ecal_front_z + hcal_box_z" />
 
         <!-- Surround the Hcal with scoring planes -->
