@@ -13,3 +13,9 @@
 /build.*
 /install
 /install.*
+detector.gdml
+tagger.gdml
+recoil.gdml
+ecal.gdml
+hcal.gdml
+BmapCorrected3D_13k_unfolded_scaled_1.15384615385.dat
