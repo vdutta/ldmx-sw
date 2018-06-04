@@ -143,7 +143,7 @@ namespace ldmx {
                         outFile->close();
                     }
                     inFile.close();
-                    std::cout << "Process: Closing file " << infilename << std::endl;
+                    //std::cout << "Process: Closing file " << infilename << std::endl;
                     for (auto module : sequence_) {
                         module->onFileClose(infilename);
                     }
