@@ -93,6 +93,15 @@ namespace ldmx {
              * @return std::pair of iterator bounds
              */
             HitLogBounds itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
+
+            /**
+             * Function to search a specific range of a HitLog for a hit.
+             *
+             * @param log HitLog to be searched
+             * @param bounds HitLogBounds to define range of search
+             * @return HitPtr pair to isolated hit (single strip or two strip combo)
+             */
+            std::pair< HitPtr , HitPtr > search( HitLog log , HitLogBounds bounds ) const;
     };
 }
 
