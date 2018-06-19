@@ -10,7 +10,7 @@ namespace ldmx {
 
     void HcalLayerAnalyzer::configure(const ldmx::ParameterSet& ps) {
         caloCol_=ps.getString("caloHitCollection");
-        minPE_ = ps.getFloat("minPE");
+        minPE_ = static_cast<float>(ps.getDouble("minPE"));
     }
 
     void HcalLayerAnalyzer::analyze(const ldmx::Event& event) {
@@ -23,35 +23,15 @@ namespace ldmx {
             
             //get current hit
             const ldmx::HcalHit* chit=(const ldmx::HcalHit*)(tca->At(i));
-            
+            float curr_PE = chit->getPE();
+
             //only process non-noise hits
-            if ( chit->getPE() > minPE_ ) {
+            if ( curr_PE > minPE_ ) {
                 
-                h_includedhits->Fill( chit->getPE() );
+                h_includedhits->Fill( curr_PE );
 
                 //Only process if hit is in the back Hcal
                 if ( chit->getSection() == ldmx::HcalSection::BACK ) {
-                    
-                    //obtain hit information
-                    float curr_layer = chit->getLayer();
-                    float curr_strip = chit->getStrip();
-               
-                    //Start iterator
-                    std::vector< std::vector<ldmx::HcalHit*> >::iterator it = hitlog.begin();
-                    while ( it != hitlog.end() ) {
-                        if (curr_layer = it[0]->getLayer() ) {
-                            it->push_back( chit );
-                            break;
-                        }
-
-                        ++it;
-                    }   
-
-                    if ( it == hitlog.end() ) {
-                        std::vector<ldmx::HcalHit*> tmp;
-                        tmp.push_back(chit);
-                        hitlog.push_back(tmp);
-                    }
 
                 } //only process if hit is in back hcal
                 else {
@@ -62,19 +42,12 @@ namespace ldmx {
 	    
         } //loop through all entries in calorimeter hits for current event (i)
         
-        //Sort hitlog
-        std::sort( hitlog.begin() , hitlog.end() , compareLayer );
-        for (std::vector< std::vector<ldmx::HcalHit*> >::iterator it = hitlog.begin(); it != hitlog.end(); ++it ) {
-            std::sort( it->begin() , it->end() , compareStrip );
-        } //loop through layers in hitlog (i)
-
         
 
     }
 
     void HcalLayerAnalyzer::onProcessStart() {
         getHistoDirectory();
-        maxlayer_ = 0.0;
         nNonBack_ = 0;
         h_includedhits = new TH1F("h_includedhits","PE Distribution of included hits",500,0.5,500.5);
         //Declare a histogram per layer of back hcal
@@ -90,13 +63,6 @@ namespace ldmx {
         std::cout << "Number Hits NOT in Back Hcal: " << nNonBack_ << std::endl;
     }
 
-    bool HcalLayerAnalyzer::compareStrip( const ldmx::HcalHit* lhs , const ldmx::HcalHit* rhs ) {
-        return ( lhs->getStrip() < rhs->getStrip() );
-    }
-
-    bool HcalLayerAnalyzer::compareLayer( const std::vector<ldmx::HcalHit*> lhs , const std::vector<ldmx::HcalHit*> rhs ) {
-        return ( lhs[0]->getLayer() < rhs[0]->getLayer() );
-    }
 }
 
 DECLARE_ANALYZER_NS(ldmx, HcalLayerAnalyzer);
