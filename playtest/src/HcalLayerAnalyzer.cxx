@@ -40,7 +40,6 @@ namespace ldmx {
         } //loop through all entries in calorimeter hits for current event (i)
         
         //Now log has the non-noise hits in it
-        //
 
         for (HitLog::iterator it = log.begin(); it != log.end(); ++it) {
             std::cout << it->first << std::endl; //printing out list of keys
@@ -69,6 +68,15 @@ namespace ldmx {
 
     int HcalLayerAnalyzer::keygen( const ldmx::HcalHit* hit ) const {
         return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
+    }
+
+    std::pair< HitLog::iterator , HitLog::iterator > HcalLayerAnalyzer::itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
+        int lowkey = layer*layermod_ + lowstrip;
+        int upkey = layer*layermod_ + upstrip;
+
+        std::pair< HitLog::iterator , HitLog::iterator > bounds( log.lower_bound( lowkey ) , log.upper_bound( upkey ) );
+
+        return bounds;
     }
 
 }

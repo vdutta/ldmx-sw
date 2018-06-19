@@ -73,6 +73,17 @@ namespace ldmx {
              * @return integer key value
              */
             int keygen( const ldmx::HcalHit* hit ) const;
+
+            /**
+             * Function to determine upper and lower bound iterators for HitLog.
+             * 
+             * @param log HitLog to be searched
+             * @param layer number of layer to search
+             * @param lowstrip number of strip to be lower bound
+             * @param upstrip number of strip to be upper bound
+             * @return std::pair of iterator bounds
+             */
+            std::pair< HitLog::iterator , HitLog::iterator > itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
     };
 }
 
