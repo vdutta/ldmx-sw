@@ -72,6 +72,18 @@ namespace ldmx {
         return bounds;
     }
 
+    std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( HitLog log , HitLogBounds bounds ) const {
+        std::pair< HitPtr , HitPtr > ret( nullptr , nullptr );
+
+        if ( bounds.first != bounds.second ) {
+            for ( HitLogIt it = bounds.first; bounds.first != bounds.second; ++it ) {
+
+            } //iterate through range defined by bounds
+        } //check to see if range has any thickness
+
+        return ret;
+    }
+
 }
 
 DECLARE_ANALYZER_NS(ldmx, HcalLayerAnalyzer);
