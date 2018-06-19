@@ -11,6 +11,7 @@
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree in HitLog class
+#include <utilities> //std::pair for storage tree in HitLog class
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -24,7 +25,35 @@
 #include "DetDescr/HcalID.h" //Get HcalSection enum for filtering out Hcal Hits
 
 namespace ldmx {
-    
+   
+    /**
+     * @class Cluster
+     * @brief Structure for nodes of HitLog map.
+     *
+     * This structure allows for up to two hits to be considered one plausible particle.
+     * The second element in the pair will be a nullptr if only one hit is plausible.
+     */
+    class Cluster {
+        public:
+            
+            /**
+             * Default Constructor.
+             *
+             * Sets both elements in hits_ to nullptr.
+             */
+            Cluster();
+
+            /**
+             * Preferred Constructor.
+             *
+             * Sets elements in hits_ to inputs.
+             */
+            Cluster( const ldmx::HcalHit* , const ldmx::HcalHit* );
+
+        private:
+            std::pair< const ldmx::HcalHit* , const ldmx::HcalHit* > hits_;
+    };
+
     /**
      * @class HitLog
      * @brief Helper class that logs the hits for a certain event in a useful way.
@@ -47,23 +76,30 @@ namespace ldmx {
              *
              * Sets layermod_ to input and sets comparison function to dictorder.
              */
-            HitLog(const int layermod);
+            HitLog( const int layermod );
+
+            /**
+             * Input new element function.
+             *
+             * @param cluster instance of Cluster that stores a pair of hits
+             */
+            void Insert( Cluster cluster );
 
         private:
             
             //* storage tree for logging hits and indices
-            std::vector< int , const ldmx::HcalHit* > log_;
+            std::vector< int , Cluster > log_;
 
             //* integer modulus for layer, should be larger than the number of layers
             const int layermod_;
 
             /**
-             * Function to determine key for a hit.
+             * Function to determine key for a Cluster.
              *
-             * @param hit hit that key needs to be generated for
+             * @param clust Cluster that key needs to be generated for
              * @return integer key
              */
-            int keygen( const ldmx::HcalHit* ) const;
+            int keygen( Cluster clust ) const;
 
             /**
              * Dictionary order to determine ordering in std::map.
