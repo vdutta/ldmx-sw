@@ -50,13 +50,6 @@ namespace ldmx {
     void HcalLayerAnalyzer::onProcessStart() {
         getHistoDirectory();
         h_includedhits = new TH1F("h_includedhits","PE Distribution of included hits",500,0.5,500.5);
-        //Declare a histogram per layer of back hcal
-        /*
-        for ( ) {
-            TH1F* h_newhistogram = new TH1F("name","title",500,0.0,1.0); //declare new histogram
-            h_hitsperlayer_.pushback( h_newhistogram ); //put new histogram into vector
-        } //loop through all layers in back hcal
-        */
 
         nNotIncluded_ = 0;
         layermod_ = 1000;
@@ -66,15 +59,15 @@ namespace ldmx {
         std::cout << "Number Hits NOT included in analysis: " << nNotIncluded_ << std::endl;
     }
 
-    int HcalLayerAnalyzer::keygen( const ldmx::HcalHit* hit ) const {
+    int HcalLayerAnalyzer::keygen( HitPtr hit ) const {
         return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
     }
 
-    std::pair< HitLog::iterator , HitLog::iterator > HcalLayerAnalyzer::itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
+    HitLogBounds HcalLayerAnalyzer::itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
         int lowkey = layer*layermod_ + lowstrip;
         int upkey = layer*layermod_ + upstrip;
 
-        std::pair< HitLog::iterator , HitLog::iterator > bounds( log.lower_bound( lowkey ) , log.upper_bound( upkey ) );
+        HitLogBounds bounds( log.lower_bound( lowkey ) , log.upper_bound( upkey ) );
 
         return bounds;
     }

@@ -26,8 +26,17 @@
 
 namespace ldmx {
     
-    //* typedef HitLog, class that will be used for logging hits by layer,strip
-    typedef std::map< int , const ldmx::HcalHit* > HitLog;
+    //* type that will be used to reference hits
+    typedef const ldmx::HcalHit* HitPtr;
+
+    //* type that will be used for logging hits by layer,strip
+    typedef std::map< int , HitPtr > HitLog;
+
+    //* type that is the iterator for HitLog
+    typedef HitLog::iterator HitLogIt;
+
+    //* type that is a pair of iterators (used as bounds)
+    typedef std::pair< HitLogIt , HitLogIt > HitLogBounds;
 
     /**
      * @class HcalLayerAnalyzer
@@ -72,7 +81,7 @@ namespace ldmx {
              * @param hit pointer to HcalHit instance that a key is needed for
              * @return integer key value
              */
-            int keygen( const ldmx::HcalHit* hit ) const;
+            int keygen( HitPtr hit ) const;
 
             /**
              * Function to determine upper and lower bound iterators for HitLog.
@@ -83,7 +92,7 @@ namespace ldmx {
              * @param upstrip number of strip to be upper bound
              * @return std::pair of iterator bounds
              */
-            std::pair< HitLog::iterator , HitLog::iterator > itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
+            HitLogBounds itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
     };
 }
 
