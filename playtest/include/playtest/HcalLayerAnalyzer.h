@@ -10,7 +10,6 @@
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
-#include <algorithm> //Sort hitlog vectors
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -24,6 +23,27 @@
 #include "DetDescr/HcalID.h" //Get HcalSection enum for filtering out Hcal Hits
 
 namespace ldmx {
+    
+    /**
+     * @class HitLog
+     * @brief Helper class that logs the hits for a certain event in a useful way.
+     *
+     * @note The implementation of this class will be variable. Not currently confident in any particular
+     *  method of storing the hits, so it may go through several versions.
+     */
+    class HitLog {
+        public:
+            
+            /**
+             * Default Constructor.
+             */
+            HitLog();
+
+        private:
+            
+            //* vector array for storing hit information
+            std::vector< std::vector< const ldmx::HcalHit* > > log;
+    };
 
     /**
      * @class HcalLayerAnalyzer
@@ -57,8 +77,8 @@ namespace ldmx {
 
             float minPE_; //* Minimum number of PEs to not be considered noise
 
-            int nStripsPerLayer_;
-            int nLayers_;
+            int nStripsPerLayer_; //* number of strips in each layer of back hcal
+            int nLayers_; //* number of layers in back hcal
 
             TH1F* h_includedhits; //* PE distribution of included hits
     };

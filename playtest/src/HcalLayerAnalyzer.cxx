@@ -28,11 +28,11 @@ namespace ldmx {
             const ldmx::HcalHit* chit=(const ldmx::HcalHit*)(tca->At(i));
             float curr_PE = chit->getPE();
 
-            //only process non-noise hits in the back hcal
-            if ( curr_PE > minPE_ and chit->getSection() == ldmx::HcalSection::BACK ) {
+            //only process hits in the back hcal
+            if ( chit->getSection() == ldmx::HcalSection::BACK ) {
                 
                 h_includedhits->Fill( curr_PE );
-                hitlot[ chit->getLayer() ][ chit->getStrip() ] += curr_PE; //WHAT TO DO WITH MULTIPLE HITS IN SAME LAYER,STRIP
+                hitlog[ chit->getLayer() ][ chit->getStrip() ] += static_cast<int>( curr_PE ); //WHAT TO DO WITH MULTIPLE HITS IN SAME LAYER,STRIP
 
             } //only process non-noise hits in the back hcal
             else {
@@ -41,7 +41,7 @@ namespace ldmx {
 	    
         } //loop through all entries in calorimeter hits for current event (i)
         
-        
+        //Now hitlog has 
 
     }
 
@@ -57,7 +57,7 @@ namespace ldmx {
         */
 
         nNotIncluded_ = 0;
-        nStripsPerLayer_ = 100; //NEED REAL NUMBER
+        nStripsPerLayer_ = 1000; //NEED REAL NUMBER
         nLayers_ = 81; //NEED REAL NUMBER
     }
 
