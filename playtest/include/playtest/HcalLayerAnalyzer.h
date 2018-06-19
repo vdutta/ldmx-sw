@@ -10,8 +10,8 @@
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
-#include <map> //std::map for storage tree in HitLog class
-#include <utilities> //std::pair for storage tree in HitLog class
+#include <map> //std::map for storage tree in ClusterLog class
+#include <utilities> //std::pair for storage tree in ClusterLog class
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -33,33 +33,34 @@ namespace ldmx {
     typedef std::pair< const ldmx::HcalHit* , const ldmx::HcalHit* > Cluster;
     
     /**
-     * constant layer modulus for Dictionary Ordering and cluster keys.
+     * constant layer modulus for cluster keys.
      */
     const int HCAL_LAYER_MOD = 1000;
 
     /**
-     * @class HitLog
+     * @class Cluster
+     * @brief Grouping class to store pointers to hits and cluster key
+     *
+     */
+    class Cluster {
+        public:
+            
+    };
+
+    /**
+     * @class ClusterLog
      * @brief Helper class that logs the hits for a certain event in a useful way.
      *
      * @note The implementation of this class will be variable. Not currently confident in any particular
      *  method of storing the hits, so it may go through several versions.
      */
-    class HitLog {
+    class ClusterLog {
         public:
             
             /**
              * Default Constructor.
-             *
-             * Sets layermod_ to 1000 and sets maps comparison function to dictorder.
              */
-            HitLog();
-
-            /**
-             * Preferred Constructor.
-             *
-             * Sets layermod_ to input and sets comparison function to dictorder.
-             */
-            HitLog( const int layermod );
+            ClusterLog();
 
             /**
              * Input new element function.
