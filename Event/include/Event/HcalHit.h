@@ -136,7 +136,7 @@ namespace ldmx {
             /**
              * The ROOT class definition.
              */
-            ClassDef(HcalHit, 1);
+            ClassDef(HcalHit, 2);
     };
 
 }
