@@ -16,11 +16,6 @@ namespace ldmx {
     void HcalLayerAnalyzer::analyze(const ldmx::Event& event) {
         const TClonesArray* tca=event.getCollection(caloCol_);
         
-        //hitlog in terms of layer,strip
-        // a number greater than zero represents a plausible mip hit
-        // zero represents otherwise
-        std::vector<int> onelayer( nStripsPerLayer_ , 0 );
-        std::vector< std::vector<int> > hitlog( nLayers_ , onelayer );
 
 	    for (size_t i = 0; i < tca->GetEntriesFast(); i++) {
             
@@ -32,7 +27,6 @@ namespace ldmx {
             if ( chit->getSection() == ldmx::HcalSection::BACK ) {
                 
                 h_includedhits->Fill( curr_PE );
-                hitlog[ chit->getLayer() ][ chit->getStrip() ] += static_cast<int>( curr_PE ); //WHAT TO DO WITH MULTIPLE HITS IN SAME LAYER,STRIP
 
             } //only process non-noise hits in the back hcal
             else {
