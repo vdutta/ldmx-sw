@@ -16,6 +16,7 @@ namespace ldmx {
     void HcalLayerAnalyzer::analyze(const ldmx::Event& event) {
         const TClonesArray* tca=event.getCollection(caloCol_);
         
+        HitLog log;
 
 	    for (size_t i = 0; i < tca->GetEntriesFast(); i++) {
             
@@ -23,19 +24,27 @@ namespace ldmx {
             const ldmx::HcalHit* chit=(const ldmx::HcalHit*)(tca->At(i));
             float curr_PE = chit->getPE();
 
-            //only process hits in the back hcal
-            if ( chit->getSection() == ldmx::HcalSection::BACK ) {
+            //only process non-noise hits in the back hcal
+            if ( curr_PE > minPE_ and chit->getSection() == ldmx::HcalSection::BACK ) {
                 
                 h_includedhits->Fill( curr_PE );
 
+                int curr_key = keygen( chit );
+                log[ curr_key ] = chit;
+
             } //only process non-noise hits in the back hcal
             else {
-                nNotIncluded++;
+                nNotIncluded_++;
             }
 	    
         } //loop through all entries in calorimeter hits for current event (i)
         
-        //Now hitlog has 
+        //Now log has the non-noise hits in it
+        //
+
+        for (HitLog::iterator it = log.begin(); it != log.end(); ++it) {
+            std::cout << it->first << std::endl; //printing out list of keys
+        }
 
     }
 
@@ -51,12 +60,15 @@ namespace ldmx {
         */
 
         nNotIncluded_ = 0;
-        nStripsPerLayer_ = 1000; //NEED REAL NUMBER
-        nLayers_ = 81; //NEED REAL NUMBER
+        layermod_ = 1000;
     }
 
     void HcalLayerAnalyzer::onProcessEnd() {
         std::cout << "Number Hits NOT included in analysis: " << nNotIncluded_ << std::endl;
+    }
+
+    int HcalLayerAnalyzer::keygen( const ldmx::HcalHit* hit ) const {
+        return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
     }
 
 }
