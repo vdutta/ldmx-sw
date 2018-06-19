@@ -11,7 +11,7 @@
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree in ClusterLog class
-#include <utilities> //std::pair for storage tree in ClusterLog class
+#include <utility> //std::pair for storage tree in ClusterLog class
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -26,91 +26,8 @@
 
 namespace ldmx {
     
-    /**
-     * New type just to save on typing
-     * Clusters hits togther if mip passes through two neighbor strips in same layer.
-     */
-    typedef std::pair< const ldmx::HcalHit* , const ldmx::HcalHit* > Cluster;
-    
-    /**
-     * constant layer modulus for cluster keys.
-     */
-    const int HCAL_LAYER_MOD = 1000;
-
-    /**
-     * @class Cluster
-     * @brief Grouping class to store pointers to hits and cluster key
-     *
-     */
-    class Cluster {
-        public:
-            
-    };
-
-    /**
-     * @class ClusterLog
-     * @brief Helper class that logs the hits for a certain event in a useful way.
-     *
-     * @note The implementation of this class will be variable. Not currently confident in any particular
-     *  method of storing the hits, so it may go through several versions.
-     */
-    class ClusterLog {
-        public:
-            
-            /**
-             * Default Constructor.
-             */
-            ClusterLog();
-
-            /**
-             * Input new element function.
-             *
-             * @param cluster instance of Cluster that stores a pair of hits
-             */
-            void Insert( Cluster cluster );
-
-            /**
-             * Find cluster in range between lowstrip and highstrip in layer.
-             * Will return FIRST cluster it finds, does NOT check for multiple clusters.
-             *
-             * @param lowstrip lower bound on strip number
-             * @param highstrip upper bound on strip number
-             * @param layer layer to search
-             * @return Cluster that contains findings (two nullptrs if nothing)
-             */
-            Cluster Find( const int layer , const int lowstrip , const int highstrip ) const;
-
-            /**
-             * Removes a vector of keys from log.
-             *
-             * @param track vector of keys
-             */
-            void RemoveTrack( std::vector< int > track );
-
-        private:
-            
-            //* storage tree for logging hits and indices
-            std::map< int , Cluster > log_;
-            
-            /**
-             * Key generator for a specific layer and strip pair.
-             *
-             * @param layer integer layer number
-             * @param strip integer strip number
-             * @return integer key value
-             */
-            int KeyGen( const int layer , const int strip ) const;
-            
-            /**
-             * Key generator for new cluster.
-             *
-             * @param cluster Cluster instance for which key will be generated.
-             * @return integer key value
-             */
-            int KeyGen( Cluster cluster ) const;
-
-             
-    };
+    //* typedef HitLog, class that will be used for logging hits by layer,strip
+    typedef std::map< int , const ldmx::HcalHit* > HitLog;
 
     /**
      * @class HcalLayerAnalyzer
@@ -144,10 +61,18 @@ namespace ldmx {
 
             float minPE_; //* Minimum number of PEs to not be considered noise
 
-            int nStripsPerLayer_; //* number of strips in each layer of back hcal
-            int nLayers_; //* number of layers in back hcal
+            int layermod_; //* layer modulus to be used for key gen
 
-            TH1F* h_includedhits; //* PE distribution of included hits
+            TH1F* h_includedhits; //* PE distribution of included hits over all layers and events
+
+            /**
+             * Function to generate key for a given hit.
+             * Relies on layermod_.
+             *
+             * @param hit pointer to HcalHit instance that a key is needed for
+             * @return integer key value
+             */
+            int keygen( const ldmx::HcalHit* hit ) const;
     };
 }
 
