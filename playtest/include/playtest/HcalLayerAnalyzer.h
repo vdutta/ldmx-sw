@@ -58,24 +58,6 @@ namespace ldmx {
             float minPE_; //* Minimum number of PEs to not be considered noise
 
             TH1F* h_includedhits; //* PE distribution of included hits
-
-            /**
-             * Comparison function for sorting hits in a given layer. Sorts by strip.
-             *
-             * @param lhs left hand side of inequality (<)
-             * @param rhs right hand side of inequality
-             * @return true if lhs has a strip number less than rhs
-             */
-            bool compareStrip( const ldmx::HcalHit* lhs , const ldmx::HcalHit* rhs ) const;
-
-            /**
-             * Comparison function for sorting layers in hitlog.
-             *
-             * @param lhs left hand side of inequality
-             * @param rhs righ hand side of inequality
-             * @return true if lhs[0] has a layer number less than rhs[0]
-             */
-            bool compareLayer( const std::vector<ldmx::HcalHit*> lhs , const std::vector<ldmx::HcalHit*> rhs ) const;
     };
 }
 
