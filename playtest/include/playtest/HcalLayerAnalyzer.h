@@ -53,9 +53,12 @@ namespace ldmx {
         private:
             std::string caloCol_; //* Obtain the calorimeter hit information
             
-            int nNonBack_; //* Number of hits not in the back Hcal (and therefore ignored)
+            int nNotIncluded_; //* Number of hits not in the back Hcal or above minPE_ threshold
 
             float minPE_; //* Minimum number of PEs to not be considered noise
+
+            int nStripsPerLayer_;
+            int nLayers_;
 
             TH1F* h_includedhits; //* PE distribution of included hits
     };
