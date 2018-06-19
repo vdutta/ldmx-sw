@@ -10,6 +10,7 @@
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
+#include <map> //std::map for storage tree in HitLog class
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -36,13 +37,42 @@ namespace ldmx {
             
             /**
              * Default Constructor.
+             *
+             * Sets layermod_ to 1000 and sets maps comparison function to dictorder.
              */
             HitLog();
 
+            /**
+             * Preferred Constructor.
+             *
+             * Sets layermod_ to input and sets comparison function to dictorder.
+             */
+            HitLog(const int layermod);
+
         private:
             
-            //* vector array for storing hit information
-            std::vector< std::vector< const ldmx::HcalHit* > > log;
+            //* storage tree for logging hits and indices
+            std::vector< int , const ldmx::HcalHit* > log_;
+
+            //* integer modulus for layer, should be larger than the number of layers
+            const int layermod_;
+
+            /**
+             * Function to determine key for a hit.
+             *
+             * @param hit hit that key needs to be generated for
+             * @return integer key
+             */
+            int keygen( const ldmx::HcalHit* ) const;
+
+            /**
+             * Dictionary order to determine ordering in std::map.
+             *
+             * @param lhs left hand side of inequality
+             * @param rhs right hand side of inequality
+             * @return true if lhs goes before rhs
+             */
+            bool dictorder( const int lhs , const int rhs ) const;
     };
 
     /**
