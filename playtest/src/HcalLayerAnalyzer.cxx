@@ -7,7 +7,7 @@
 #include "playtest/HcalLayerAnalyzer.h"
 
 namespace ldmx {
-
+    
     void HcalLayerAnalyzer::configure(const ldmx::ParameterSet& ps) {
         caloCol_=ps.getString("caloHitCollection");
         minPE_ = static_cast<float>(ps.getDouble("minPE"));

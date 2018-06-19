@@ -31,6 +31,11 @@ namespace ldmx {
      * Clusters hits togther if mip passes through two neighbor strips in same layer.
      */
     typedef std::pair< const ldmx::HcalHit* , const ldmx::HcalHit* > Cluster;
+    
+    /**
+     * constant layer modulus for Dictionary Ordering and cluster keys.
+     */
+    const int HCAL_LAYER_MOD = 1000;
 
     /**
      * @class HitLog
@@ -61,24 +66,49 @@ namespace ldmx {
              *
              * @param cluster instance of Cluster that stores a pair of hits
              */
-            void Insert(  );
+            void Insert( Cluster cluster );
+
+            /**
+             * Find cluster in range between lowstrip and highstrip in layer.
+             * Will return FIRST cluster it finds, does NOT check for multiple clusters.
+             *
+             * @param lowstrip lower bound on strip number
+             * @param highstrip upper bound on strip number
+             * @param layer layer to search
+             * @return Cluster that contains findings (two nullptrs if nothing)
+             */
+            Cluster Find( const int layer , const int lowstrip , const int highstrip ) const;
+
+            /**
+             * Removes a vector of keys from log.
+             *
+             * @param track vector of keys
+             */
+            void RemoveTrack( std::vector< int > track );
 
         private:
             
             //* storage tree for logging hits and indices
-            std::vector< int , Cluster > log_;
-
-            //* integer modulus for layer, should be larger than the number of layers
-            const int layermod_;
-
+            std::map< int , Cluster > log_;
+            
             /**
-             * Dictionary order to determine ordering in std::map.
+             * Key generator for a specific layer and strip pair.
              *
-             * @param lhs left hand side of inequality
-             * @param rhs right hand side of inequality
-             * @return true if lhs goes before rhs
+             * @param layer integer layer number
+             * @param strip integer strip number
+             * @return integer key value
              */
-            bool dictorder( const int lhs , const int rhs ) const;
+            int KeyGen( const int layer , const int strip ) const;
+            
+            /**
+             * Key generator for new cluster.
+             *
+             * @param cluster Cluster instance for which key will be generated.
+             * @return integer key value
+             */
+            int KeyGen( Cluster cluster ) const;
+
+             
     };
 
     /**
