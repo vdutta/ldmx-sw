@@ -84,22 +84,25 @@ namespace ldmx {
                 //there is at least one hit in the range
                 //lowbound points to the first one
                 //see if there is a hit on either side of lowerbound
-                HitLogIt beforeside = log.find( lowbound->first - 1 );
-                HitLogIt afterside = log.find( lowbound->first + 1 );
+                HitLogIt beforeside = std::prev( lowbound ); 
+                HitLogIt afterside = std::next( lowbound );
+                
+                int beforekeydif = lowbound->first - beforeside->first;
+                int afterkeydif = afterside->first - lowbound->first;
 
-                if ( beforeside == log.end() or afterside == log.end() ) {
-                    //at least one side is empty --> possibly isolated
-                    ret->first = lowbound->second;
-
-                    if ( beforeside != log.end() ) {
-                        //beforeside is not empty
+                if ( beforekeydif != 1 or afterkeydif != 1 ) {
+                    //lowbound has at most one neighbor
+                    ret->first = lowbound->second
+                    
+                    if ( beforekeydif == 1 ) {
+                        //beforeside is the neighbor for lowbound
                         ret->second = beforeside->second;
-                    } else if ( afterside != log.end() ) {
-                        //afterside is not empty
+                    } else if ( afterkeydif == 1 ) {
+                        //afterside is the neighbor for lowerbound
                         ret->second = afterside->second;
-                    } //determine which (if any) side is non-empty
+                    } //else: lowbound is truly isolated
 
-                } //at least one side is empty
+                } //check if lowbound could be isolated
 
             } //check to see if range has any thickness
 
