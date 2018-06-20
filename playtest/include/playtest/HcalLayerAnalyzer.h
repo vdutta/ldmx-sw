@@ -13,6 +13,7 @@
 #include <map> //std::map for storage tree in ClusterLog class
 #include <utility> //std::pair for storage tree in ClusterLog class
 #include <iterator> //std::next and std::prev for search through map
+#include <cmath> //floor and ceil for stripbounds calculations
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -32,9 +33,6 @@ namespace ldmx {
 
     //* type that will be used for logging hits by layer,strip
     typedef std::map< int , HitPtr > HitLog;
-
-    //* type that is the iterator for HitLog
-    typedef HitLog::iterator HitLogIt;
 
     /**
      * @class HcalLayerAnalyzer
@@ -70,6 +68,14 @@ namespace ldmx {
 
             int layermod_; //* layer modulus to be used for key gen
 
+            int nStrips_; //* number of strips per layer of Hcal
+
+            int nEcalThickness_; //* thickness of Ecal in number of strips (rounded up)
+
+            float origin_; //* origin of Ecal in strips
+            float lowside_; //* low side of Ecal in strips
+            float upside_; //* upper side of Ecal in strips
+
             TH1F* h_includedhits; //* PE distribution of included hits over all layers and events
 
             /**
@@ -83,14 +89,38 @@ namespace ldmx {
 
             /**
              * Function to search a specific range of a HitLog for a hit.
+             * Returns a pair of nullptrs if failed to find an isolated hit.
              *
              * @param log HitLog to be searched
-             * @param layer layer number to be searched
-             * @param lowstrip lower bound strip number
-             * @param upstrip upper bound strip number
+             * @param lowkey lower bound key
+             * @param upkey upper bound key
              * @return HitPtr pair to isolated hit (single strip or two strip combo)
              */
-            std::pair< HitPtr , HitPtr > search( const HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
+            std::pair< HitPtr , HitPtr > search( const HitLog log , const int lowkey , const int upkey ) const;
+
+            /**
+             * Function to find strip bounds for input layer given seed layer.
+             *
+             * @param seedlayer layer number of seed
+             * @param seedstrip strip number of seed
+             * @param layer layer number of interest
+             * @param lowstrip strip number of lower bound
+             * @param upstrip strip number of upper bound
+             * @return true if projected range intersects the input layer
+             */
+            bool stripbounds( const int seedlayer , const int seedstrip , const int layer , int &lowstrip , int &upstrip ) const;
+
+            /**
+             * Function to find seedstrip from seedlayer by finding an isolated hit.
+             * Will change seedlayer if unable to find isolated hit in that layer.
+             *
+             * @param log HitLog to be searched
+             * @param seedlayer layer number of seed
+             * @param seedstrip strip number of seed
+             * @return true if search for seed was successful
+             */
+            bool findseed( const HitLog log , int &seedlayer , int &seedstrip ) const;
+
     };
 }
 
