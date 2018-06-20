@@ -11,6 +11,12 @@ namespace ldmx {
     void HcalLayerAnalyzer::configure(const ldmx::ParameterSet& ps) {
         caloCol_=ps.getString("caloHitCollection");
         minPE_ = static_cast<float>(ps.getDouble("minPE"));
+        nStrips_= ps.getInteger("nStrips");
+        nEcalThickness_ = ps.getInteger("nEcalThickness");
+
+        origin_ = static_cast<float>(nStrips_)/2;
+        lowside_ = origin_ - static_cast<float>(nEcalThickness_)/2;
+        upside_ = origin_ + static_cast<float>(nEcalThickness_)/2;
     }
 
     void HcalLayerAnalyzer::analyze(const ldmx::Event& event) {
@@ -64,18 +70,15 @@ namespace ldmx {
     }
     
 
-    std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( const HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
+    std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( const HitLog log , const int lowkey , const int upkey ) const {
         
         std::pair< HitPtr , HitPtr > ret( nullptr , nullptr );
         
-        if ( lowstrip > upstrip ) { //Mis-use correction
+        if ( lowkey > upkey ) { //Mis-use correction
             std::cout << "Input strip numbers to search in wrong order: " << lowstrip << " " << upstrip << std::endl;
             std::cout << "Returning an empty search" << std::endl;
             return ret;
         } else { //inputs are correct form
-
-            int lowkey = layer*layermod_ + lowstrip;
-            int upkey = layer*layermod_ + upstrip;
 
             auto lowbound = log.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
             auto upbound = log.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
@@ -109,6 +112,49 @@ namespace ldmx {
         } //make sure inputs are correct
             
         return ret;
+    }
+
+    bool HcalLayerAnalyzer::stripbounds( const int seedlayer , const int seedstrip , const int layer , int &lowstrip , int &upstrip ) const {
+        
+        float slope = (seedstrip - origin_)/seedlayer; //slope of line between seed and origin
+
+        lowstrip = static_cast<int>(floor( layer*slope + lowside_ ));
+        upstrip = static_cast<int>(ceil( layer*slope + upside_ ));
+        
+        //Change if out of bounds
+        if ( lowstrip < 1 )
+            lowstrip = 1;
+        if ( upstrip > nStrips_ )
+            upstrip = nStrips_;
+
+        if ( lowstrip > nStrips_ or upstrip < 1 ) {
+            return false; //projected track is outside of Hcal
+        }
+
+        return true;
+    }
+
+    bool HcalLayerAnalyzer::findseed( const HitLog log , int &seedlayer , int &seedstrip ) const {
+        
+        std::pair< HitPtr , HitPtr > result = search( log , seedlayer*layermod_ , (seedlayer+1)*layermod_ - 1 );
+
+        if ( result.first != nullptr ) { //Check if search was successful
+            seedstrip = result.first->getStrip();
+        } else {
+            std::cout << "Warning:[HcalLayerAnalzyer::findseed] Unable to find isolated hit in input seedlayer." << std::endl;
+            std::cout << "\tProceeding with first isolated hit found." << std::endl;
+            result = search( log , 0 , 100*layermod_ );
+
+            if ( result.first == nullptr ) {
+                std::cout << "Error:[HcalLayerAnalyzer::findseed] Unable to find isolated hit anywhere in this event." << std::endl;
+                return false;
+            }
+
+            seedlayer = result.first->getLayer();
+            seedstrip = result.first->getStrip();
+        }
+
+        return true;
     }
 
 }
