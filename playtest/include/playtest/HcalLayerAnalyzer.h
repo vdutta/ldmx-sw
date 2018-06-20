@@ -100,6 +100,10 @@ namespace ldmx {
 
             /**
              * Function to find strip bounds for input layer given seed layer.
+             * This function assumes that the possible track originates from the Ecal.
+             * Within a few layers of the seed, this function will do a good job shrinking the parameter space.
+             * Farther away from the seed (in layers), this function will only work if the track did originate
+             *  from the Ecal.
              *
              * @param seedlayer layer number of seed
              * @param seedstrip strip number of seed
