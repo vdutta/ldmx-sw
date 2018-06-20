@@ -62,25 +62,49 @@ namespace ldmx {
     int HcalLayerAnalyzer::keygen( HitPtr hit ) const {
         return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
     }
+    
 
-    HitLogBounds HcalLayerAnalyzer::itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
-        int lowkey = layer*layermod_ + lowstrip;
-        int upkey = layer*layermod_ + upstrip;
-
-        HitLogBounds bounds( log.lower_bound( lowkey ) , log.upper_bound( upkey ) );
-
-        return bounds;
-    }
-
-    std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( HitLog log , HitLogBounds bounds ) const {
+    std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( const HitLog log , const int layer , const int lowstrip , const int upstrip ) const {
+        
         std::pair< HitPtr , HitPtr > ret( nullptr , nullptr );
+        
+        if ( lowstrip > upstrip ) { //Mis-use correction
+            std::cout << "Input strip numbers to search in wrong order: " << lowstrip << " " << upstrip << std::endl;
+            std::cout << "Returning an empty search" << std::endl;
+            return ret;
+        } else { //inputs are correct form
 
-        if ( bounds.first != bounds.second ) {
-            for ( HitLogIt it = bounds.first; bounds.first != bounds.second; ++it ) {
+            int lowkey = layer*layermod_ + lowstirp;
+            int upkey = layer*layermod_ + upstirp;
 
-            } //iterate through range defined by bounds
-        } //check to see if range has any thickness
+            HitLogIt lowbound = log.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
+            HitLogIt upbound = log.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
+        
+            if ( lowbound != upbound ) { //check to see if range has any thickness
+                //there is at least one hit in the range
+                //lowbound points to the first one
+                //see if there is a hit on either side of lowerbound
+                HitLogIt beforeside = log.find( lowbound->first - 1 );
+                HitLogIt afterside = log.find( lowbound->first + 1 );
 
+                if ( beforeside == log.end() or afterside == log.end() ) {
+                    //at least one side is empty --> possibly isolated
+                    ret->first = lowbound->second;
+
+                    if ( beforeside != log.end() ) {
+                        //beforeside is not empty
+                        ret->second = beforeside->second;
+                    } else if ( afterside != log.end() ) {
+                        //afterside is not empty
+                        ret->second = afterside->second;
+                    } //determine which (if any) side is non-empty
+
+                } //at least one side is empty
+
+            } //check to see if range has any thickness
+
+        } //make sure inputs are correct
+            
         return ret;
     }
 
