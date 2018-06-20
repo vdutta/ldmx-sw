@@ -74,32 +74,32 @@ namespace ldmx {
             return ret;
         } else { //inputs are correct form
 
-            int lowkey = layer*layermod_ + lowstirp;
-            int upkey = layer*layermod_ + upstirp;
+            int lowkey = layer*layermod_ + lowstrip;
+            int upkey = layer*layermod_ + upstrip;
 
-            HitLogIt lowbound = log.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
-            HitLogIt upbound = log.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
+            auto lowbound = log.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
+            auto upbound = log.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
         
             if ( lowbound != upbound ) { //check to see if range has any thickness
                 //there is at least one hit in the range
                 //lowbound points to the first one
                 //see if there is a hit on either side of lowerbound
-                HitLogIt beforeside = std::prev( lowbound ); 
-                HitLogIt afterside = std::next( lowbound );
+                auto beforeside = std::prev( lowbound ); 
+                auto afterside = std::next( lowbound );
                 
                 int beforekeydif = lowbound->first - beforeside->first;
                 int afterkeydif = afterside->first - lowbound->first;
 
                 if ( beforekeydif != 1 or afterkeydif != 1 ) {
                     //lowbound has at most one neighbor
-                    ret->first = lowbound->second
+                    ret.first = lowbound->second;
                     
                     if ( beforekeydif == 1 ) {
                         //beforeside is the neighbor for lowbound
-                        ret->second = beforeside->second;
+                        ret.second = beforeside->second;
                     } else if ( afterkeydif == 1 ) {
                         //afterside is the neighbor for lowerbound
-                        ret->second = afterside->second;
+                        ret.second = afterside->second;
                     } //else: lowbound is truly isolated
 
                 } //check if lowbound could be isolated
