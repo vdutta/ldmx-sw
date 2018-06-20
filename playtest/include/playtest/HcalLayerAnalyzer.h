@@ -12,6 +12,7 @@
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree in ClusterLog class
 #include <utility> //std::pair for storage tree in ClusterLog class
+#include <iterator> //std::next and std::prev for search through map
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -34,9 +35,6 @@ namespace ldmx {
 
     //* type that is the iterator for HitLog
     typedef HitLog::iterator HitLogIt;
-
-    //* type that is a pair of iterators (used as bounds)
-    typedef std::pair< HitLogIt , HitLogIt > HitLogBounds;
 
     /**
      * @class HcalLayerAnalyzer
@@ -84,24 +82,15 @@ namespace ldmx {
             int keygen( HitPtr hit ) const;
 
             /**
-             * Function to determine upper and lower bound iterators for HitLog.
-             * 
-             * @param log HitLog to be searched
-             * @param layer number of layer to search
-             * @param lowstrip number of strip to be lower bound
-             * @param upstrip number of strip to be upper bound
-             * @return std::pair of iterator bounds
-             */
-            HitLogBounds itbounds( HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
-
-            /**
              * Function to search a specific range of a HitLog for a hit.
              *
              * @param log HitLog to be searched
-             * @param bounds HitLogBounds to define range of search
+             * @param layer layer number to be searched
+             * @param lowstrip lower bound strip number
+             * @param upstrip upper bound strip number
              * @return HitPtr pair to isolated hit (single strip or two strip combo)
              */
-            std::pair< HitPtr , HitPtr > search( HitLog log , HitLogBounds bounds ) const;
+            std::pair< HitPtr , HitPtr > search( const HitLog log , const int layer , const int lowstrip , const int upstrip ) const;
     };
 }
 
