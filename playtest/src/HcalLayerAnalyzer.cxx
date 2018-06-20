@@ -75,7 +75,7 @@ namespace ldmx {
         std::pair< HitPtr , HitPtr > ret( nullptr , nullptr );
         
         if ( lowkey > upkey ) { //Mis-use correction
-            std::cout << "Input strip numbers to search in wrong order: " << lowstrip << " " << upstrip << std::endl;
+            std::cout << "Input hit keys to search in wrong order: " << lowkey << " " << upkey << std::endl;
             std::cout << "Returning an empty search" << std::endl;
             return ret;
         } else { //inputs are correct form
