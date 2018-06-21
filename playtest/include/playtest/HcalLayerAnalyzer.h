@@ -10,10 +10,6 @@
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
-#include <map> //std::map for storage tree in ClusterLog class
-#include <utility> //std::pair for storage tree in ClusterLog class
-#include <iterator> //std::next and std::prev for search through map
-#include <cmath> //floor and ceil for stripbounds calculations
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -23,17 +19,12 @@
 #include "Framework/EventProcessor.h" //Needed to declare analyzer
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/Event.h" //Study event by event
-#include "Event/HcalHit.h" //Get Hcal Specific information from hit
 #include "DetDescr/HcalID.h" //Get HcalSection enum for filtering out Hcal Hits
+
+#include "playtest/HitLog.h" //HitLog class
 
 namespace ldmx {
     
-    //* type that will be used to reference hits
-    typedef const ldmx::HcalHit* HitPtr;
-
-    //* type that will be used for logging hits by layer,strip
-    typedef std::map< int , HitPtr > HitLog;
-
     /**
      * @class HcalLayerAnalyzer
      * @brief ldmx::Analyzer that constructs histograms studying how layers in the Hcal behave differently.
@@ -82,16 +73,7 @@ namespace ldmx {
 
             TH1F* h_includedhits; //* PE distribution of included hits over all layers and events
 
-            /**
-             * Function to generate key for a given hit.
-             * Relies on layermod_.
-             *
-             * @param hit pointer to HcalHit instance that a key is needed for
-             * @return integer key value
-             */
-            int keygen( HitPtr hit ) const;
-
-            /**
+           /**
              * Function to check if a hit is a plausible MIP hit.
              *
              * @param hit pointer to HcalHit instance
@@ -99,34 +81,7 @@ namespace ldmx {
              */
             bool isMIP( HitPtr hit ) const;
 
-            /**
-             * Function to search a specific range of a HitLog for a hit.
-             * Returns a pair of nullptrs if failed to find an isolated hit.
-             *
-             * @param log HitLog to be searched
-             * @param lowkey lower bound key
-             * @param upkey upper bound key
-             * @return HitPtr pair to isolated hit (single strip or two strip combo)
-             */
-            std::pair< HitPtr , HitPtr > search( const HitLog log , const int lowkey , const int upkey ) const;
-
-            /**
-             * Function to find strip bounds for input layer given seed layer.
-             * This function assumes that the possible track originates from the Ecal.
-             * Within a few layers of the seed, this function will do a good job shrinking the parameter space.
-             * Farther away from the seed (in layers), this function will only work if the track did originate
-             *  from the Ecal.
-             *
-             * @param seedlayer layer number of seed
-             * @param seedstrip strip number of seed
-             * @param layer layer number of interest
-             * @param lowstrip strip number of lower bound
-             * @param upstrip strip number of upper bound
-             * @return true if projected range intersects the input layer
-             */
-            bool stripbounds( const int seedlayer , const int seedstrip , const int layer , int &lowstrip , int &upstrip ) const;
-
-            /**
+             /**
              * Function to find seedstrip from seedlayer by finding an isolated hit.
              * Will change seedlayer if unable to find isolated hit in that layer.
              *
