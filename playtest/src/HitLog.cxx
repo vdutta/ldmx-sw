@@ -109,11 +109,12 @@ namespace ldmx {
     }
 
     bool HitLog::SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const {
-        
+       
+        bool success = false;
+
         if ( lowkey > upkey ) { //Mis-use correction
             std::cout << "Input hit keys to HitLog::SearchByKey in wrong order: " << lowkey << " " << upkey << std::endl;
             std::cout << "Returning an empty search" << std::endl;
-            return false;
         } else { //inputs are correct form
 
             auto lowbound = log_.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
@@ -152,33 +153,15 @@ namespace ldmx {
                         track.push_back( afterside->second );
                     } //else: lowbound is truly isolated
 
+                    success = true;
+
                 } //check if lowbound could be isolated
 
             } //check to see if range has any thickness
 
         } //make sure inputs are correct
             
-        return ret;
-    }
-
-    bool HitLog::stripbounds( const int seedlayer , const int seedstrip , const int layer , int &lowstrip , int &upstrip ) const {
-        
-        float slope = (seedstrip - origin_)/seedlayer; //slope of line between seed and origin
-
-        lowstrip = static_cast<int>(floor( layer*slope + lowside_ ));
-        upstrip = static_cast<int>(ceil( layer*slope + upside_ ));
-        
-        //Change if out of bounds
-        if ( lowstrip < 1 )
-            lowstrip = 1;
-        if ( upstrip > nStrips_ )
-            upstrip = nStrips_;
-
-        if ( lowstrip > nStrips_ or upstrip < 1 ) {
-            return false; //projected track is outside of Hcal
-        }
-
-        return true;
+        return success;
     }
 
 }
