@@ -8,14 +8,14 @@
 
 namespace ldmx {
     
-    HitLog::HitLog() : minPE_(0.0), conedepth_(2), coneangle_(3), origin_(17.5),
+    HitLog::HitLog() : minPE_(0.0), conedepth_(2), coneangle_(3), trackwidth_(3), origin_(17.5),
                        lowside_(12.5), upside_(22.5), nstrips_(34), nlayers_(81), layermod_(1000) {
         
     }
 
-    HitLog::HitLog( const float minPE , const int conedepth , const int coneangle , const float origin ,
-            const float lowside , const float upside , const int nstrips , const int nlayers ) :
-            HitLog(), minPE_(minPE), conedepth_(conedepth), coneangle_(coneangle), origin_(origin),
+    HitLog::HitLog( const float minPE , const int conedepth , const int coneangle , const int trackwidth ,
+            const float origin , const float lowside , const float upside , const int nstrips , const int nlayers ) :
+            HitLog(), minPE_(minPE), conedepth_(conedepth), coneangle_(coneangle), trackwidth_(trackwidth), origin_(origin),
             lowside_(lowside), upside_(upside), nstrips_(nstrips), nlayers_(nlayers)  {
 
     }
@@ -34,6 +34,18 @@ namespace ldmx {
 
     void HitLog::SetSearchCone( const int seedlayer , const int seedstrip ) {
         
+    }
+    
+    bool HitLog::BeginPartialTrack( std::vector< HitPtr > &track ) const {
+    
+    }
+            
+    bool HitLog::SearchLayer( const int layer , std::vector< HitPtr > &track ) const {
+
+    }
+    
+    bool HitLog::isAcceptableTrack( const std::vector< HitPtr > track ) const {
+
     }
 
     std::pair< HitPtr , HitPtr > HitLog::search( const HitLog log , const int lowkey , const int upkey ) const {
