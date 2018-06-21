@@ -7,9 +7,33 @@
 #include "playtest/HitLog.h"
 
 namespace ldmx {
+    
+    HitLog::HitLog() : minPE_(0.0), conedepth_(2), coneangle_(3), origin_(17.5),
+                       lowside_(12.5), upside_(22.5), nstrips_(34), nlayers_(81), layermod_(1000) {
+        
+    }
 
-    int HitLog::keygen( HitPtr hit ) const {
+    HitLog::HitLog( const float minPE , const int conedepth , const int coneangle , const float origin ,
+            const float lowside , const float upside , const int nstrips , const int nlayers ) :
+            HitLog(), minPE_(minPE), conedepth_(conedepth), coneangle_(coneangle), origin_(origin),
+            lowside_(lowside), upside_(upside), nstrips_(nstrips), nlayers_(nlayers)  {
+
+    }
+
+    void HitLog::AddHit( HitPtr hit ) {
+        
+        int key = KeyGen( hit );
+        log_[ key ] = hit;
+
+        return;
+    }
+
+    int HitLog::KeyGen( HitPtr hit ) const {
         return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
+    }
+
+    void HitLog::SetSearchCone( const int seedlayer , const int seedstrip ) {
+        
     }
 
     std::pair< HitPtr , HitPtr > HitLog::search( const HitLog log , const int lowkey , const int upkey ) const {

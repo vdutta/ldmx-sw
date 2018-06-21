@@ -37,8 +37,7 @@ namespace ldmx {
                 
                 h_includedhits->Fill( curr_PE );
 
-                int curr_key = keygen( chit );
-                log[ curr_key ] = chit;
+                log.AddHit( chit );
 
             } //only process non-noise hits in the back hcal
             else {
@@ -49,9 +48,6 @@ namespace ldmx {
         
         //Now log has the non-noise hits in it
 
-        for (HitLog::iterator it = log.begin(); it != log.end(); ++it) {
-            std::cout << it->first << std::endl; //printing out list of keys
-        }
 
     }
 
