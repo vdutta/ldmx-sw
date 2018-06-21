@@ -66,11 +66,7 @@ namespace ldmx {
     void HcalLayerAnalyzer::onProcessEnd() {
         std::cout << "Number Hits NOT included in analysis: " << nNotIncluded_ << std::endl;
     }
-
-    int HcalLayerAnalyzer::keygen( HitPtr hit ) const {
-        return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
-    }
-    
+   
     bool HcalLayerAnalyzer::isMIP( HitPtr hit ) const {
         //Now just returning true until find something better
         return true;
