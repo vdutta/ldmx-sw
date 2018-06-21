@@ -88,6 +88,11 @@ namespace ldmx {
              * @return integer key value
              */
             int KeyGen( HitPtr hit ) const;
+
+            /**
+             * Corrects for strip numbers outside of real range.
+             */
+            void CorrectStrip( int &strip) const;
             
             /**
              * Finds a seed strip given a seed layer.
@@ -110,6 +115,7 @@ namespace ldmx {
             /**
              * Search for next mip given layer and partial track.
              * Will add to track if found a mip hit.
+             * Assumes track has AT LEAST two hits in it.
              */
             bool SearchLayer( const int layer , std::vector< HitPtr > &track ) const;
 
