@@ -13,6 +13,8 @@ namespace ldmx {
         minPE_ = static_cast<float>(ps.getDouble("minPE"));
         nStrips_= ps.getInteger("nStrips");
         nEcalThickness_ = ps.getInteger("nEcalThickness");
+        conedepth_ = ps.getInteger("conedepth");
+        coneangle_ = ps.getInteger("coneangle");
 
         origin_ = static_cast<float>(nStrips_)/2;
         lowside_ = origin_ - static_cast<float>(nEcalThickness_)/2;
@@ -69,6 +71,10 @@ namespace ldmx {
         return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
     }
     
+    bool HcalLayerAnalyzer::isMIP( HitPtr hit ) const {
+        //Now just returning true until find something better
+        return true;
+    }
 
     std::pair< HitPtr , HitPtr > HcalLayerAnalyzer::search( const HitLog log , const int lowkey , const int upkey ) const {
         
