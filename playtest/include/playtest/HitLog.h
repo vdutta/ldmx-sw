@@ -118,17 +118,16 @@ namespace ldmx {
              */
             bool isAcceptableTrack( const std::vector< HitPtr > track ) const;
 
-
             /**
              * Function to search a specific range of a HitLog for a hit.
              * Returns a pair of nullptrs if failed to find an isolated hit.
              *
-             * @param log HitLog to be searched
              * @param lowkey lower bound key
              * @param upkey upper bound key
-             * @return HitPtr pair to isolated hit (single strip or two strip combo)
+             * @param track partial track to add hit to if found
+             * @return true if successfully found a hit in the given key range 
              */
-            std::pair< HitPtr , HitPtr > search( const HitLog log , const int lowkey , const int upkey ) const;
+            bool SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const;
 
             /**
              * Function to find strip bounds for input layer given seed layer.
