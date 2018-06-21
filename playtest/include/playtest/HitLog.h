@@ -100,7 +100,7 @@ namespace ldmx {
              *
              */
             bool FindSeed( int &seedlayer , int &seedstrip ) const;
-
+            
             /**
              * Constructs search cone around seed and list of layers that aren't in cone or seed.
              *
@@ -134,22 +134,6 @@ namespace ldmx {
              * @return true if successfully found a hit in the given key range 
              */
             bool SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const;
-
-            /**
-             * Function to find strip bounds for input layer given seed layer.
-             * This function assumes that the possible track originates from the Ecal.
-             * Within a few layers of the seed, this function will do a good job shrinking the parameter space.
-             * Farther away from the seed (in layers), this function will only work if the track did originate
-             *  from the Ecal.
-             *
-             * @param seedlayer layer number of seed
-             * @param seedstrip strip number of seed
-             * @param layer layer number of interest
-             * @param lowstrip strip number of lower bound
-             * @param upstrip strip number of upper bound
-             * @return true if projected range intersects the input layer
-             */
-            bool stripbounds( const int seedlayer , const int seedstrip , const int layer , int &lowstrip , int &upstrip ) const;
 
     };
 
