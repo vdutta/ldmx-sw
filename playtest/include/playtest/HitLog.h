@@ -11,6 +11,7 @@
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree
+#include <stack> //std::stack for search cone
 #include <utility> //std::pair for storage tree
 #include <iterator> //std::next and std::prev for search through map
 #include <cmath> //floor and ceil for stripbounds calculations
@@ -30,29 +31,60 @@ namespace ldmx {
      */
     class HitLog {
         public:
+            /**
+             * Default Constructor.
+             */
+            HitLog();
+
+            /**
+             * Preferred Constructor.
+             */
+            HitLog( const float minPE , const int conedepth , const int coneangle , const float origin ,
+                    const float lowside , const float upside , const int nstrips , const int nlayers );
+
+            /**
+             * Add hit to log
+             */
+            void AddHit( HitPtr hit );
+
 
         private:
- 
+            
+            std::map< int , HitPtr > log_; //* map that will be used to store the hits
+
+            std::vector< bool > layercheck_; //* vector of layers to see if searched or not
+
+            std::stack< std::pair< int , int > > cone_; //* search cone in keys around seed
+            
+            int nlayers_; //* number of layers in detector
+            int nstrips_; //* number of strips per layer
+
             float minPE_; //* Minimum number of PEs to not be considered noise
 
             int conedepth_; //* depth of search cone around seed in layers
 
-            float coneangle_; //* angular opening of cone around seed in strips across the first layer
+            int coneangle_; //* angular opening of cone around seed in strips across the first layer
 
             float origin_; //* center of Ecal in strips
             float lowside_; //* low side of Ecal in strips
             float upside_; //* upper side of Ecal in strips
 
-             /**
+            /**
              * Function to generate key for a given hit.
              * Relies on layermod_.
              *
              * @param hit pointer to HcalHit instance that a key is needed for
              * @return integer key value
              */
-            int keygen( HitPtr hit ) const;
+            int KeyGen( HitPtr hit ) const;
 
-             /**
+            /**
+             * Constructs search cone around seed
+             *
+             */
+            void SetSearchCone( const int seedlayer , const int seedstrip );
+
+            /**
              * Function to search a specific range of a HitLog for a hit.
              * Returns a pair of nullptrs if failed to find an isolated hit.
              *
