@@ -72,7 +72,11 @@ namespace ldmx {
 
             int nEcalThickness_; //* thickness of Ecal in number of strips (rounded up)
 
-            float origin_; //* origin of Ecal in strips
+            int conedepth_; //* depth of search cone around seed in layers
+
+            float coneangle_; //* angular opening of cone around seed in strips across the first layer
+
+            float origin_; //* center of Ecal in strips
             float lowside_; //* low side of Ecal in strips
             float upside_; //* upper side of Ecal in strips
 
@@ -86,6 +90,14 @@ namespace ldmx {
              * @return integer key value
              */
             int keygen( HitPtr hit ) const;
+
+            /**
+             * Function to check if a hit is a plausible MIP hit.
+             *
+             * @param hit pointer to HcalHit instance
+             * @return true if hit is considered a plausible MIP.
+             */
+            bool isMIP( HitPtr hit ) const;
 
             /**
              * Function to search a specific range of a HitLog for a hit.
