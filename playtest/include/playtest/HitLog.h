@@ -58,28 +58,7 @@ namespace ldmx {
 
 
         private:
-            
-            std::map< int , HitPtr > log_; //* map that will be used to store the hits
-
-            std::vector< bool > layercheck_; //* vector of layers to see if searched or not
-
-            std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
-            std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
-            
-            int nlayers_; //* number of layers in detector
-            int nstrips_; //* number of strips per layer
-
-            float minPE_; //* Minimum number of PEs to not be considered noise
-
-            int conedepth_; //* depth of search cone around seed in layers
-            int coneangle_; //* angular opening of cone around seed in strips across the first layer
-
-            int trackwidth_; //* width of extended track to search in number of strips
-
-            float origin_; //* center of Ecal in strips
-            float lowside_; //* low side of Ecal in strips
-            float upside_; //* upper side of Ecal in strips
-
+    
             /**
              * Function to generate key for a given hit.
              * Relies on layermod_.
@@ -96,7 +75,7 @@ namespace ldmx {
             
             /**
              * Finds a seed strip given a seed layer.
-             * Looks through entire log if nothing is found in given layer.
+             * Recursively looks through more different seed layers if doesn't find one in current layer.
              *
              */
             bool FindSeed( int &seedlayer , int &seedstrip ) const;
@@ -134,6 +113,29 @@ namespace ldmx {
              * @return true if successfully found a hit in the given key range 
              */
             bool SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const;
+             
+            int nlayers_; //* number of layers in detector
+            int nstrips_; //* number of strips per layer
+            
+            int layermod_; //* modulus to use for hit keys
+
+            float minPE_; //* Minimum number of PEs to not be considered noise
+
+            int conedepth_; //* depth of search cone around seed in layers
+            int coneangle_; //* angular opening of cone around seed in strips across the first layer
+
+            int trackwidth_; //* width of extended track to search in number of strips
+
+            std::map< int , HitPtr > log_; //* map that will be used to store the hits
+
+            std::vector< bool > layercheck_; //* vector of layers to see if searched or not
+
+            std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
+            std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
+
+            float origin_; //* center of Ecal in strips
+            float lowside_; //* low side of Ecal in strips
+            float upside_; //* upper side of Ecal in strips
 
     };
 

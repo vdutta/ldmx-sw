@@ -8,17 +8,13 @@
 
 namespace ldmx {
     
-    HitLog::HitLog() : minPE_(0.0), conedepth_(2), coneangle_(3), trackwidth_(3), origin_(17.5),
-                       lowside_(12.5), upside_(22.5), nstrips_(34), nlayers_(81), layermod_(1000) {
-        
-    }
+    HitLog::HitLog() : nlayers_(81), nstrips_(34), layermod_(1000), minPE_(0.0), conedepth_(2), coneangle_(3),
+                       trackwidth_(3), layercheck_( nlayers_ , false ), origin_(17.5), lowside_(12.5), upside_(22.5) { }
 
-    HitLog::HitLog( const float minPE , const int conedepth , const int coneangle , const int trackwidth ,
-            const float origin , const float lowside , const float upside , const int nstrips , const int nlayers ) :
-            HitLog(), minPE_(minPE), conedepth_(conedepth), coneangle_(coneangle), trackwidth_(trackwidth), origin_(origin),
-            lowside_(lowside), upside_(upside), nstrips_(nstrips), nlayers_(nlayers)  {
-
-    }
+    HitLog::HitLog( const int nlayers , const int nstrips , const float minPE , const int conedepth , const int coneangle ,
+                    const int trackwidth , const float origin , const float lowside , const float upside ) :
+            nlayers_(nlayers), nstrips_(nstrips), layermod_(1000), minPE_(minPE), conedepth_(conedepth), coneangle_(coneangle),
+            trackwidth_(trackwidth), layercheck_( nlayers_ , false ), origin_(origin), lowside_(lowside), upside_(upside) { }
 
     void HitLog::AddHit( HitPtr hit ) {
         
