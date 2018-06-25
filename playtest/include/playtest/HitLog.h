@@ -12,6 +12,7 @@
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree
 #include <queue> //std::queue for search cone and layer list
+#include <set> //std::set for layers that haven't been checked yet
 #include <utility> //std::pair for storage tree
 #include <iterator> //std::next and std::prev for search through map
 #include <cmath> //floor and ceil for stripbounds calculations
@@ -39,8 +40,8 @@ namespace ldmx {
             /**
              * Preferred Constructor.
              */
-            HitLog( const float minPE , const int conedepth , const int coneangle , const int trackwidth ,
-                    const float origin , const float lowside , const float upside , const int nstrips , const int nlayers );
+            HitLog( const int nlayers , const int nstrips , const float minPE , const int conedepth , const int coneangle ,
+                    const int minconehits , const int trackwidth , const float origin , const float lowside , const upside );
 
             /**
              * Add hit to log
@@ -75,8 +76,12 @@ namespace ldmx {
             
             /**
              * Finds a seed strip given a seed layer.
-             * Recursively looks through more different seed layers if doesn't find one in current layer.
+             * Recursively looks through more different seed layers if doesn't find one in input layer.
+             * Will return false if it exhausts its layer options for a seed.
              *
+             * @param seedlayer starting seedlayer to search for mip
+             * @param seedstrip strip number of seed if mip is found
+             * @return true if found a seed (seedlayer and seedstrip are its position)
              */
             bool FindSeed( int &seedlayer , int &seedstrip ) const;
             
@@ -96,7 +101,7 @@ namespace ldmx {
              * Will add to track if found a mip hit.
              * Assumes track has AT LEAST two hits in it.
              */
-            bool SearchLayer( const int layer , std::vector< HitPtr > &track ) const;
+            bool ExtendTrack( std::vector< HitPtr > &track ) const;
 
             /**
              * Check if plausible track is acceptable.
@@ -123,15 +128,17 @@ namespace ldmx {
 
             int conedepth_; //* depth of search cone around seed in layers
             int coneangle_; //* angular opening of cone around seed in strips across the first layer
+            int minconehits_; //* minimum number of hits in cone around seed to allow for seed to be accepted
 
             int trackwidth_; //* width of extended track to search in number of strips
 
             std::map< int , HitPtr > log_; //* map that will be used to store the hits
 
-            std::vector< bool > layercheck_; //* vector of layers to see if searched or not
+            std::set< int > layercheck_; //* set of layers that haven't been checked exhaustively yet 
 
             std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
             std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
+            std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
 
             float origin_; //* center of Ecal in strips
             float lowside_; //* low side of Ecal in strips
