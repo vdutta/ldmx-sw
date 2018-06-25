@@ -21,8 +21,6 @@
 #include "Event/Event.h" //Study event by event
 #include "DetDescr/HcalID.h" //Get HcalSection enum for filtering out Hcal Hits
 
-#include "playtest/HitLog.h" //HitLog class
-
 namespace ldmx {
     
     /**
@@ -72,25 +70,6 @@ namespace ldmx {
             float upside_; //* upper side of Ecal in strips
 
             TH1F* h_includedhits; //* PE distribution of included hits over all layers and events
-
-           /**
-             * Function to check if a hit is a plausible MIP hit.
-             *
-             * @param hit pointer to HcalHit instance
-             * @return true if hit is considered a plausible MIP.
-             */
-            bool isMIP( HitPtr hit ) const;
-
-             /**
-             * Function to find seedstrip from seedlayer by finding an isolated hit.
-             * Will change seedlayer if unable to find isolated hit in that layer.
-             *
-             * @param log HitLog to be searched
-             * @param seedlayer layer number of seed
-             * @param seedstrip strip number of seed
-             * @return true if search for seed was successful
-             */
-            bool findseed( const HitLog log , int &seedlayer , int &seedstrip ) const;
 
     };
 }
