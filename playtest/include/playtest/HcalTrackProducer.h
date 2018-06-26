@@ -43,7 +43,7 @@ namespace ldmx {
              */
             HcalTrackProducer( const std::string& name , Process& process ) : Producer( name , process ) {}
             
-            virtual void configur( const ParameterSet& ps );
+            virtual void configure( const ParameterSet& ps );
 
             virtual void produce( Event& event );
 

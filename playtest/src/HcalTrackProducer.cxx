@@ -8,7 +8,7 @@
 
 namespace ldmx {
     
-    void HcalTrackProducer::configur( const ParameterSet& ps ) {
+    void HcalTrackProducer::configure( const ParameterSet& ps ) {
     
     }
 
