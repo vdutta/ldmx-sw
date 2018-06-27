@@ -21,16 +21,12 @@
 #include "TClonesArray.h" //Add new array of tracks to event bus
 
 //LDMX Framework
-#include "Event/HcalHit.h" //Get Hcal Specific information from hit
 #include "Event/Event.h" //add new TConesArray to event bus
 #include "Framework/EventProcessor.h" //inherit from Producer class
 #include "Framework/ParameterSet.h" //get parameters from config script
-
+#include "playtest/HcalTrack.h" //store tracks generated
 
 namespace ldmx {
-
-    //* type that will be used to reference hits
-    typedef const ldmx::HcalHit* HitPtr;
 
     /**
      * @class HcalTrackProducer
@@ -58,7 +54,9 @@ namespace ldmx {
         private:
  
             /**
-             * Add hit to log
+             * Add hit to log_.
+             *
+             * @param hit pointer to hit that will be added to log_.
              */
             void AddHit( HitPtr hit );
 
@@ -69,7 +67,7 @@ namespace ldmx {
              * @param track plausible track - should be empty
              * @return true if a track was found
              */
-            bool TrackSearch( int seedlayer , std::vector< HitPtr > &track );
+            bool TrackSearch( int seedlayer , HcalTrack &track );
    
             /**
              * Function to generate key for a given hit.
@@ -105,19 +103,19 @@ namespace ldmx {
             /**
              * Begins partial track by searching through cone around seed.
              */
-            bool BeginPartialTrack( std::vector< HitPtr > &track ) const;
+            bool BeginPartialTrack( HcalTrack &track );
 
             /**
              * Search for next mip given layer and partial track.
              * Will add to track if found a mip hit.
              * Assumes track has AT LEAST two hits in it.
              */
-            bool ExtendTrack( std::vector< HitPtr > &track ) const;
+            bool ExtendTrack( HcalTrack &track );
 
             /**
              * Check if plausible track is acceptable.
              */
-            bool isAcceptableTrack( const std::vector< HitPtr > track ) const;
+            bool isAcceptableTrack( const HcalTrack track ) const;
 
             /**
              * Function to search a specific range of a log for a hit.
@@ -128,8 +126,10 @@ namespace ldmx {
              * @param track partial track to add hit to if found
              * @return true if successfully found a hit in the given key range 
              */
-            bool SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const;
-             
+            bool SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) const;
+            
+            std::string hitcollname_; //* name of collection of hits
+ 
             int nlayers_; //* number of layers in detector
             int nstrips_; //* number of strips per layer
             
@@ -142,6 +142,8 @@ namespace ldmx {
             int minconehits_; //* minimum number of hits in cone around seed to allow for seed to be accepted
 
             int trackwidth_; //* width of extended track to search in number of strips
+            
+            TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event
 
             std::map< int , HitPtr > log_; //* map that will be used to store the hits
 
@@ -150,10 +152,6 @@ namespace ldmx {
             std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
             std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
             std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
-
-            float origin_; //* center of Ecal in strips
-            float lowside_; //* low side of Ecal in strips
-            float upside_; //* upper side of Ecal in strips
 
     };
 
