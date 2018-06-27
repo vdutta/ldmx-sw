@@ -79,6 +79,12 @@ namespace ldmx {
             
             TRefArray hits_; //* references to hits in the track
             int nhits_; //* number of hits in the track
+            
+            /**
+             * ROOT Class Definition
+             */
+            ClassDef( HcalTrack , 1 );
+
     };
 
 }

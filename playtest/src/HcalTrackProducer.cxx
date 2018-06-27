@@ -69,19 +69,20 @@ namespace ldmx {
         } //iterate through rawhits (i)
 
         //search for tracks
-        HcalTrack track;
+        HcalTrack *track = new HcalTrack();
         int seedlayer = 0;
         int trackcnt = 0;
         while( TrackSearch( seedlayer , track ) and trackcnt < 100 ) {
             //add track to collection
-            HcalTrack *toadd = (HcalTrack *)(hcaltracks_->At(trackcnt));
+            HcalTrack *toadd = (HcalTrack *)(hcaltracks_->New(trackcnt));
             //delete toadd;
-            toadd = new HcalTrack( track ); 
+            //toadd = new HcalTrack( *track );
+            *toadd = *track; 
             
             //Remove track from log
             RemoveTrack( track );
 
-            track.Clear(); //re-initialize track
+            track->Clear(); //re-initialize track
             seedlayer = *layercheck_.begin(); //change seedlayer
             trackcnt++;
         } //keep searching for tracks until can't find anymore
@@ -122,11 +123,11 @@ namespace ldmx {
         return;
     }
 
-    void HcalTrackProducer::RemoveTrack( const HcalTrack &track ) {
+    void HcalTrackProducer::RemoveTrack( const HcalTrack *track ) {
         
-        for ( int i = 0; i < track.getNHits(); i++ ) {
+        for ( int i = 0; i < track->getNHits(); i++ ) {
             
-            std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track.getHit(i) ) );
+            std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track->getHit(i) ) );
             if ( toremove == log_.end() ) {
                 std::cout << "[ HcalTrackProducer::RemoveTrack ]: ";
                 std::cout << "Unable to locate hit to be removed from log." << std::endl;
@@ -141,7 +142,7 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack &track ) {
+    bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack *track ) {
 
         int seedstrip = 0;
         while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
@@ -194,20 +195,20 @@ namespace ldmx {
             //set keys to cover entire layer
             int lowkey = seedlayer*layermod_;
             int upkey = (seedlayer+1)*layermod_ - 1;
-            HcalTrack trackseed;
+            HcalTrack *trackseed = new HcalTrack();
             int seedkey = seedlayer*layermod_ + seedstrip;
             
             bool mipfound = SearchByKey( lowkey , upkey , trackseed );
             while ( badseeds_.find( seedkey ) != badseeds_.end() and mipfound ) { //SearchByKey found a mip and it is listed as a bad seed
-                seedstrip = static_cast<int>( trackseed.getHit(0)->getStrip() );
+                seedstrip = static_cast<int>( trackseed->getHit(0)->getStrip() );
                 seedkey = seedlayer*layermod_ + seedstrip;
                 lowkey = seedkey+1;
-                trackseed.Clear();
+                trackseed->Clear();
                 mipfound = SearchByKey( lowkey , upkey , trackseed );
             } //SearchByKey found a mip and it is listed as a bad seed
 
             if ( mipfound ) { //loop exited with a mipfound, then it is not a bad seed
-                seedstrip = static_cast<int>( trackseed.getHit(0)->getStrip() );
+                seedstrip = static_cast<int>( trackseed->getHit(0)->getStrip() );
                 return true;
             } else { //entire layer searched, no good seeds
                 layercheck_.erase( seedlayer_it );
@@ -272,7 +273,7 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::BeginPartialTrack( HcalTrack &track ) {
+    bool HcalTrackProducer::BeginPartialTrack( HcalTrack *track ) {
 
         while ( !cone_.empty() ) { //loop through cone to find mips
             
@@ -282,15 +283,15 @@ namespace ldmx {
         } //loop through cone to find mips
 
         //check if enough hits in cone
-        return ( track.getNHits() >= minconehits_ );
+        return ( track->getNHits() >= minconehits_ );
     }
             
-    bool HcalTrackProducer::ExtendTrack( HcalTrack &track ) {
+    bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
 
         //check to see if track has been changed
         bool addednewhit = true;
         float leftslope, rightslope;
-        std::pair< HitPtr , HitPtr > leftmost( track.getHit(0), track.getHit(1) ), rightmost( track.getHit(0) , track.getHit(1) );
+        std::pair< HitPtr , HitPtr > leftmost( track->getHit(0), track->getHit(1) ), rightmost( track->getHit(0) , track->getHit(1) );
  
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
@@ -300,9 +301,9 @@ namespace ldmx {
             if ( addednewhit ) { //track has been changed, so edit slope
 
                 //Find leftmost, secondleftmost, rightmost, secondrightmost (left and right sides could be equal)
-                for ( int i = 0; i < track.getNHits(); i++ ) {
+                for ( int i = 0; i < track->getNHits(); i++ ) {
                 
-                    HitPtr curr_hit = track.getHit( i );
+                    HitPtr curr_hit = track->getHit( i );
                     float curr_strip = curr_hit->getStrip();
                     float curr_layer = curr_hit->getLayer();
                     bool isdifleftlayer = ( std::abs(curr_layer - leftmost.first->getLayer()) >= 1.0 );
@@ -367,12 +368,12 @@ namespace ldmx {
         return isAcceptableTrack( track );
     }
     
-    bool HcalTrackProducer::isAcceptableTrack( const HcalTrack &track ) const {
+    bool HcalTrackProducer::isAcceptableTrack( const HcalTrack *track ) const {
         //For now, only going by number of hits in track
-        return ( track.getNHits() > mintrackhits_ );
+        return ( track->getNHits() > mintrackhits_ );
     }
 
-    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) {
+    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track ) {
         
         nsbkcalls_++;
         
@@ -409,14 +410,14 @@ namespace ldmx {
 
                 if ( beforekeydif != 1 or afterkeydif != 1 ) {
                     //lowbound has at most one neighbor
-                    track.addHit( lowbound->second );
+                    track->addHit( lowbound->second );
 
                     if ( beforekeydif == 1 ) {
                         //beforeside is the neighbor for lowbound
-                        track.addHit( beforeside->second );
+                        track->addHit( beforeside->second );
                     } else if ( afterkeydif == 1 ) {
                         //afterside is the neighbor for lowerbound
-                        track.addHit( afterside->second );
+                        track->addHit( afterside->second );
                     } //else: lowbound is truly isolated
 
                     success = true;
