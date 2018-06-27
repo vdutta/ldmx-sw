@@ -96,7 +96,7 @@ namespace ldmx {
              * @param seedstrip strip number of seed if mip is found
              * @return true if found a seed (seedlayer and seedstrip are its position)
              */
-            bool FindSeed( int &seedlayer , int &seedstrip ) const;
+            bool FindSeed( int &seedlayer , int &seedstrip );
             
             /**
              * Constructs search cone around seed and list of layers that aren't in cone or seed.
