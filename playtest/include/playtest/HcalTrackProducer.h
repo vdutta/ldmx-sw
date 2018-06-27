@@ -19,6 +19,7 @@
 
 //ROOT
 #include "TClonesArray.h" //Add new array of tracks to event bus
+#include "TH1.h" //analyzer histograms
 
 //LDMX Framework
 #include "Event/Event.h" //add new TConesArray to event bus
@@ -148,7 +149,7 @@ namespace ldmx {
              * @param track partial track to add hit to if found
              * @return true if successfully found a hit in the given key range 
              */
-            bool SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) const;
+            bool SearchByKey( const int lowkey , const int upkey , HcalTrack &track );
             
             std::string hitcollname_; //* name of collection of hits
  
@@ -165,6 +166,8 @@ namespace ldmx {
 
             int trackwidth_; //* width of extended track to search in number of strips
             
+            int mintrackhits_; //* minimum number of hits in a full track for it to be accepted
+
             TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event
 
             std::map< int , HitPtr > log_; //* map that will be used to store the hits
@@ -174,7 +177,10 @@ namespace ldmx {
             std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
             std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
             std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
-
+            
+            int nsbkcalls_; //* number of search by key calls
+            int missingtrack_; //* number of events with tracks missing
+            int extratrack_; //* number of events with extra tracks
     };
 
 }
