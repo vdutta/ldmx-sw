@@ -22,9 +22,15 @@ namespace ldmx {
         conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
         coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
         minconehits_ = ps.getInteger( "MinConeHits" , 3 );
+        
         trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
         
+        mintrackhits_ = ps.getInteger( "MinTrackHits" , 20 );
+
         hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
+        
+        missingtrack_ = 0;
+        extratrack_ = 0;
 
         return; 
     }
@@ -49,6 +55,8 @@ namespace ldmx {
 
         badseeds_.clear();
 
+        nsbkcalls_ = 0;
+
         //obtain list of hits
         const TClonesArray *rawhits = event.getCollection( hitcollname_ );
 
@@ -64,7 +72,7 @@ namespace ldmx {
         HcalTrack track;
         int seedlayer = 0;
         int trackcnt = 0;
-        while( TrackSearch( seedlayer , track ) and trackcnt < 5 ) {
+        while( TrackSearch( seedlayer , track ) and trackcnt < 100 ) {
             //add track to collection
             HcalTrack *toadd = (HcalTrack *)(hcaltracks_->At(trackcnt));
             //delete toadd;
@@ -75,12 +83,16 @@ namespace ldmx {
 
             track.Clear(); //re-initialize track
             seedlayer = *layercheck_.begin(); //change seedlayer
-            std::cout << seedlayer << std::endl;
             trackcnt++;
         } //keep searching for tracks until can't find anymore
 
         //add collection to event bus
         event.add( "HcalTracks" , hcaltracks_ );
+        
+        if ( trackcnt < 1 )
+            missingtrack_++;
+        else if ( trackcnt > 1 )
+            extratrack_++;
 
         return;
     }
@@ -98,7 +110,8 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::onProcessEnd() {
-
+        std::cout << "Missing Track Events: " << missingtrack_ << std::endl;
+        std::cout << "Extra Track Events: " << extratrack_ << std::endl;
     }
 
     void HcalTrackProducer::AddHit( HitPtr hit ) {
@@ -115,9 +128,9 @@ namespace ldmx {
             
             std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track.getHit(i) ) );
             if ( toremove == log_.end() ) {
-                std::cout << "[ HcalTrackProducer::RemoveTrack ]:\t";
+                std::cout << "[ HcalTrackProducer::RemoveTrack ]: ";
                 std::cout << "Unable to locate hit to be removed from log." << std::endl;
-                std::cout << "                                     ";
+                std::cout << "                                    ";
                 std::cout << "This bodes ill for how this producer was defined." << std::endl;
             } else {
                 log_.erase( toremove );
@@ -317,11 +330,18 @@ namespace ldmx {
                 } //iterate through partial track (it)
             
                 //Extend from leftmost to layer
-                leftslope = (leftmost.first->getStrip() - leftmost.second->getStrip())/(leftmost.first->getLayer() - leftmost.second->getLayer());
+                if ( leftmost.first->getLayer() - leftmost.second->getLayer() > 0.01 ) {
+                    leftslope = (leftmost.first->getStrip() - leftmost.second->getStrip())/(leftmost.first->getLayer() - leftmost.second->getLayer());
+                } else {
+                    leftslope = 0.0;
+                }
 
                 //Extend from rightmost to layer
-                rightslope = (rightmost.first->getStrip() - rightmost.second->getStrip())/(rightmost.first->getLayer() - rightmost.second->getLayer());
-            
+                if ( rightmost.first->getLayer() - rightmost.second->getLayer() > 0.01 ) {
+                    rightslope = (rightmost.first->getStrip() - rightmost.second->getStrip())/(rightmost.first->getLayer() - rightmost.second->getLayer());
+                } else {
+                    rightslope = 0.0;
+                }
             } //track has been changed, so edit slope
 
             float leftedge = (layer - leftmost.first->getLayer())*leftslope + leftmost.first->getStrip();
@@ -348,12 +368,14 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::isAcceptableTrack( const HcalTrack &track ) const {
-        //For now, accepting all tracks
-        return true;
+        //For now, only going by number of hits in track
+        return ( track.getNHits() > mintrackhits_ );
     }
 
-    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) const {
-
+    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) {
+        
+        nsbkcalls_++;
+        
         bool success = false;
 
         if ( lowkey > upkey ) { //Mis-use correction
