@@ -9,7 +9,25 @@
 namespace ldmx {
     
     void HcalTrackProducer::configure( const ParameterSet& ps ) {
-    
+        
+        hitcollname_ = ps.getString( "HitCollectionName" );
+
+        nlayers_ = ps.getInteger( "NumHcalLayers" , 81 );
+        nstrips_ = ps.getInteger( "NumHcalStrips" , 34 );
+
+        layermod_ = ps.getInteger( "LayerModulus" , 1000 );
+
+        minPE_ = ps.getDouble( "MinimumPE" , 0.0 );
+
+        conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
+        coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
+        minconehits_ = ps.getInteger( "MinConeHits" , 3 );
+        
+        trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
+        
+        hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
+
+        return; 
     }
 
     void HcalTrackProducer::produce( Event& event ) {
@@ -40,17 +58,18 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::TrackSearch( int seedlayer , std::vector< HitPtr > &track ) {
+    bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack &track ) {
         
         int seedstrip = 0;
         while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
             
             SetSearchCone( seedlayer , seedstrip );
             
-            if ( BeginPartialTrack( track ) ) { //track successfully started
+            //Checks if track is started successfully and then tries to
+            // extend the track.
+            if ( BeginPartialTrack( track ) and ExtendTrack( track ) ) { //track successfully started
                 
-                ExtendTrack( track );
-                return ( isTrackAcceptable( track ) );
+                return true;
             
             } else { //bad seed
                 
@@ -79,7 +98,11 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) const {
-        
+ 
+        if ( layercheck_.empty() ) { //no more layers to check
+            return false;
+        }
+       
         //check if seedlayer has been searched before
         std::set<int>::iterator seedlayer_it = layercheck_.find( seedlayer );
 
@@ -88,7 +111,7 @@ namespace ldmx {
             //set keys to cover entire layer
             int lowkey = seedlayer*layermod_;
             int upkey = (seedlayer+1)*layermod_ - 1;
-            std::vector< HitPtr > trackseed;
+            HcalTrack trackseed;
             int seedkey = seedlayer*layermod_ + seedstrip;
             
             bool mipfound = SearchByKey( lowkey , upkey , trackseed );
@@ -109,20 +132,21 @@ namespace ldmx {
 
         } //seedlayer hasn't been searched before
 
-        if ( layercheck_.empty() ) { //no more layers to check
-            return false;
-        }
-
         //Function would exit by now if it hadn't found a seed
-        seedlayer = static_cast<int>( (*layercheck_.begin())->getLayer() );
+        seedlayer = *layercheck_.begin();
         return ( FindSeed( seedlayer , seedstrip ) );
     }
 
     void HcalTrackProducer::SetSearchCone( const int seedlayer , const int seedstrip ) {
         
         //reset lists
-        cone_.clear();
-        layerlist_.clear();
+        while ( !cone_.empty() ) {
+            cone_.pop();
+        }
+        
+        while ( !layerlist_.empty() ) {
+            layerlist_.pop();
+        } 
         
         //calculate slope of cone
         float slope = static_cast<float>( conewidth_ )/( conedepth_*2.0 );
@@ -165,7 +189,7 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::BeginPartialTrack( std::vector< HitPtr > &track ) const {
+    bool HcalTrackProducer::BeginPartialTrack( HcalTrack &track ) {
         
         while ( !cone_.empty() ) { //loop through cone to find mips
             
@@ -178,12 +202,12 @@ namespace ldmx {
         return ( track.size() >= minconehits_ );
     }
             
-    bool HcalTrackProducer::ExtendTrack( std::vector< HitPtr > &track ) const {
+    bool HcalTrackProducer::ExtendTrack( HcalTrack &track ) {
         
         //check to see if track has been changed
         bool addednewhit = true;
         float leftslope, rightslope;
-        std::pair< HitPtr , HitPtr > leftmost( track[0], track[1] ), rightmost( track[0] , track[1] );
+        std::pair< HitPtr , HitPtr > leftmost( track.getHit(0), track.getHit(1) ), rightmost( track.getHit(0) , track.getHit(1) );
  
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
@@ -193,24 +217,25 @@ namespace ldmx {
             if ( addednewhit ) { //track has been changed, so edit slope
 
                 //Find leftmost, secondleftmost, rightmost, secondrightmost (left and right sides could be equal)
-                for ( std::vector< HitPtr >::iterator it = track.begin(); it != track.end(); ++it ) {
+                for ( int i = 0; i < track.getNHits(); i++ ) {
                 
-                    float curr_strip = (*it)->getStrip();
+                    HitPtr curr_hit = track.getHit( i );
+                    float curr_strip = curr_hit->getStrip();
             
                     //Check if curr_strip is first or second most left
                     if ( curr_strip < leftmost.first->getStrip() ) {
                         leftmost.second = leftmost.first;
-                        leftmost.first = (*it);
+                        leftmost.first = curr_hit;
                     } else if ( curr_strip < leftmost.second->getStrip() ) {
-                        leftmost.second = (*it);
+                        leftmost.second = curr_hit;
                     }   
             
                     //Check if curr_strip is first or second most right
                     if ( curr_strip > rightmost.first->getStrip() ) {
                         rightmost.second = rightmost.first;
-                        rightmost.first = (*it);
+                        rightmost.first = curr_hit;
                     } else if ( curr_strip > rightmost.second->getStrip() ) {
-                        rightmost.second = (*it);
+                        rightmost.second = curr_hit;
                     }
                 } //iterate through partial track (it)
             
@@ -222,8 +247,8 @@ namespace ldmx {
             
             } //track has been changed, so edit slope
 
-            float leftedge = (layer - leftmost.first->getLayer())*slope + leftmost.first->getStrip();
-            float rightedge = (layer - rightmost.first->getLayer())*slope + rightmost.first->getStrip();
+            float leftedge = (layer - leftmost.first->getLayer())*leftslope + leftmost.first->getStrip();
+            float rightedge = (layer - rightmost.first->getLayer())*rightslope + rightmost.first->getStrip();
 
             //Arithmetic mean of right edge and left edge
             float centertrack = (leftedge+rightedge)/2;
@@ -242,15 +267,15 @@ namespace ldmx {
 
         } //loop through elements of layerlist_
 
-        return true;
+        return isAcceptableTrack( track );
     }
     
-    bool HcalTrackProducer::isAcceptableTrack( const std::vector< HitPtr > track ) const {
+    bool HcalTrackProducer::isAcceptableTrack( const HcalTrack track ) const {
         //For now, accepting all tracks
         return true;
     }
 
-    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , std::vector< HitPtr > &track ) const {
+    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) const {
        
         bool success = false;
 
@@ -285,14 +310,14 @@ namespace ldmx {
 
                 if ( beforekeydif != 1 or afterkeydif != 1 ) {
                     //lowbound has at most one neighbor
-                    track.push_back( lowbound->second );
+                    track.addHit( lowbound->second );
 
                     if ( beforekeydif == 1 ) {
                         //beforeside is the neighbor for lowbound
-                        track.push_back( beforeside->second );
+                        track.addHit( beforeside->second );
                     } else if ( afterkeydif == 1 ) {
                         //afterside is the neighbor for lowerbound
-                        track.push_back( afterside->second );
+                        track.addHit( afterside->second );
                     } //else: lowbound is truly isolated
 
                     success = true;
@@ -308,4 +333,4 @@ namespace ldmx {
 
 }
 
-DECLARE_ANALYZER_NS( ldmx , HcalTrackProducer );
+DECLARE_PRODUCER_NS( ldmx , HcalTrackProducer );
