@@ -64,10 +64,18 @@ namespace ldmx {
         //search for tracks
         HcalTrack track;
         int seedlayer = 0;
-        while( TrackSearch( seedlayer , track ) ) {
-            hcaltracks_->Add( &track ); //add track to collection
+        int trackcnt = 0;
+        while( TrackSearch( seedlayer , track ) and trackcnt < 5 ) {
+            //add track to collection
+            HcalTrack *toadd = (HcalTrack *)(hcaltracks_->At(trackcnt));
+            std::cout << "Point to new location in TClonesArray" << std::endl;
+            toadd = new HcalTrack( track ); 
+            std::cout << "Copy over track information" << std::endl;
+
             track.Clear(); //re-initialize track
             seedlayer = *layercheck_.begin(); //change seedlayer
+            std::cout << seedlayer << std::endl;
+            trackcnt++;
         } //keep searching for tracks until can't find anymore
 
         //add collection to event bus
@@ -101,7 +109,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack &track ) {
-        
+        std::cout << "HcalTrackProducer::TrackSearch" << std::endl;
         int seedstrip = 0;
         while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
             
@@ -140,7 +148,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) {
- 
+        std::cout << "HcalTrackProducer::FindSeed" << std::endl; 
         if ( layercheck_.empty() ) { //no more layers to check
             return false;
         }
@@ -232,7 +240,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::BeginPartialTrack( HcalTrack &track ) {
-        
+        std::cout << "HcalTrackProducer::BeginPartialTrack" << std::endl;
         while ( !cone_.empty() ) { //loop through cone to find mips
             
             SearchByKey( cone_.front().first , cone_.front().second , track );
@@ -245,7 +253,7 @@ namespace ldmx {
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack &track ) {
-        
+        std::cout << "HcalTrackProducer::ExtendTrack" << std::endl;
         //check to see if track has been changed
         bool addednewhit = true;
         float leftslope, rightslope;
@@ -289,9 +297,6 @@ namespace ldmx {
                 } //iterate through partial track (it)
             
                 //Extend from leftmost to layer
-                std::cout << "Redefining leftslope and rightslope" << std::endl;
-                std::cout << "\t" << leftmost.first->getLayer() - leftmost.second->getLayer() << "\t";
-                std::cout << rightmost.first->getLayer() - rightmost.second->getLayer() << std::endl;
                 leftslope = (leftmost.first->getStrip() - leftmost.second->getStrip())/(leftmost.first->getLayer() - leftmost.second->getLayer());
 
                 //Extend from rightmost to layer
