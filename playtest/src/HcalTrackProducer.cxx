@@ -17,7 +17,7 @@ namespace ldmx {
 
         layermod_ = ps.getInteger( "LayerModulus" , 1000 );
 
-        minPE_ = ps.getDouble( "MinimumPE" , 0.0 );
+        minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 0.0 ) );
 
         conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
         coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
@@ -31,7 +31,7 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::produce( Event& event ) {
-        
+
         //initialize event containters
         log_.clear();
         
@@ -263,25 +263,35 @@ namespace ldmx {
                 
                     HitPtr curr_hit = track.getHit( i );
                     float curr_strip = curr_hit->getStrip();
-            
+                    float curr_layer = curr_hit->getLayer();
+                    bool isdifleftlayer = ( std::abs(curr_layer - leftmost.first->getLayer()) >= 1.0 );
+                    bool isdifrightlayer = ( std::abs(curr_layer - rightmost.first->getLayer()) >= 1.0 );
+
                     //Check if curr_strip is first or second most left
                     if ( curr_strip < leftmost.first->getStrip() ) {
-                        leftmost.second = leftmost.first;
+                        if ( isdifleftlayer ) {
+                            leftmost.second = leftmost.first;
+                        } //check to make sure second most left is not on same layer
                         leftmost.first = curr_hit;
-                    } else if ( curr_strip < leftmost.second->getStrip() ) {
+                    } else if ( curr_strip < leftmost.second->getStrip() and isdifleftlayer ) {
                         leftmost.second = curr_hit;
-                    }   
+                    } //check to update second most (and make sure it isn't on the same level)
             
                     //Check if curr_strip is first or second most right
                     if ( curr_strip > rightmost.first->getStrip() ) {
-                        rightmost.second = rightmost.first;
+                        if ( isdifrightlayer ) {
+                            rightmost.second = rightmost.first;
+                        }
                         rightmost.first = curr_hit;
-                    } else if ( curr_strip > rightmost.second->getStrip() ) {
+                    } else if ( curr_strip > rightmost.second->getStrip() and isdifrightlayer ) {
                         rightmost.second = curr_hit;
                     }
                 } //iterate through partial track (it)
             
                 //Extend from leftmost to layer
+                std::cout << "Redefining leftslope and rightslope" << std::endl;
+                std::cout << "\t" << leftmost.first->getLayer() - leftmost.second->getLayer() << "\t";
+                std::cout << rightmost.first->getLayer() - rightmost.second->getLayer() << std::endl;
                 leftslope = (leftmost.first->getStrip() - leftmost.second->getStrip())/(leftmost.first->getLayer() - leftmost.second->getLayer());
 
                 //Extend from rightmost to layer
