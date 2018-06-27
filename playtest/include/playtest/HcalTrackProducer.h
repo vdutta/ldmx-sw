@@ -65,7 +65,7 @@ namespace ldmx {
              *
              * @param track HcalTrack to be removed.
              */
-            void RemoveTrack( const HcalTrack& track );
+            void RemoveTrack( const HcalTrack *track );
 
             /**
              * Attempt to reconstruct a track from a seed layer.
@@ -74,7 +74,7 @@ namespace ldmx {
              * @param track plausible track - should be empty
              * @return true if a track was found
              */
-            bool TrackSearch( int seedlayer , HcalTrack &track );
+            bool TrackSearch( int seedlayer , HcalTrack *track );
    
             /**
              * Function to generate key for a given hit.
@@ -119,7 +119,7 @@ namespace ldmx {
              * @param track HcalTrack that stores beginning of track
              * @return true if successfully started track
              */
-            bool BeginPartialTrack( HcalTrack &track );
+            bool BeginPartialTrack( HcalTrack *track );
 
             /**
              * Search for next mip given layer and partial track.
@@ -129,7 +129,7 @@ namespace ldmx {
              * @param track HcalTrack to be extended
              * @return true if acceptable track was created
              */
-            bool ExtendTrack( HcalTrack &track );
+            bool ExtendTrack( HcalTrack *track );
 
             /**
              * Check if plausible track is acceptable.
@@ -137,7 +137,7 @@ namespace ldmx {
              * @param track HcalTrack to check
              * @return true if acceptable
              */
-            bool isAcceptableTrack( const HcalTrack &track ) const;
+            bool isAcceptableTrack( const HcalTrack *track ) const;
 
             /**
              * Function to search a specific range of a log for a hit.
@@ -148,7 +148,7 @@ namespace ldmx {
              * @param track partial track to add hit to if found
              * @return true if successfully found a hit in the given key range 
              */
-            bool SearchByKey( const int lowkey , const int upkey , HcalTrack &track );
+            bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track );
             
             std::string hitcollname_; //* name of collection of hits
  
