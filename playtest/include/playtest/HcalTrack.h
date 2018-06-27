@@ -32,6 +32,13 @@ namespace ldmx {
              * Default Constructor
              */
             HcalTrack() : nhits_(0) { }
+            
+            /**
+             * Copy Constructor
+             */
+            HcalTrack( const HcalTrack& tocopy ) : hits_(tocopy.hits_),nhits_(tocopy.nhits_)  {
+                
+            }
 
             /**
              * Clear the track
