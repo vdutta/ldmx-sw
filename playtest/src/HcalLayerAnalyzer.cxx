@@ -22,6 +22,7 @@ namespace ldmx {
     }
 
     void HcalLayerAnalyzer::analyze(const ldmx::Event& event) {
+        /*
         const TClonesArray* tca=event.getCollection(caloCol_);
 
 	    for (size_t i = 0; i < tca->GetEntriesFast(); i++) {
@@ -43,8 +44,8 @@ namespace ldmx {
         } //loop through all entries in calorimeter hits for current event (i)
         
         //Now log has the non-noise hits in it
-
-
+        */
+        return;
     }
 
     void HcalLayerAnalyzer::onProcessStart() {

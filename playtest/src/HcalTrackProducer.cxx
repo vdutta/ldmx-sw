@@ -44,7 +44,7 @@ namespace ldmx {
             cone_.pop();
         }
 
-        while ( !layerlist_empty() ) {
+        while ( !layerlist_.empty() ) {
             layerlist_.pop();
         }
 
@@ -65,7 +65,7 @@ namespace ldmx {
         HcalTrack track;
         int seedlayer = 0;
         while( TrackSearch( seedlayer , track ) ) {
-            hcaltracks_->Add( track ); //add track to collection
+            hcaltracks_->Add( &track ); //add track to collection
             track.Clear(); //re-initialize track
             seedlayer = *layercheck_.begin(); //change seedlayer
         } //keep searching for tracks until can't find anymore
@@ -139,7 +139,7 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) const {
+    bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) {
  
         if ( layercheck_.empty() ) { //no more layers to check
             return false;
@@ -191,7 +191,7 @@ namespace ldmx {
         } 
         
         //calculate slope of cone
-        float slope = static_cast<float>( conewidth_ )/( conedepth_*2.0 );
+        float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
 
         for ( int l = seedlayer - conedepth_; l < seedlayer + conedepth_ + 1; l++ ) {
             
@@ -235,13 +235,13 @@ namespace ldmx {
         
         while ( !cone_.empty() ) { //loop through cone to find mips
             
-            SearchByKey( cone_.front().first , cone.front().second , track );
+            SearchByKey( cone_.front().first , cone_.front().second , track );
             cone_.pop();
 
         } //loop through cone to find mips
 
         //check if enough hits in cone
-        return ( track.size() >= minconehits_ );
+        return ( track.getNHits() >= minconehits_ );
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack &track ) {
@@ -369,10 +369,10 @@ namespace ldmx {
             } //check to see if range has any thickness
 
         } //make sure inputs are correct
-            
-    } //mis-use correction
+        
+        return success;
+    }
 
-    return success;
 }
 
 DECLARE_PRODUCER_NS( ldmx , HcalTrackProducer );
