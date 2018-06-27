@@ -22,7 +22,6 @@ namespace ldmx {
         conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
         coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
         minconehits_ = ps.getInteger( "MinConeHits" , 3 );
-        
         trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
         
         hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
@@ -68,9 +67,11 @@ namespace ldmx {
         while( TrackSearch( seedlayer , track ) and trackcnt < 5 ) {
             //add track to collection
             HcalTrack *toadd = (HcalTrack *)(hcaltracks_->At(trackcnt));
-            std::cout << "Point to new location in TClonesArray" << std::endl;
+            //delete toadd;
             toadd = new HcalTrack( track ); 
-            std::cout << "Copy over track information" << std::endl;
+            
+            //Remove track from log
+            RemoveTrack( track );
 
             track.Clear(); //re-initialize track
             seedlayer = *layercheck_.begin(); //change seedlayer
@@ -107,9 +108,28 @@ namespace ldmx {
 
         return;
     }
+
+    void HcalTrackProducer::RemoveTrack( const HcalTrack &track ) {
+        
+        for ( int i = 0; i < track.getNHits(); i++ ) {
+            
+            std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track.getHit(i) ) );
+            if ( toremove == log_.end() ) {
+                std::cout << "[ HcalTrackProducer::RemoveTrack ]:\t";
+                std::cout << "Unable to locate hit to be removed from log." << std::endl;
+                std::cout << "                                     ";
+                std::cout << "This bodes ill for how this producer was defined." << std::endl;
+            } else {
+                log_.erase( toremove );
+            }
+        
+        } //iterate through track and remove each hit (i)
+
+        return;
+    }
     
     bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack &track ) {
-        std::cout << "HcalTrackProducer::TrackSearch" << std::endl;
+
         int seedstrip = 0;
         while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
             
@@ -148,7 +168,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) {
-        std::cout << "HcalTrackProducer::FindSeed" << std::endl; 
+
         if ( layercheck_.empty() ) { //no more layers to check
             return false;
         }
@@ -240,7 +260,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::BeginPartialTrack( HcalTrack &track ) {
-        std::cout << "HcalTrackProducer::BeginPartialTrack" << std::endl;
+
         while ( !cone_.empty() ) { //loop through cone to find mips
             
             SearchByKey( cone_.front().first , cone_.front().second , track );
@@ -253,7 +273,7 @@ namespace ldmx {
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack &track ) {
-        std::cout << "HcalTrackProducer::ExtendTrack" << std::endl;
+
         //check to see if track has been changed
         bool addednewhit = true;
         float leftslope, rightslope;
@@ -327,13 +347,13 @@ namespace ldmx {
         return isAcceptableTrack( track );
     }
     
-    bool HcalTrackProducer::isAcceptableTrack( const HcalTrack track ) const {
+    bool HcalTrackProducer::isAcceptableTrack( const HcalTrack &track ) const {
         //For now, accepting all tracks
         return true;
     }
 
     bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack &track ) const {
-       
+
         bool success = false;
 
         if ( lowkey > upkey ) { //Mis-use correction

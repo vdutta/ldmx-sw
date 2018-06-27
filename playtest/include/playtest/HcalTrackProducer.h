@@ -59,6 +59,13 @@ namespace ldmx {
              * @param hit pointer to hit that will be added to log_.
              */
             void AddHit( HitPtr hit );
+            
+            /**
+             * Remove list of hits for a track.
+             *
+             * @param track HcalTrack to be removed.
+             */
+            void RemoveTrack( const HcalTrack& track );
 
             /**
              * Attempt to reconstruct a track from a seed layer.
@@ -130,7 +137,7 @@ namespace ldmx {
              * @param track HcalTrack to check
              * @return true if acceptable
              */
-            bool isAcceptableTrack( const HcalTrack track ) const;
+            bool isAcceptableTrack( const HcalTrack &track ) const;
 
             /**
              * Function to search a specific range of a log for a hit.
