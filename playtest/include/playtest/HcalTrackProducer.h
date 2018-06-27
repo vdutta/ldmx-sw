@@ -19,7 +19,6 @@
 
 //ROOT
 #include "TClonesArray.h" //Add new array of tracks to event bus
-#include "TH1.h" //analyzer histograms
 
 //LDMX Framework
 #include "Event/Event.h" //add new TConesArray to event bus
@@ -181,6 +180,7 @@ namespace ldmx {
             int nsbkcalls_; //* number of search by key calls
             int missingtrack_; //* number of events with tracks missing
             int extratrack_; //* number of events with extra tracks
+
     };
 
 }
