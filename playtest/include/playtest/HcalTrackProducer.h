@@ -80,6 +80,10 @@ namespace ldmx {
 
             /**
              * Corrects for strip numbers outside of real range.
+             * Negative strip numbers are set to zero and numbers greater
+             *  than the number of strips are set to nstrips_.
+             *
+             * @param strip the strip number to correct
              */
             void CorrectStrip( int &strip) const;
             
@@ -97,11 +101,16 @@ namespace ldmx {
             /**
              * Constructs search cone around seed and list of layers that aren't in cone or seed.
              *
+             * @param seedlayer layer number of seed
+             * @param seedstrip strip number of seed
              */
             void SetSearchCone( const int seedlayer , const int seedstrip );
             
             /**
              * Begins partial track by searching through cone around seed.
+             *
+             * @param track HcalTrack that stores beginning of track
+             * @return true if successfully started track
              */
             bool BeginPartialTrack( HcalTrack &track );
 
@@ -109,11 +118,17 @@ namespace ldmx {
              * Search for next mip given layer and partial track.
              * Will add to track if found a mip hit.
              * Assumes track has AT LEAST two hits in it.
+             *
+             * @param track HcalTrack to be extended
+             * @return true if acceptable track was created
              */
             bool ExtendTrack( HcalTrack &track );
 
             /**
              * Check if plausible track is acceptable.
+             *
+             * @param track HcalTrack to check
+             * @return true if acceptable
              */
             bool isAcceptableTrack( const HcalTrack track ) const;
 
