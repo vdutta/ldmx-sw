@@ -31,7 +31,49 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::produce( Event& event ) {
-    
+        
+        //initialize event containters
+        log_.clear();
+        
+        layercheck_.clear();
+        for ( int i = 1; i < nlayers_+1; i++ ) {
+            layercheck_.insert( i );
+        }
+
+        while ( !cone_.empty() ) {
+            cone_.pop();
+        }
+
+        while ( !layerlist_empty() ) {
+            layerlist_.pop();
+        }
+
+        badseeds_.clear();
+
+        //obtain list of hits
+        const TClonesArray *rawhits = event.getCollection( hitcollname_ );
+
+        //pre-process hits and add to log
+        for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
+            HitPtr curr_hit = (HitPtr)(rawhits->At(i));
+            if ( curr_hit->getPE() > minPE_ ) { //curr_hit is not noise
+                AddHit( curr_hit );
+            } //curr_hit is not noise
+        } //iterate through rawhits (i)
+
+        //search for tracks
+        HcalTrack track;
+        int seedlayer = 0;
+        while( TrackSearch( seedlayer , track ) ) {
+            hcaltracks_->Add( track ); //add track to collection
+            track.Clear(); //re-initialize track
+            seedlayer = *layercheck_.begin(); //change seedlayer
+        } //keep searching for tracks until can't find anymore
+
+        //add collection to event bus
+        event.add( "HcalTracks" , hcaltracks_ );
+
+        return;
     }
 
     void HcalTrackProducer::onFileOpen() {
@@ -67,7 +109,7 @@ namespace ldmx {
             
             //Checks if track is started successfully and then tries to
             // extend the track.
-            if ( BeginPartialTrack( track ) and ExtendTrack( track ) ) { //track successfully started
+            if ( BeginPartialTrack( track ) and ExtendTrack( track ) ) { //track successfully constructed
                 
                 return true;
             
@@ -116,15 +158,15 @@ namespace ldmx {
             
             bool mipfound = SearchByKey( lowkey , upkey , trackseed );
             while ( badseeds_.find( seedkey ) != badseeds_.end() and mipfound ) { //SearchByKey found a mip and it is listed as a bad seed
-                seedstrip = static_cast<int>( trackseed[0]->getStrip() );
+                seedstrip = static_cast<int>( trackseed.getHit(0)->getStrip() );
                 seedkey = seedlayer*layermod_ + seedstrip;
                 lowkey = seedkey+1;
-                trackseed.clear();
+                trackseed.Clear();
                 mipfound = SearchByKey( lowkey , upkey , trackseed );
             } //SearchByKey found a mip and it is listed as a bad seed
 
             if ( mipfound ) { //loop exited with a mipfound, then it is not a bad seed
-                seedstrip = static_cast<int>( trackseed[0]->getStrip() );
+                seedstrip = static_cast<int>( trackseed.getHit(0)->getStrip() );
                 return true;
             } else { //entire layer searched, no good seeds
                 layercheck_.erase( seedlayer_it );
@@ -156,7 +198,7 @@ namespace ldmx {
             std::set<int>::iterator l_it = layercheck_.find( l );
             
             if ( l_it != layercheck_.end() ) { //current layer hasn't been check entirely
-                //make keys
+                //calculate strip numbers for layer
                 float left = (l - seedlayer)*slope + seedstrip;
                 float right = (l - seedlayer)*(-1)*slope + seedstrip;
                 
@@ -168,13 +210,13 @@ namespace ldmx {
 
                 int lowstrip = static_cast<int>(std::floor( left ));
                 int upstrip = static_cast<int>(std::ceil( right ));
-                CorrectStrip( lowkey );
-                CorrectStrip( upkey );
+                CorrectStrip( lowstrip );
+                CorrectStrip( upstrip );
 
-                //add them to cone
-                cone_.push( std::pair< l*layermod_+lowstrip , l*layermod_+upstrip > );
+                //add keys to cone
+                cone_.push( std::pair<int,int>( l*layermod_+lowstrip , l*layermod_+upstrip ) );
 
-            }
+            } //current layer hasn't been exhaustively checked
         } //iterate through layers in cone (l)
 
         //Set Layer List (layers outside cone that haven't been searched exhaustively
@@ -193,7 +235,7 @@ namespace ldmx {
         
         while ( !cone_.empty() ) { //loop through cone to find mips
             
-            SearchByKey( cone_.front()->first , cone.front()->second , track );
+            SearchByKey( cone_.front().first , cone.front().second , track );
             cone_.pop();
 
         } //loop through cone to find mips
@@ -328,9 +370,9 @@ namespace ldmx {
 
         } //make sure inputs are correct
             
-        return success;
-    }
+    } //mis-use correction
 
+    return success;
 }
 
 DECLARE_PRODUCER_NS( ldmx , HcalTrackProducer );
