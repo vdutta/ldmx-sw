@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-import sys
-import os
-
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
