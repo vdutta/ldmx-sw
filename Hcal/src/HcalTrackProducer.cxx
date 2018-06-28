@@ -27,12 +27,11 @@ namespace ldmx {
         
         mintrackhits_ = ps.getInteger( "MinTrackHits" , 20 );
         
+        maxtrackcnt_ = ps.getInteger( "MaxTrackCount", 100 );
+
         hcaltracksname_ = ps.getString( "HcalTrackCollectionName" , "HcalTracks" );
         hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
         
-        missingtrack_ = 0;
-        extratrack_ = 0;
-
         return; 
     }
 
@@ -56,8 +55,6 @@ namespace ldmx {
 
         badseeds_.clear();
 
-        nsbkcalls_ = 0;
-
         //obtain list of hits
         const TClonesArray *rawhits = event.getCollection( hitcollname_ );
 
@@ -73,7 +70,7 @@ namespace ldmx {
         HcalTrack *track = new HcalTrack();
         int seedlayer = 0;
         int trackcnt = 0;
-        while( TrackSearch( seedlayer , track ) and trackcnt < 100 ) {
+        while( TrackSearch( seedlayer , track ) and trackcnt < maxtrackcnt_ ) {
             //add track to collection
             //Attempt to add as full HcalTrack
             HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
@@ -93,11 +90,6 @@ namespace ldmx {
         //add collection to event bus
         event.add( hcaltracksname_ , hcaltracks_ );
         
-        if ( trackcnt < 1 )
-            missingtrack_++;
-        else if ( trackcnt > 1 )
-            extratrack_++;
-
         return;
     }
 
@@ -114,8 +106,6 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::onProcessEnd() {
-        std::cout << "Missing Track Events: " << missingtrack_ << std::endl;
-        std::cout << "Extra Track Events: " << extratrack_ << std::endl;
     }
 
     void HcalTrackProducer::AddHit( HitPtr hit ) {
@@ -377,8 +367,6 @@ namespace ldmx {
     }
 
     bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track ) {
-        
-        nsbkcalls_++;
         
         bool success = false;
 

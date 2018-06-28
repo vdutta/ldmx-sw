@@ -166,6 +166,8 @@ namespace ldmx {
             int trackwidth_; //* width of extended track to search in number of strips
             
             int mintrackhits_; //* minimum number of hits in a full track for it to be accepted
+            
+            int maxtrackcnt_; //* maximum number of tracks that can be found before exiting
 
             std::string hcaltracksname_; //* name of track collection to be put into event bus
             TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event
@@ -178,10 +180,6 @@ namespace ldmx {
             std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
             std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
             
-            int nsbkcalls_; //* number of search by key calls
-            int missingtrack_; //* number of events with tracks missing
-            int extratrack_; //* number of events with extra tracks
-
     };
 
 }
