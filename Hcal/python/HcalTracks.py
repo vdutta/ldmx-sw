@@ -13,7 +13,7 @@ HcalTracks.parameters["NumHcalLayers"] = 81
 HcalTracks.parameters["NumHcalStrips"] = 34
 
 # minimum PE for a single hit to be considered non-noise
-HcalTracks.parameters["MinimumPE"] = 3.5
+HcalTracks.parameters["MinimumPE"] = 15.5
 
 # Search Cone around seed specifications
 #  Depth - number of layers to search away from seed
@@ -25,4 +25,7 @@ HcalTracks.parameters["MinConeHits"] = 3
 
 # Width of search in each layer (by number of strips) when extending track
 HcalTracks.parameters["TrackWidth"] = 3
+
+# Minimum number of hits in track to be considered valid track
+HcalTracks.parameters["MinTrackHits"] = 40
 
