@@ -1,6 +1,6 @@
-# declare playtest module
+# declare Hcal module
 module(
-  NAME playtest  
+  NAME Hcal  
   DEPENDENCIES Framework Event DetDescr
   EXTERNAL_DEPENDENCIES ROOT Python
 )
