@@ -9,7 +9,7 @@
 
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
-#include <vector> //Vector of hits per layer
+#include <string> //names of histograms
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -52,8 +52,7 @@ namespace ldmx {
             std::string trackcollname_; //* name of the collection of HcalTracks 
             
             TH1F* h_tracksperevent_; //* number of tracks per event
-            TH1F* h_hitspertrack_; //* number ot hits per track
-
+            TH1F* h_hitspertrack_[10]; //* number ot hits per track, index i is the ith track found in the event
     };
 }
 
