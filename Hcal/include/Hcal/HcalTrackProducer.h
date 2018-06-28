@@ -167,6 +167,7 @@ namespace ldmx {
             
             int mintrackhits_; //* minimum number of hits in a full track for it to be accepted
 
+            std::string hcaltracksname_; //* name of track collection to be put into event bus
             TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event
 
             std::map< int , HitPtr > log_; //* map that will be used to store the hits
