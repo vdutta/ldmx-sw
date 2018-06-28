@@ -158,6 +158,8 @@ namespace ldmx {
             int layermod_; //* modulus to use for hit keys
 
             float minPE_; //* Minimum number of PEs to not be considered noise
+            
+            int firstseedlayer_; //* first seed layer to try
 
             int conedepth_; //* depth of search cone around seed in layers
             int coneangle_; //* angular opening of cone around seed in strips across the first layer

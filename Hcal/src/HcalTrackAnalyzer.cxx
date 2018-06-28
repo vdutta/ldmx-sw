@@ -22,7 +22,11 @@ namespace ldmx {
         h_tracksperevent_->Fill( ntracks );
         for( int i = 0; i < ntracks; i++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(i) );
-            h_hitspertrack_->Fill( curr_track->getNHits() );
+            if (i < 9 ) {
+                h_hitspertrack_[i]->Fill( curr_track->getNHits() );
+            } else {
+                std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 9 tracks!" << std::endl;
+            }
         }
         
         return;
@@ -34,14 +38,20 @@ namespace ldmx {
         
         h_tracksperevent_ = new TH1F( "h_tracksperevent_" , "Tracks Per Event" ,
             11 , -0.5 , 10.5 );
-        h_hitspertrack_ = new TH1F( "h_hitspertrack_" , "Hits Per Track" ,
-            151 , -0.5 , 150.5 );
+        
+        for ( int i = 0; i < 9; i++ ) {
+            h_hitspertrack_[i] = new TH1F( ("h_hitspertrack_"+std::to_string(i)).c_str() ,
+                ("Hits Per Track "+std::to_string(i)).c_str() ,
+                201 , -0.5 , 200.5 );
+            h_hitspertrack_[i]->SetLineColor( i+1 );
+        }
 
         return;
     }
 
     void HcalTrackAnalyzer::onProcessEnd() {
     }
+
 
 }
 

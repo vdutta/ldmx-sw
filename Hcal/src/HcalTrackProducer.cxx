@@ -10,7 +10,7 @@ namespace ldmx {
     
     void HcalTrackProducer::configure( const ParameterSet& ps ) {
         
-        hitcollname_ = ps.getString( "HitCollectionName" );
+        hitcollname_ = ps.getString( "HitCollectionName" , "hcalDigis" );
 
         nlayers_ = ps.getInteger( "NumHcalLayers" , 81 );
         nstrips_ = ps.getInteger( "NumHcalStrips" , 34 );
@@ -18,7 +18,9 @@ namespace ldmx {
         layermod_ = ps.getInteger( "LayerModulus" , 1000 );
 
         minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 0.0 ) );
-
+        
+        firstseedlayer_ = ps.getInteger( "FirstSeedLayer" , 1 );
+        
         conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
         coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
         minconehits_ = ps.getInteger( "MinConeHits" , 3 );
@@ -68,7 +70,7 @@ namespace ldmx {
 
         //search for tracks
         HcalTrack *track = new HcalTrack();
-        int seedlayer = 0;
+        int seedlayer = firstseedlayer_;
         int trackcnt = 0;
         while( TrackSearch( seedlayer , track ) and trackcnt < maxtrackcnt_ ) {
             //add track to collection
