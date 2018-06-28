@@ -75,6 +75,13 @@ namespace ldmx {
                 return (HitPtr)(hits_.At(i));
             }
 
+            /**
+             * Get full TRefArray.
+             */
+            TRefArray getTrack() {
+                return hits_;
+            }
+
         private:
             
             TRefArray hits_; //* references to hits in the track
