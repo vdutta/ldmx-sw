@@ -27,7 +27,7 @@ namespace ldmx {
         
         mintrackhits_ = ps.getInteger( "MinTrackHits" , 20 );
 
-        hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
+        hcaltracks_ = new TClonesArray( "TRefArray"/*"ldmx::HcalTrack"*/ , 1000 );
         
         missingtrack_ = 0;
         extratrack_ = 0;
@@ -74,11 +74,13 @@ namespace ldmx {
         int trackcnt = 0;
         while( TrackSearch( seedlayer , track ) and trackcnt < 100 ) {
             //add track to collection
-            HcalTrack *toadd = (HcalTrack *)(hcaltracks_->New(trackcnt));
-            //delete toadd;
-            //toadd = new HcalTrack( *track );
-            *toadd = *track; 
-            
+            //Attempt to add as full HcalTrack
+            //HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
+            //*toadd = *track; 
+            //Attempt to add as TRefArray
+            TRefArray *toadd = (TRefArray *)(hcaltracks_->ConstructedAt(trackcnt));
+            *toadd = track->getTrack();
+
             //Remove track from log
             RemoveTrack( track );
 
