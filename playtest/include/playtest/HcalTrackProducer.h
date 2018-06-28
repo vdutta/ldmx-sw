@@ -24,7 +24,7 @@
 #include "Event/Event.h" //add new TConesArray to event bus
 #include "Framework/EventProcessor.h" //inherit from Producer class
 #include "Framework/ParameterSet.h" //get parameters from config script
-#include "playtest/HcalTrack.h" //store tracks generated
+#include "Event/HcalTrack.h" //store tracks generated
 
 namespace ldmx {
 

@@ -90,7 +90,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            //ClassDef( HcalTrack , 1 );
+            ClassDef( HcalTrack , 1 );
 
     };
 

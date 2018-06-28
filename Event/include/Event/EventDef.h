@@ -19,6 +19,7 @@
 #include "Event/TriggerResult.h"
 #include "Event/ClusterAlgoResult.h"
 #include "Event/HcalHit.h"
+#include "Event/HcalTrack.h"
 #include "Event/HcalVetoResult.h"
 #include "Event/PnWeightResult.h"
 #include "Event/SiStripHit.h"
