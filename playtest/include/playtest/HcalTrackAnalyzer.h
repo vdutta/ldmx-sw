@@ -19,7 +19,7 @@
 #include "Framework/EventProcessor.h" //Needed to declare analyzer
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/Event.h" //Study event by event
-#include "Event/HcalTrack.h" //Study hcal tracks
+#include "playtest/HcalTrack.h" //Study hcal tracks
 
 namespace ldmx {
     
