@@ -26,7 +26,8 @@ namespace ldmx {
         trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
         
         mintrackhits_ = ps.getInteger( "MinTrackHits" , 20 );
-
+        
+        hcaltracksname_ = ps.getString( "HcalTrackCollectionName" , "HcalTracks" );
         hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
         
         missingtrack_ = 0;
@@ -90,7 +91,7 @@ namespace ldmx {
         } //keep searching for tracks until can't find anymore
 
         //add collection to event bus
-        event.add( "HcalTracks" , hcaltracks_ );
+        event.add( hcaltracksname_ , hcaltracks_ );
         
         if ( trackcnt < 1 )
             missingtrack_++;
