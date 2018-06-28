@@ -4,7 +4,7 @@
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "playtest/HcalTrackProducer.h"
+#include "Hcal/HcalTrackProducer.h"
 
 namespace ldmx {
     

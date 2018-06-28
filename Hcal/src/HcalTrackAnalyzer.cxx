@@ -4,7 +4,7 @@
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "playtest/HcalTrackAnalyzer.h"
+#include "Hcal/HcalTrackAnalyzer.h"
 
 namespace ldmx {
     

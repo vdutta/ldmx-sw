@@ -4,8 +4,8 @@
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef PLAYTEST_HCALTRACKPRODUCER_H
-#define PLAYTEST_HCALTRACKPROCUCER_H
+#ifndef HCAL_HCALTRACKPRODUCER_H
+#define HCAL_HCALTRACKPROCUCER_H
 
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
@@ -185,4 +185,4 @@ namespace ldmx {
 
 }
 
-#endif /* PLAYTEST_HCALTRACKPRODUCER_H */
+#endif /* HCAL_HCALTRACKPRODUCER_H */
