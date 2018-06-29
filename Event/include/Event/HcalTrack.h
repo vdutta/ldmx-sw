@@ -44,9 +44,10 @@ namespace ldmx {
              * Clear the track
              */
             void Clear() {
+
                 TObject::Clear();
 
-                hits_.Clear();
+                hits_.Delete(); //Clear();
                 nhits_ = 0;
 
                 return;
