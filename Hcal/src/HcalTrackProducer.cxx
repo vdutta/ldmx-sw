@@ -101,7 +101,7 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::RemoveTrack( const HcalTrack *track ) {
-        //std::cout << "HcalTrackProducer::RemoveTrack" << std::endl;
+        
         for ( int i = 0; i < track->getNHits(); i++ ) {
             
             std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track->getHit(i) ) );
@@ -120,7 +120,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack *track ) {
-        //std::cout << "HcalTrackProducer::TrackSearch" << std::endl;
+        
         int seedstrip = 0;
         while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
             
@@ -131,7 +131,7 @@ namespace ldmx {
             if ( BeginPartialTrack( track ) and ExtendTrack( track ) ) { //track successfully constructed
                 return true;
             }
-            //std::cout << "Insert Bad Seed: " << seedlayer*layermod_ + seedstrip << std::endl;
+            
             //bad seed
             badseeds_.insert( seedlayer*layermod_ + seedstrip );
 
@@ -156,7 +156,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) {
-        //std::cout << "HcalTrackProducer::FindSeed" << std::endl;
+        
         if ( layercheck_.empty() ) { //no more layers to check
             return false;
         }
@@ -202,7 +202,7 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::SetSearchCone( const int seedlayer , const int seedstrip ) {
-        //std::cout << "HcalTrackProducer::SetSearchCone" << std::endl;
+        
         //reset lists
         while ( !cone_.empty() ) {
             cone_.pop();
@@ -216,7 +216,7 @@ namespace ldmx {
         float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
 
         for ( int l = seedlayer - conedepth_; l < seedlayer + conedepth_ + 1; l++ ) {
-            
+
             std::set<int>::iterator l_it = layercheck_.find( l );
             
             if ( l_it != layercheck_.end() ) { //current layer hasn't been check entirely
@@ -254,7 +254,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::BeginPartialTrack( HcalTrack *track ) {
-        //std::cout << "HcalTrackProducer::BeginPartialTrack" << std::endl;
+        
         //make sure track is empty
         if ( track->getNHits() > 0 ) {
             track->Clear();
@@ -272,7 +272,7 @@ namespace ldmx {
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
-        //std::cout << "HcalTrackProducer::ExtendTrack" << std::endl;
+        
         //check to see if track has been changed
         bool addednewhit = true;
         float leftslope, rightslope;
@@ -394,17 +394,17 @@ namespace ldmx {
                 if ( beforekeydif != 1 or afterkeydif != 1 ) {
                     //lowbound has at most one neighbor
                     track->addHit( lowbound->second );
-                    //std::cout << "Add to Track: " << KeyGen( lowbound->second ) << "\t";
+                    
                     if ( beforekeydif == 1 ) {
                         //beforeside is the neighbor for lowbound
                         track->addHit( beforeside->second );
-                        //std::cout << KeyGen( beforeside->second );
+                        
                     } else if ( afterkeydif == 1 ) {
                         //afterside is the neighbor for lowerbound
                         track->addHit( afterside->second );
-                        //std::cout << KeyGen( afterside->second );
+                        
                     } //else: lowbound is truly isolated
-                    //std::cout << std::endl;
+                    
                     success = true;
 
                 } //check if lowbound could be isolated
