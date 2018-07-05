@@ -220,18 +220,20 @@ namespace ldmx {
             std::set<int>::iterator l_it = layercheck_.find( l );
             
             if ( l_it != layercheck_.end() ) { //current layer hasn't been check entirely
-                //calculate strip numbers for layer
-                float left = (l - seedlayer)*slope + seedstrip;
-                float right = (l - seedlayer)*(-1)*slope + seedstrip;
                 
-                if ( left > right ) {
-                    float tmp = left;
-                    left = right;
-                    right = tmp;
-                } //they are in wrong order
+                int centerstrip, lowstrip, upstrip;
+                if ( true ) { //!(( seedlayer ^ l ) & 1 ) ) { 
+                    //current layer and seedlayer have same parity (same orientation)
+                    centerstrip = seedstrip; 
+                } else { 
+                    //current layer has different orientation
+                }
 
-                int lowstrip = static_cast<int>(std::floor( left ));
-                int upstrip = static_cast<int>(std::ceil( right ));
+                //calculate current halfwidth of cone
+                float halfwidth = std::abs(slope*(l - seedlayer))/2.0;
+                
+                lowstrip = static_cast<int>(std::floor( centerstrip - halfwidth ));
+                upstrip = static_cast<int>(std::ceil( centerstrip + halfwidth ));
                 CorrectStrip( lowstrip );
                 CorrectStrip( upstrip );
 
