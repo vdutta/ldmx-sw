@@ -79,7 +79,7 @@ namespace ldmx {
             /**
              * Get full TRefArray.
              */
-            TRefArray getTrack() {
+            const TRefArray &getTrack() {
                 return hits_;
             }
 
