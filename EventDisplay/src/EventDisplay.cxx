@@ -144,11 +144,13 @@ namespace ldmx {
         hcalDigiHits_ = new TClonesArray("ldmx::HcalHit");
         recoilHits_ = new TClonesArray("ldmx::SimTrackerHit");
         ecalClusters_ = new TClonesArray("ldmx::EcalCluster");
+        hcalTracks_ = new TClonesArray("ldmx::HcalTrack");
         ecalSimParticles_ = new TClonesArray("ldmx::SimTrackerHit");
 
         foundECALDigis_ = GetECALDigisColl(ecalDigisCollName_);
         foundHCALDigis_ = GetHCALDigisColl(hcalDigisCollName_);
         foundClusters_ = GetClustersColl(clustersCollName_);
+        foundHcalTracks_ = GetHCALTracksColl(hcalTracksCollName_);
         foundTrackerHits_ = GetTrackerHitsColl(trackerHitsCollName_);
         foundEcalSPHits_ = GetEcalSimParticlesColl(ecalSimParticlesCollName_);
 
@@ -270,6 +272,17 @@ namespace ldmx {
         }
     }
 
+    bool EventDisplay::GetHCALTracksColl(const TString hcalTracksCollName) {
+        if (tree_->GetListOfBranches()->FindObject(hcalTracksCollName)) {
+            tree_->ResetBranchAddress(tree_->GetBranch(hcalTracksCollName_));
+            tree_->SetBranchAddress(hcalTracksCollName, &hcalTracks_);
+            return true;
+        } else {
+            std::cout << "No branch with name \"" << hcalTracksCollName << "\"" << std::endl;
+            return false;
+        }
+    }
+
     void EventDisplay::GetEcalSimParticlesCollInput() {
 
         const TString clustersCollName = textBox2_->GetText();
@@ -321,6 +334,10 @@ namespace ldmx {
             eventObjects_->drawECALClusters(ecalClusters_);
         }
 
+        if (foundHcalTracks_) {
+            eventObjects_->drawHCALTracks(hcalTracks_);
+        }
+
         if (foundTrackerHits_) {
             eventObjects_->drawRecoilHits(recoilHits_);
         }
@@ -363,6 +380,7 @@ namespace ldmx {
         foundECALDigis_ = GetECALDigisColl(ecalDigisCollName_);
         foundHCALDigis_ = GetHCALDigisColl(hcalDigisCollName_);
         foundClusters_ = GetClustersColl(clustersCollName_);
+        foundHcalTracks_ = GetHCALTracksColl(hcalTracksCollName_);
         foundTrackerHits_ = GetTrackerHitsColl(trackerHitsCollName_);
         foundEcalSPHits_ = GetEcalSimParticlesColl(ecalSimParticlesCollName_);
 
