@@ -305,6 +305,8 @@ namespace ldmx {
 
     void EventObjects::drawHCALTracks(TClonesArray* hcalTracks) {
         
+        const float undefinedpos = 100000.0;
+
         int iT = 0;
         HcalTrack* track;
         for (TIter next(hcalTracks); track = (ldmx::HcalTrack*)next();) {
@@ -320,22 +322,73 @@ namespace ldmx {
                 //hit information
                 int layer = chit->getLayer();
                 int strip = chit->getStrip();
-
+                std::vector<float> currpos( 3 , undefinedpos+1 ); //current position of chit
+                
+                //Lifting position from HcalHit (which is currently calculated from simhit)
+                currpos[0] = chit->getX();
+                currpos[1] = chit->getY();
+                currpos[2] = chit->getZ();
+                
+                //uncomment below to lift position from layer,strip information
+                /*
                 switch ( chit->getSection() ) {
                     case HcalSection::BACK : 
+                        if ( layer % 2 == 0 ) {
+                            //horizontal
+                            currpos[1] = bar_width*(0.5+bar)-hcal_y_width/2;
+                        } else {
+                            //vertical
+                            currpos[0] = bar_width*(0.5+bar)-hcal_x_width/2;
+                        }
+                        currpos[2] = (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick;
                         break;
                     case HcalSection::TOP : 
+                        currpos[1] = hcal_ecal_xy/2+hcal_layer_thick*layer;
+                        currpos[2] = ecal_front_z+bar*bar_width;
                         break;
                     case HcalSection::BOTTOM : 
+                        currpos[1] = -(hcal_ecal_xy/2+hcal_layer_thick*layer);
+                        currpos[2] = ecal_front_z+bar*bar_width;
                         break;
                     case HcalSection::LEFT : 
+                        currpos[0] = (hcal_ecal_xy/2+hcal_layer_thick*layer);
+                        currpos[2] = ecal_front_z+bar*bar_width;
                         break;
                     case HcalSection::RIGHT : 
+                        currpos[0] = -(hcal_ecal_xy/2+hcal_layer_thick*layer);
+                        currpos[2] = ecal_front_z+bar*bar_width;
                         break;
                     default : 
+                        std::cout << "[EventObjects::drawHCALTracks] HcalSection undefined, skipping hit" << std::endl;
                         break;
                 }
+                */
 
+                //Only update start/end position if currpos is earlier/later than start/end
+                // checking if coordinates are defined as well
+                if ( currpos[2] < start[2] ) {
+                    if ( currpos[0] < undefinedpos ) {
+                        start[0] = currpos[0];
+                    }
+
+                    if ( currpos[1] < undefinedpos ) {
+                        start[1] = currpos[1];
+                    }
+
+                    start[2] = currpos[2];
+                }
+
+                if ( currpos[2] > end[2] and currpos[2] < undefinedpos ) {
+                    if ( currpos[0] < undefinedpos ) {
+                        end[0] = currpos[0];
+                    }
+
+                    if ( currpos[1] < undefinedpos ) {
+                        end[1] = currpos[1];
+                    }
+
+                    end[2] = currpos[2];
+                }
                 
             } //iterate through hits in track (iHit)
             
@@ -343,7 +396,7 @@ namespace ldmx {
             TString trackName;
             trackName.Form("HCAL Track %d", iT);
 
-            TEveArrow* trackray = new TEveArrow( /*xlen,ylen,zlen,x0,y0,z0*/ );
+            TEveArrow* trackray = new TEveArrow( end[0]-start[0] , end[1]-start[1] , end[2]-start[2] , start[0] , start[1] , start[2] );
             trackray->SetElementName(trackName);
 
             hcalTracks_->AddElement(trackray);
