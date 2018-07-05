@@ -16,6 +16,7 @@ namespace ldmx {
         hcalHits_ = new TEveElementList("HCAL RecHits");
         recoilTrackerHits_ = new TEveElementList("Recoil Sim Hits");
         ecalClusters_ = new TEveElementList("ECAL Clusters");
+        hcalTracks_ = new TEveElementList("HCAL Tracks");
         ecalSimParticles_ = new TEveElementList("ECAL SP Sim Particles");
         hits_ = new TEveElementList("Reco Hits");
         recoObjs_ = new TEveElementList("Reco Objects");
@@ -302,6 +303,31 @@ namespace ldmx {
         recoObjs_->AddElement(ecalClusters_);
     }
 
+    void EventObjects::drawHCALTracks(TClonesArray* hcalTracks) {
+
+        int iT = 0;
+        HcalTrack* track;
+        for (TIter next(hcalTracks); track = (ldmx::HcalTrack*)next();) {
+            
+            //Declare new display element to represent current track
+            TString trackName;
+            trackName.Form("HCAL Track %d", iT);
+            TEveElement* hcalTrack = new TEveElementList(trackName);
+            
+            //Iterate through hits in the track
+            TRefArray hitlist = track->getTrack();
+            for (int iHit = 0; iHit < hitlist.GetEntriesFast(); iHit++) {
+                    
+            }
+
+            hcalTracks_->AddElement(hcalTrack);
+            iT++;
+        }
+
+        hcalTracks_->SetPickable(1);
+        recoObjs_->AddElement(hcalTracks_);
+
+    }
     
     void EventObjects::drawECALSimParticles(TClonesArray* ecalSimParticles) {
 

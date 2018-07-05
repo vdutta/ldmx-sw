@@ -8,6 +8,7 @@
 #include "Event/SimTrackerHit.h"
 #include "Event/EcalCluster.h"
 #include "Event/SimParticle.h"
+#include "Event/HcalTrack.h"
 
 #include "EventDisplay/DetectorGeometry.h"
 #include "EventDisplay/EveShapeDrawer.h"
@@ -40,6 +41,8 @@ namespace ldmx {
             void drawRecoilHits(TClonesArray* hits);
 
             void drawECALClusters(TClonesArray* clusters);
+            
+            void drawHCALTracks(TClonesArray* hcalTracks);
 
             void drawECALSimParticles(TClonesArray* ecalSimParticles);
 
@@ -54,6 +57,8 @@ namespace ldmx {
             TEveElement* getRecoilHits() { return recoilTrackerHits_; }
 
             TEveElement* getECALClusters() { return ecalClusters_; }
+            
+            TEveElement* getHCALTracks() { return hcalTracks_; }
 
             TEveElement* getECALSimParticles() { return ecalSimParticles_; }
 
@@ -67,6 +72,7 @@ namespace ldmx {
             TEveElement* hcalHits_{nullptr};
             TEveElement* recoilTrackerHits_{nullptr};
             TEveElement* ecalClusters_{nullptr};
+            TEveElement* hcalTracks_{nullptr};
             TEveElement* ecalSimParticles_{nullptr};
 
             TEveElement* hits_{nullptr};
