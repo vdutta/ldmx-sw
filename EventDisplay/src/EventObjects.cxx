@@ -304,29 +304,56 @@ namespace ldmx {
     }
 
     void EventObjects::drawHCALTracks(TClonesArray* hcalTracks) {
-
+        
         int iT = 0;
         HcalTrack* track;
         for (TIter next(hcalTracks); track = (ldmx::HcalTrack*)next();) {
             
-            //Declare new display element to represent current track
-            TString trackName;
-            trackName.Form("HCAL Track %d", iT);
-            TEveElement* hcalTrack = new TEveElementList(trackName);
+            //starting and ending points of track
+            std::vector<float> start( 3 , 0.0 ), end( 3 , 0.0 );
             
             //Iterate through hits in the track
             TRefArray hitlist = track->getTrack();
             for (int iHit = 0; iHit < hitlist.GetEntriesFast(); iHit++) {
-                    
-            }
+                
+                const ldmx::HcalHit* chit = (const ldmx::HcalHit*)(hitlist.At(iHit));
+                //hit information
+                int layer = chit->getLayer();
+                int strip = chit->getStrip();
 
-            hcalTracks_->AddElement(hcalTrack);
+                switch ( chit->getSection() ) {
+                    case HcalSection::BACK : 
+                        break;
+                    case HcalSection::TOP : 
+                        break;
+                    case HcalSection::BOTTOM : 
+                        break;
+                    case HcalSection::LEFT : 
+                        break;
+                    case HcalSection::RIGHT : 
+                        break;
+                    default : 
+                        break;
+                }
+
+                
+            } //iterate through hits in track (iHit)
+            
+            //Declare new display element to represent current track
+            TString trackName;
+            trackName.Form("HCAL Track %d", iT);
+
+            TEveArrow* trackray = new TEveArrow( /*xlen,ylen,zlen,x0,y0,z0*/ );
+            trackray->SetElementName(trackName);
+
+            hcalTracks_->AddElement(trackray);
+            
             iT++;
-        }
+        } //iterate through tracks in collection (track, iT)
 
         hcalTracks_->SetPickable(1);
         recoObjs_->AddElement(hcalTracks_);
-
+        
     }
     
     void EventObjects::drawECALSimParticles(TClonesArray* ecalSimParticles) {
