@@ -225,15 +225,21 @@ namespace ldmx {
                 if ( true ) { //!(( seedlayer ^ l ) & 1 ) ) { 
                     //current layer and seedlayer have same parity (same orientation)
                     centerstrip = seedstrip; 
+                
+                    //calculate current halfwidth of cone
+                    float halfwidth = std::abs(slope*(l - seedlayer))/2.0;
+                
+                    lowstrip = static_cast<int>(std::floor( centerstrip - halfwidth ));
+                    upstrip = static_cast<int>(std::ceil( centerstrip + halfwidth ));
+                
                 } else { 
                     //current layer has different orientation
+                    //no way to determine centerstrip because we have no track direction yet
+                    //search entire layer
+                    lowstrip = 0;
+                    upstrip = nstrips_;
                 }
-
-                //calculate current halfwidth of cone
-                float halfwidth = std::abs(slope*(l - seedlayer))/2.0;
-                
-                lowstrip = static_cast<int>(std::floor( centerstrip - halfwidth ));
-                upstrip = static_cast<int>(std::ceil( centerstrip + halfwidth ));
+ 
                 CorrectStrip( lowstrip );
                 CorrectStrip( upstrip );
 
@@ -368,7 +374,9 @@ namespace ldmx {
             std::cout << "Input hit keys to HcalTrackProducer::SearchByKey in wrong order: " << lowkey << " " << upkey << std::endl;
             std::cout << "Returning an empty search" << std::endl;
         } else { //inputs are correct form
-
+            
+            int lowbuffer = 0, upbuffer = 0;
+            
             auto lowbound = log_.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
             auto upbound = log_.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
         
@@ -377,6 +385,11 @@ namespace ldmx {
                 //lowbound points to the first one
                 //see if there is a hit on either side of lowerbound
                 
+                //generate list of hits in this range
+                //group them based on key separation
+                //give groups to isMIP
+                //store MIPs in track
+
                 //prev and next will return iterators outside of container
                 //must check if lowbound is on an edge
                 auto beforeside = std::prev( lowbound ); 
