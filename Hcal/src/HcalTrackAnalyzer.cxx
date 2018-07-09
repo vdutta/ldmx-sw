@@ -29,6 +29,12 @@ namespace ldmx {
             }
         }
         
+        //Drop non-interesting events
+        if ( ntracks > 1 )
+            setStorageHint( hint_shouldKeep );
+        else
+            setStorageHint( hint_shouldDrop );
+        
         return;
     }
 
