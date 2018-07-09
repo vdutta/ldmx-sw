@@ -31,14 +31,13 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() : nhits_(0) { }
+            HcalTrack() : nhits_(0), nlayhits_(0) { }
             
             /**
              * Copy Constructor
              */
-            HcalTrack( const HcalTrack& tocopy ) : hits_(tocopy.hits_),nhits_(tocopy.nhits_)  {
-                
-            }
+            HcalTrack( const HcalTrack& tocopy ) : 
+                hits_(tocopy.hits_),nhits_(tocopy.nhits_),nlayhits_(tocopy.nlayhits_) { }
 
             /**
              * Clear the track
@@ -63,10 +62,25 @@ namespace ldmx {
             }
 
             /**
+             * Increment the number of layers hit by one.
+             */
+            void incLayHit() {
+                nlayhits_++;
+                return;
+            }
+
+            /**
              * Get number of hits in track
              */
             int getNHits() const {
                 return nhits_;
+            }
+
+            /**
+             * Get number of layers hit in track
+             */
+            int getNLayHits() const {
+                return nlayhits_;
             }
 
             /**
@@ -87,7 +101,8 @@ namespace ldmx {
             
             TRefArray hits_; //* references to hits in the track
             int nhits_; //* number of hits in the track
-            
+            int nlayhits_; //* number of layers hit in the track
+
             /**
              * ROOT Class Definition
              */
