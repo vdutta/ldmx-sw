@@ -11,6 +11,7 @@ namespace ldmx {
     void HcalTrackProducer::configure( const ParameterSet& ps ) {
         
         hitcollname_ = ps.getString( "HitCollectionName" , "hcalDigis" );
+        hitpassname_ = ps.getString( "HitPassName" , "recon" );
 
         nlayers_ = ps.getInteger( "NumHcalLayers" , 81 );
         nstrips_ = ps.getInteger( "NumHcalStrips" , 34 );
@@ -58,7 +59,7 @@ namespace ldmx {
         badseeds_.clear();
 
         //obtain list of hits
-        const TClonesArray *rawhits = event.getCollection( hitcollname_ );
+        const TClonesArray *rawhits = event.getCollection( hitcollname_ , hitpassname_ );
 
         //pre-process hits and add to log
         for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {

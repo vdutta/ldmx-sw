@@ -151,7 +151,8 @@ namespace ldmx {
             bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track );
             
             std::string hitcollname_; //* name of collection of hits
- 
+            std::string hitpassname_; //* name of pass that made hit collection
+
             int nlayers_; //* number of layers in detector
             int nstrips_; //* number of strips per layer
             
