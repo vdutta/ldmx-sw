@@ -23,7 +23,7 @@ namespace ldmx {
         for( int i = 0; i < ntracks; i++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(i) );
             if (i < 9 ) {
-                h_hitspertrack_[i]->Fill( curr_track->getNHits() );
+                h_layhitspertrack_[i]->Fill( curr_track->getNLayHits() );
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 9 tracks!" << std::endl;
             }
@@ -40,18 +40,14 @@ namespace ldmx {
             11 , -0.5 , 10.5 );
         
         for ( int i = 0; i < 9; i++ ) {
-            h_hitspertrack_[i] = new TH1F( ("h_hitspertrack_"+std::to_string(i)).c_str() ,
-                ("Hits Per Track "+std::to_string(i)).c_str() ,
+            h_layhitspertrack_[i] = new TH1F( ("h_layhitspertrack_"+std::to_string(i)).c_str() ,
+                ("Layer Hits Per Track "+std::to_string(i)).c_str() ,
                 201 , -0.5 , 200.5 );
-            h_hitspertrack_[i]->SetLineColor( i+1 );
+            h_layhitspertrack_[i]->SetLineColor( i+1 );
         }
 
         return;
     }
-
-    void HcalTrackAnalyzer::onProcessEnd() {
-    }
-
 
 }
 

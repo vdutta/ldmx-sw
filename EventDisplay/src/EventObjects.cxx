@@ -407,12 +407,13 @@ namespace ldmx {
             trackray->SetPickable(kTRUE);
 
             hcalTracks_->AddElement(trackray);
-            
+            std::cout << "Add trackray " << trackName << " to hcalTracks list" << std::endl;
             iT++;
         } //iterate through tracks in collection (track, iT)
 
         //hcalTracks_->SetPickable(1);
         recoObjs_->AddElement(hcalTracks_);
+        std::cout << "Add hcalTracks list to recoObjs" << std::endl;
         
     }
     

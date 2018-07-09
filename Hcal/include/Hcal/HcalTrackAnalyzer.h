@@ -46,13 +46,13 @@ namespace ldmx {
 
             virtual void onProcessStart(); 
 
-            virtual void onProcessEnd();
+            virtual void onProcessEnd() {}
 
         private:
             std::string trackcollname_; //* name of the collection of HcalTracks 
             
             TH1F* h_tracksperevent_; //* number of tracks per event
-            TH1F* h_hitspertrack_[10]; //* number ot hits per track, index i is the ith track found in the event
+            TH1F* h_layhitspertrack_[10]; //* number of layer hits per track, index i is the ith track found in the event
     };
 }
 

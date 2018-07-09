@@ -300,28 +300,35 @@ namespace ldmx {
                     HitPtr curr_hit = track->getHit( i );
                     float curr_strip = curr_hit->getStrip();
                     float curr_layer = curr_hit->getLayer();
-                    bool isdifleftlayer = ( std::abs(curr_layer - leftmost.first->getLayer()) >= 1.0 );
-                    bool isdifrightlayer = ( std::abs(curr_layer - rightmost.first->getLayer()) >= 1.0 );
-
-                    //Check if curr_strip is first or second most left
-                    if ( curr_strip < leftmost.first->getStrip() ) {
-                        if ( isdifleftlayer ) {
-                            leftmost.second = leftmost.first;
-                        } //check to make sure second most left is not on same layer
-                        leftmost.first = curr_hit;
-                    } else if ( curr_strip < leftmost.second->getStrip() and isdifleftlayer ) {
-                        leftmost.second = curr_hit;
-                    } //check to update second most (and make sure it isn't on the same level)
-            
-                    //Check if curr_strip is first or second most right
-                    if ( curr_strip > rightmost.first->getStrip() ) {
-                        if ( isdifrightlayer ) {
-                            rightmost.second = rightmost.first;
+                    if ( true ) { //!(( layer ^ curr_layer ) & 1 ) ) { 
+                    //current layer and layer have same parity (same orientation)
+                     
+                        bool isdifleftlayer = ( std::abs(curr_layer - leftmost.first->getLayer()) >= 1.0 );
+                        bool isdifrightlayer = ( std::abs(curr_layer - rightmost.first->getLayer()) >= 1.0 );
+    
+                        //Check if curr_strip is first or second most left
+                        if ( curr_strip < leftmost.first->getStrip() ) {
+                            if ( isdifleftlayer ) {
+                                leftmost.second = leftmost.first;
+                            } //check to make sure second most left is not on same layer
+                            leftmost.first = curr_hit;
+                        } else if ( curr_strip < leftmost.second->getStrip() and isdifleftlayer ) {
+                            leftmost.second = curr_hit;
+                        } //check to update second most (and make sure it isn't on the same level)
+                
+                        //Check if curr_strip is first or second most right
+                        if ( curr_strip > rightmost.first->getStrip() ) {
+                            if ( isdifrightlayer ) {
+                                rightmost.second = rightmost.first;
+                            }
+                            rightmost.first = curr_hit;
+                        } else if ( curr_strip > rightmost.second->getStrip() and isdifrightlayer ) {
+                            rightmost.second = curr_hit;
                         }
-                        rightmost.first = curr_hit;
-                    } else if ( curr_strip > rightmost.second->getStrip() and isdifrightlayer ) {
-                        rightmost.second = curr_hit;
+     
                     }
+                    //skip curr_hit if not same orientation as layer
+               
                 } //iterate through partial track (it)
             
                 //Extend from leftmost to layer
@@ -337,6 +344,7 @@ namespace ldmx {
                 } else {
                     rightslope = 0.0;
                 }
+
             } //track has been changed, so edit slope
 
             float leftedge = (layer - leftmost.first->getLayer())*leftslope + leftmost.first->getStrip();
