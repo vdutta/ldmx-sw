@@ -27,7 +27,7 @@ namespace ldmx {
         
         trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
         
-        mintrackhits_ = ps.getInteger( "MinTrackHits" , 20 );
+        mintracklayhits_ = ps.getInteger( "MinTrackLayerHits" , 20 );
         
         maxtrackcnt_ = ps.getInteger( "MaxTrackCount", 100 );
 
@@ -356,14 +356,14 @@ namespace ldmx {
 
             addednewhit = SearchByKey( lowkey , upkey , track );
 
-        } //loop through elements of layerlist_
+        } //loop through elements of layerlist
 
         return isAcceptableTrack( track );
     }
     
     bool HcalTrackProducer::isAcceptableTrack( const HcalTrack *track ) const {
         //For now, only going by number of hits in track
-        return ( track->getNHits() > mintrackhits_ );
+        return ( track->getNLayHits() > mintracklayhits_ );
     }
 
     bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track ) {
@@ -419,6 +419,8 @@ namespace ldmx {
                         track->addHit( afterside->second );
                         
                     } //else: lowbound is truly isolated
+                    
+                    track->incLayHit();
                     
                     success = true;
 

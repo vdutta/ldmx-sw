@@ -167,7 +167,7 @@ namespace ldmx {
 
             int trackwidth_; //* width of extended track to search in number of strips
             
-            int mintrackhits_; //* minimum number of hits in a full track for it to be accepted
+            int mintracklayhits_; //* minimum number of layers hit in a full track for it to be accepted
             
             int maxtrackcnt_; //* maximum number of tracks that can be found before exiting
 
