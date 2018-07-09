@@ -395,16 +395,23 @@ namespace ldmx {
             //Declare new display element to represent current track
             TString trackName;
             trackName.Form("HCAL Track %d", iT);
-
+            
+            double r = pow(pow((end[0]-start[0]),2) + pow((end[1]-start[1]),2) + pow((end[2]-start[2]),2),0.5);
+            
             TEveArrow* trackray = new TEveArrow( end[0]-start[0] , end[1]-start[1] , end[2]-start[2] , start[0] , start[1] , start[2] );
             trackray->SetElementName(trackName);
+            trackray->SetMainColor(kBlack);
+            trackray->SetTubeR(60*0.02/r);
+            trackray->SetConeL(100*0.02/r);
+            trackray->SetConeR(150*0.02/r);
+            trackray->SetPickable(kTRUE);
 
             hcalTracks_->AddElement(trackray);
             
             iT++;
         } //iterate through tracks in collection (track, iT)
 
-        hcalTracks_->SetPickable(1);
+        //hcalTracks_->SetPickable(1);
         recoObjs_->AddElement(hcalTracks_);
         
     }
