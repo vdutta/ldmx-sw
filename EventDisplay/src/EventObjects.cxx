@@ -42,8 +42,7 @@ namespace ldmx {
         return pa2 > pb2;
     }
 
-    static bool compSims(const SimTrackerHit* a, const SimTrackerHit* b) {
-
+    static bool compSims(const SimTrackerHit* a, const SimTrackerHit* b) { 
         if (a->getSimParticle() == b->getSimParticle()) {
             return compSimsP(a,b);
         } else {
@@ -366,7 +365,7 @@ namespace ldmx {
 
                 //Only update start/end position if currpos is earlier/later than start/end
                 // checking if coordinates are defined as well
-                if ( currpos[2] < start[2] ) {
+                if ( currpos[2] < start[2] and currpos[2] > 0.0 ) {
                     if ( currpos[0] < undefinedpos ) {
                         start[0] = currpos[0];
                     }

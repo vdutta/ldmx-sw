@@ -19,7 +19,8 @@ namespace ldmx {
         layermod_ = ps.getInteger( "LayerModulus" , 1000 );
 
         minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 0.0 ) );
-        
+        maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" , 4000.0 ) );
+
         firstseedlayer_ = ps.getInteger( "FirstSeedLayer" , 1 );
         
         conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
@@ -384,62 +385,85 @@ namespace ldmx {
             std::cout << "Returning an empty search" << std::endl;
         } else { //inputs are correct form
             
-            int lowbuffer = 0, upbuffer = 0;
-            
             auto lowbound = log_.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
             auto upbound = log_.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
+            std::vector< std::vector<HitPtr> > mipvec; //list of mips in this key range
+
+            //group them based on key separation and then check if a group is a mip
+            std::vector<HitPtr> curr_group;
+            for( auto it = lowbound; it != upbound; ++it ) {
+                
+               if ( it == log_.begin() ) {
+                    //beginning of log, isolated on left
+                    if ( curr_group.size() > 0 ) {
+                        std::cout << "[ HcalTrackProducer::SearchByKey ] Iterator reached begining of log after adding to a group.\n";
+                        std::cout << "                                   Something was jumbled." << std::endl;
+                        curr_group.clear();
+                    }
+                } else {
+                    //inside log, find previous hit
+                    auto previt = std::prev( it );
+ 
+                    int keydif = it->first - previt->first;
+                    
+                    if ( keydif != 1 ) {
+                        //different group
+                        if ( isMIP( curr_group ) ) {
+                            mipvec.push_back( curr_group );
+                        }
+                        curr_group.clear();
+                    } //checking key difference 
+                } //if it is log_.begin()
+
+                curr_group.push_back( it->second );
+            
+            } //iterate through [lowbound, upbound) range of log (it)
+            
+            //check last group (may include upbound)
+            // improve? need to scan past upbound to finish constructing last group?
+            if ( isMIP( curr_group ) ) {
+                mipvec.push_back( curr_group );
+            }
         
-            if ( lowbound != upbound ) { //check to see if range has any thickness
-                //there is at least one hit in the range
-                //lowbound points to the first one
-                //see if there is a hit on either side of lowerbound
-                
-                //generate list of hits in this range
-                //group them based on key separation
-                //give groups to isMIP
-                //store MIPs in track
-
-                //prev and next will return iterators outside of container
-                //must check if lowbound is on an edge
-                auto beforeside = std::prev( lowbound ); 
-                auto afterside = std::next( lowbound );
-                
-                int beforekeydif = lowbound->first - beforeside->first;
-                int afterkeydif = afterside->first - lowbound->first;
-                
-                if ( lowbound == log_.begin() ) { //there cannot be a beforeside
-                    beforekeydif = 1000;
-                }
-
-                if ( lowbound == log_.end() ) { //there cannot be an afterside
-                    afterkeydif = 1000;
-                }
-
-                if ( beforekeydif != 1 or afterkeydif != 1 ) {
-                    //lowbound has at most one neighbor
-                    track->addHit( lowbound->second );
-                    
-                    if ( beforekeydif == 1 ) {
-                        //beforeside is the neighbor for lowbound
-                        track->addHit( beforeside->second );
-                        
-                    } else if ( afterkeydif == 1 ) {
-                        //afterside is the neighbor for lowerbound
-                        track->addHit( afterside->second );
-                        
-                    } //else: lowbound is truly isolated
-                    
-                    track->incLayHit();
-                    
+            //mipvec has group(s) considered mips
+            //cases based on how many mips were found
+            switch( mipvec.size() ) {
+                case 0:
+                    //no mips in this key range
+                    break;
+                case 1:
+                    //one mip in this key range
+                    track->incLayHit(); //think about moving this to a more general spot (avoid double counting a layer)
+                    track->addGroup( mipvec[0] );
                     success = true;
-
-                } //check if lowbound could be isolated
-
-            } //check to see if range has any thickness
+                    break;
+                default:
+                    //more than one mip found
+                    std::cout << "[ HcalTrackProducer::SearchByKey ] More than one MIP found in key range " << lowkey << "->" << upkey << "\n";
+                    std::cout << "                                   Not adding any of them and returning a failed search." << std::endl;
+                    break;
+            } //cases based on how many mips were found
 
         } //make sure inputs are correct
         
         return success;
+    }
+
+    bool HcalTrackProducer::isMIP( const std::vector< HitPtr > &group ) const {
+        
+        unsigned int groupsize = group.size();
+        //check if group is too small or too big in number
+        if ( groupsize < 1 or groupsize > 2 ) {
+            return false;
+        }
+        
+        //calculate total energy of group
+        float groupE = 0.0;
+        for ( int i = 0; i < groupsize; i++ ) {
+            groupE += group[i]->getEnergy();
+        }
+
+        return ( groupE < maxEnergy_ );
     }
 
 }

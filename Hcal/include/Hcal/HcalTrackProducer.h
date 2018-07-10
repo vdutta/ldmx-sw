@@ -149,6 +149,17 @@ namespace ldmx {
              * @return true if successfully found a hit in the given key range 
              */
             bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track );
+
+            /**
+             * Function to determine whether a group of hits can be considered a mip.
+             * checks on number of individual hits, and total energy of group.
+             * Assumes group is isolated (defined as all hits in the group are adjacent strips
+             *  and the strips on either side of the group are empty).
+             *
+             * @param group vector of HitPtr that contains the hits in a group
+             * @return true if considered a mip
+             */
+            bool isMIP( const std::vector< HitPtr > &group ) const;
             
             std::string hitcollname_; //* name of collection of hits
             std::string hitpassname_; //* name of pass that made hit collection
@@ -159,6 +170,7 @@ namespace ldmx {
             int layermod_; //* modulus to use for hit keys
 
             float minPE_; //* Minimum number of PEs to not be considered noise
+            float maxEnergy_; //* Maximum energy of a hit to not be considered a non-mip
             
             int firstseedlayer_; //* first seed layer to try
 

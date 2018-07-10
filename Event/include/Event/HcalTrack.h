@@ -70,6 +70,16 @@ namespace ldmx {
             }
 
             /**
+             * Add a group of hits to the track.
+             */
+            void addGroup( const std::vector<HitPtr> group ) {
+                for( auto it = group.begin(); it != group.end(); ++it ) {
+                    addHit( *it );
+                }
+                return;
+            }
+
+            /**
              * Get number of hits in track
              */
             int getNHits() const {
