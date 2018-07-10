@@ -443,6 +443,7 @@ namespace ldmx {
                     std::cout << "                                   Adding first one found." << std::endl;
                     track->incLayHit();
                     track->addGroup( mipvec[0] );
+                    success = true;
                     break;
             } //cases based on how many mips were found
 
