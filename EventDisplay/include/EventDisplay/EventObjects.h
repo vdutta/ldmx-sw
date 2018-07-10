@@ -50,6 +50,8 @@ namespace ldmx {
 
             void ColorClusters();
 
+            void ColorHcalTracks();
+
             TEveElement* getECALHits() { return ecalHits_; }
 
             TEveElement* getHCALHits() { return hcalHits_; }
