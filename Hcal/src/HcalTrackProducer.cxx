@@ -389,7 +389,7 @@ namespace ldmx {
             auto upbound = log_.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
             std::vector< std::vector<HitPtr> > mipvec; //list of mips in this key range
 
-            //group them based on key separation and then check if a group is a mip
+            //group hits based on key separation and then check if a group is a mip
             std::vector<HitPtr> curr_group;
             for( auto it = lowbound; it != upbound; ++it ) {
                 
@@ -400,6 +400,7 @@ namespace ldmx {
                         std::cout << "                                   Something was jumbled." << std::endl;
                         curr_group.clear();
                     }
+
                 } else {
                     //inside log, find previous hit
                     auto previt = std::prev( it );
@@ -414,7 +415,7 @@ namespace ldmx {
                         curr_group.clear();
                     } //checking key difference 
                 } //if it is log_.begin()
-
+                
                 curr_group.push_back( it->second );
             
             } //iterate through [lowbound, upbound) range of log (it)
