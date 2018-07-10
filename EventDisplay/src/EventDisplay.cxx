@@ -27,10 +27,15 @@ namespace ldmx {
         TGHorizontalFrame* commandFrame9 = new TGHorizontalFrame(contents, 100,0);
         TGHorizontalFrame* commandFrame10 = new TGHorizontalFrame(contents, 100,0);
         TGHorizontalFrame* commandFrame11 = new TGHorizontalFrame(contents, 100,0);
+        TGHorizontalFrame* commandFramecolorhtracks = new TGHorizontalFrame(contents, 100,0);
 
         TGButton* buttonColor = new TGTextButton(commandFrame3, "Color Clusters");
         commandFrame3->AddFrame(buttonColor, new TGLayoutHints(kLHintsExpandX));
         buttonColor->Connect("Pressed()", "ldmx::EventDisplay", this, "ColorClusters()");
+
+        TGButton* buttonColorHcalTracks = new TGTextButton( commandFramecolorhtracks , "Color Hcal Tracks" );
+        commandFramecolorhtracks->AddFrame(buttonColorHcalTracks, new TGLayoutHints(kLHintsExpandX));
+        buttonColorHcalTracks->Connect("Pressed()","ldmx::EventDisplay",this,"ColorHcalTracks()");
 
         TGButton* buttonPrevious = new TGTextButton(commandFrame2, "<<< Previous Event");
         commandFrame2->AddFrame(buttonPrevious, new TGLayoutHints(kLHintsExpandX));
@@ -106,6 +111,7 @@ namespace ldmx {
         contents->AddFrame(commandFrame2, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame3, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame6, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
+        contents->AddFrame(commandFramecolorhtracks , new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->Resize(800, 1200);
 
         AddFrame(contents, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
@@ -407,6 +413,14 @@ namespace ldmx {
     void EventDisplay::ColorClusters() {
 
         eventObjects_->ColorClusters();
+
+        manager_->RegisterRedraw3D();
+        manager_->FullRedraw3D(kFALSE, kTRUE);
+    }
+
+    void EventDisplay::ColorHcalTracks() {
+        
+        eventObjects_->ColorHcalTracks();
 
         manager_->RegisterRedraw3D();
         manager_->FullRedraw3D(kFALSE, kTRUE);

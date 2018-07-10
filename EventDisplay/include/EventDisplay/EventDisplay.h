@@ -75,6 +75,8 @@ namespace ldmx {
 
             void ColorClusters();
 
+            void ColorHcalTracks();
+
         private:
 
             TFile* file_;
