@@ -124,7 +124,7 @@ namespace ldmx {
                 color = 200*r_.Rndm();
             }
 
-            //go through hits in track
+            //go through hits in track, change color and set transparency to zero
             TEveElement::List_i hit;
             for (hit = (*track)->BeginChildren(); hit != (*track)->EndChildren(); hit++) {
                 TEveElement* trackChild = *hit;
@@ -337,12 +337,12 @@ namespace ldmx {
 
     void EventObjects::drawHCALTracks(TClonesArray* tracks) {
         
-        const float undefinedpos = 100000.0;
-
+        //iterate through tracks
         int iT = 0;
         HcalTrack* track;
         for (TIter next(tracks); track = (ldmx::HcalTrack*)next();) {
             
+            //construct track, drawing hcal hits
             TString trackname;
             trackname.Form("Hcal Track %d", iT);
             TEveElement *trackray = new TEveElementList(trackname);
@@ -359,6 +359,7 @@ namespace ldmx {
                 TString digiName;
                 digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, chit->getZ());
     
+                //draw transparent hit (color and transparency will be set in ColorHcalTracks() )
                 TEveBox* hcalDigiHit = 0;
                 if (section == 0) {
                     if (layer % 2 == 0) {
