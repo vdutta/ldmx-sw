@@ -303,13 +303,13 @@ namespace ldmx {
         recoObjs_->AddElement(ecalClusters_);
     }
 
-    void EventObjects::drawHCALTracks(TClonesArray* hcalTracks) {
+    void EventObjects::drawHCALTracks(TClonesArray* tracks) {
         
         const float undefinedpos = 100000.0;
 
         int iT = 0;
         HcalTrack* track;
-        for (TIter next(hcalTracks); track = (ldmx::HcalTrack*)next();) {
+        for (TIter next(tracks); track = (ldmx::HcalTrack*)next();) {
             
             //starting and ending points of track
             std::vector<float> start( 3 , 0.0 ), end( 3 , 0.0 );
