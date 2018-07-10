@@ -440,7 +440,9 @@ namespace ldmx {
                 default:
                     //more than one mip found
                     std::cout << "[ HcalTrackProducer::SearchByKey ] More than one MIP found in key range " << lowkey << "->" << upkey << "\n";
-                    std::cout << "                                   Not adding any of them and returning a failed search." << std::endl;
+                    std::cout << "                                   Adding first one found." << std::endl;
+                    track->incLayHit();
+                    track->addGroup( mipvec[0] );
                     break;
             } //cases based on how many mips were found
 
