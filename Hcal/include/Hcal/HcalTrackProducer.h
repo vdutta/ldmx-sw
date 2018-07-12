@@ -77,8 +77,18 @@ namespace ldmx {
             bool TrackSearch( int seedlayer , HcalTrack *track );
    
             /**
+             * Function to generate key from section,layer,hit information.
+             *
+             * @param section HcalSection enum specify the section
+             * @param layer layer number
+             * @param strip strip number
+             * @return integer key value
+             */
+            int KeyGen( const int section , const int layer , const int strip ) const;
+
+            /**
              * Function to generate key for a given hit.
-             * Relies on layermod_.
+             * Relies on layer and section moduli.
              *
              * @param hit pointer to HcalHit instance that a key is needed for
              * @return integer key value
@@ -167,7 +177,8 @@ namespace ldmx {
             int nlayers_; //* number of layers in detector
             int nstrips_; //* number of strips per layer
             
-            int layermod_; //* modulus to use for hit keys
+            int layermod_; //* layer modulus to use for hit keys
+            int sectionmod_; //* section modulus to use for hit keys
 
             float minPE_; //* Minimum number of PEs to not be considered noise
             float maxEnergy_; //* Maximum energy of a hit to not be considered a non-mip

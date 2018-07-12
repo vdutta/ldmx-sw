@@ -16,7 +16,9 @@ namespace ldmx {
         nlayers_ = ps.getInteger( "NumHcalLayers" , 81 );
         nstrips_ = ps.getInteger( "NumHcalStrips" , 34 );
 
-        layermod_ = ps.getInteger( "LayerModulus" , 1000 );
+        //setting moduli to next highest order of 10
+        layermod_ = (int)(pow( 10 , std::ceil( log10( nstrips_ ) ) ));
+        sectionmod_ = (int)(pow( 10 , std::ceil( log10( nlayers_ ) ) ));
 
         minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 0.0 ) );
         maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" , 4000.0 ) );
@@ -142,8 +144,15 @@ namespace ldmx {
         return false;
     }
 
+    int HcalTrackProducer::KeyGen( const int section , const int layer , const int strip ) const {
+        return( section*sectionmod_*layermod_ + layer*layermod_ + strip );
+    }
+    
     int HcalTrackProducer::KeyGen( HitPtr hit ) const {
-        return static_cast<int>( hit->getLayer()*layermod_ + hit->getStrip() );
+        int section = static_cast<int>( hit->getSection() );
+        int layer = static_cast<int>( hit->getLayer() );
+        int strip = static_cast<int>( hit->getStrip() );
+        return KeyGen( section , layer , strip );
     }
     
     void HcalTrackProducer::CorrectStrip( int &strip ) const {
