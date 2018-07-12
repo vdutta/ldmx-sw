@@ -111,18 +111,19 @@ namespace ldmx {
             return;
         }
 
-        int color_i = 0;
+        Int_t color = kRed-1;
         TEveElement::List_i track;
         for ( track = tracks->BeginChildren(); track != tracks->EndChildren(); track++ ) {
             
             //choose color
-            Int_t color = 0;
-            if ( color_i < colors_.size() ) {
-                color = colors_[color_i];
-                color_i++;
-            } else {
-                color = 200*r_.Rndm();
-            }
+            color++;
+//            Int_t color = 0;
+//            if ( color_i < colors_.size() ) {
+//                color = colors_[color_i];
+//                color_i++;
+//            } else {
+//                color = 200*r_.Rndm();
+//            }
 
             //go through hits in track, change color and set transparency to zero
             TEveElement::List_i hit;
