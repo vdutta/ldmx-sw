@@ -86,6 +86,7 @@ namespace ldmx {
             double simThresh_ = 0;
             TRandom r_;
             std::vector<Color_t> colors_ = {kRed, kBlue, kGreen, kYellow, kMagenta, kBlack, kOrange, kPink};
+            std::vector<Color_t> hcaltrackcolors_ = {kRed , kMagenta};
 
     };
 }
