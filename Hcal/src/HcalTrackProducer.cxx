@@ -384,7 +384,7 @@ namespace ldmx {
         bool success = false;
 
         if ( lowkey > upkey ) { //Mis-use correction
-            std::cout << "Input hit keys to HcalTrackProducer::SearchByKey in wrong order: " << lowkey << " " << upkey << std::endl;
+            std::cout << "Input hit keys to HcalTrackProducer::SearchByKey in wrong order: " << lowkey << "->" << upkey << std::endl;
             std::cout << "Returning an empty search" << std::endl;
         } else { //inputs are correct form
             
