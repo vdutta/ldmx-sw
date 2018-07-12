@@ -255,7 +255,7 @@ namespace ldmx {
                 CorrectStrip( upstrip );
 
                 //add keys to cone
-                cone_.push( std::pair<int,int>( l*layermod_+lowstrip , l*layermod_+upstrip ) );
+                cone_.push( std::pair<int,int>( KeyGen( 0 , l , lowstrip ), KeyGen( 0 , l , upstrip ) ) );
 
             } //current layer hasn't been exhaustively checked
         } //iterate through layers in cone (l)
@@ -370,8 +370,8 @@ namespace ldmx {
             CorrectStrip( upstrip );
 
             //SearchByKey
-            int lowkey = layer*layermod_ + lowstrip;
-            int upkey = layer*layermod_ + upstrip;
+            int lowkey = KeyGen( 0 , layer , lowstrip );
+            int upkey = KeyGen( 0 , layer , upstrip );
 
             addednewhit = SearchByKey( lowkey , upkey , track );
 
