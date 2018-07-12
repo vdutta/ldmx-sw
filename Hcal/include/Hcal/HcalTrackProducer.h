@@ -25,6 +25,7 @@
 #include "Framework/EventProcessor.h" //inherit from Producer class
 #include "Framework/ParameterSet.h" //get parameters from config script
 #include "Event/HcalTrack.h" //store tracks generated
+#include "DetDescr/HcalID.h" //for HcalSection enum
 
 namespace ldmx {
 
