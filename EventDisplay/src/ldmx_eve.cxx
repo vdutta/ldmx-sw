@@ -23,7 +23,6 @@ int main(int argc, char** argv) {
 
     TEveBrowser* browser = manager->GetBrowser();
     browser->StartEmbedding(TRootBrowser::kLeft);
-    manager->AddEvent(new TEveEventManager("LDMX Detector", ""));
 
     EventDisplay *display = new EventDisplay(manager);
     if (!display->SetFile(file)) { 
@@ -34,8 +33,6 @@ int main(int argc, char** argv) {
 
         return -1;
     }
-
-    manager->AddEvent(new TEveEventManager("LDMX Event", ""));
 
     browser->SetTabTitle("Event Control", 0);
     browser->StopEmbedding();

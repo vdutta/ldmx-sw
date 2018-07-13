@@ -29,6 +29,18 @@ namespace ldmx {
 
             ~EventObjects() {
 
+                delete ecalHits_;
+                delete hcalHits_;
+                delete recoilTrackerHits_;
+                delete ecalClusters_;
+                delete ecalSimParticles_;
+
+                delete hits_;
+                delete recoObjs_;
+
+                delete hexReadout_;
+                delete drawer_;
+
             }
 
             void Initialize();
@@ -63,17 +75,17 @@ namespace ldmx {
 
         private:
 
-            TEveElement* ecalHits_{nullptr};
-            TEveElement* hcalHits_{nullptr};
-            TEveElement* recoilTrackerHits_{nullptr};
-            TEveElement* ecalClusters_{nullptr};
-            TEveElement* ecalSimParticles_{nullptr};
+            TEveElement* ecalHits_;
+            TEveElement* hcalHits_;
+            TEveElement* recoilTrackerHits_;
+            TEveElement* ecalClusters_;
+            TEveElement* ecalSimParticles_;
 
-            TEveElement* hits_{nullptr};
-            TEveElement* recoObjs_{nullptr};
+            TEveElement* hits_;
+            TEveElement* recoObjs_;
 
-            EcalHexReadout* hexReadout_{nullptr};
-            EveShapeDrawer* drawer_{nullptr};
+            EcalHexReadout* hexReadout_;
+            EveShapeDrawer* drawer_;
 
             double simThresh_ = 0;
             TRandom r_;

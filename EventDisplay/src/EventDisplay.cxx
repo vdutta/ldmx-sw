@@ -6,17 +6,20 @@ namespace ldmx {
 
     EventDisplay::EventDisplay(TEveManager* manager) : TGMainFrame(gClient->GetRoot(), 320, 320) {
 
+        SetWindowName("LDMX Event Display");
+
         manager_ = manager;
         TGLViewer* viewer = manager_->GetDefaultGLViewer();
         viewer->UseLightColorSet();
 
         theDetector_ = new DetectorGeometry();
         eventObjects_ = new EventObjects();
+
+        manager_->AddEvent(new TEveEventManager("LDMX Detector", ""));
         manager_->AddElement(theDetector_->getECAL());
         manager_->AddElement(theDetector_->getHCAL());
         manager_->AddElement(theDetector_->getRecoilTracker());
-
-        SetCleanup(kDeepCleanup);
+        manager_->AddEvent(new TEveEventManager("LDMX Event", ""));
 
         TGVerticalFrame* contents = new TGVerticalFrame(this, 800,1200);
         TGHorizontalFrame* commandFrame1 = new TGHorizontalFrame(contents, 100,0);
@@ -108,15 +111,11 @@ namespace ldmx {
         contents->AddFrame(commandFrame2, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame3, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame6, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-        contents->Resize(800, 1200);
 
         AddFrame(contents, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
 
-        SetWindowName("LDMX Event Display");
-
         MapSubwindows();
         Resize(GetDefaultSize());
-        MapRaised();
         MapWindow();
 
         manager_->FullRedraw3D(kTRUE);

@@ -133,7 +133,7 @@ namespace ldmx {
             TColor* aColor = new TColor();
             Int_t color = aColor->GetColor((Int_t)rgb[0], (Int_t)rgb[1], (Int_t)rgb[2]);
 
-            TEveBox *ecalDigiHit = drawer_->drawBox(xyPos.first, xyPos.second, layerZPos[layer]+ecal_front_z-1.5, 3, 3, layerZPos[layer]+ecal_front_z+1.5, 0, color, 0, digiName);
+            TEveGeoShape* ecalDigiHit = drawer_->drawHexPrism(xyPos.first, xyPos.second, layerZPos[layer]+ecal_front_z, 0, 0, 0, 3, 4.47, color, 0, digiName);
             ecalHits_->AddElement(ecalDigiHit);
         }
 
@@ -175,22 +175,25 @@ namespace ldmx {
             TString digiName;
             digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, hitVec[i]->getZ());
 
-            TEveBox* hcalDigiHit = 0;
+            TEveGeoShape* hcalDigiHit = 0;
             //TEveBox* hcalDigiHit2 = 0;
             //hcalDigiHit2 = drawer_->drawBox(hitVec[i]->getX(), hitVec[i]->getY(), hitVec[i]->getZ()-15, 30, 30, hitVec[i]->getZ()+15, 0, color, 0, digiName);
             if (section == 0) {
                 if (layer % 2 == 0) {
                     //horizontal
-                    hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
+                    hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, 0, 0, color, 0, digiName);
+
                 } else {
                     //vertical, once alternating bar orientation in the back is implemented, uncomment
                     //hcalDigiHit = drawer_->drawBox((bar_width*(0.5-bar)-hcal_y_width/2), hitVec[i]->getY(), (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, bar_width, 150, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
-                    hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
+                    //hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, color, 0, digiName);
+                    hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, 0, 0, color, 0, digiName);
+
                 }
-            } else if (section == 1) {hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), hcal_ecal_xy/2+hcal_layer_thick*layer, ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 3) {hcalDigiHit = drawer_->drawBox((hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 2) {hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), -(hcal_ecal_xy/2+hcal_layer_thick*layer), ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 4) {hcalDigiHit = drawer_->drawBox(-(hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
+            } else if (section == 1) {hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), hcal_ecal_xy/2+hcal_layer_thick*layer, ecal_front_z+(bar+1/2)*bar_width, 150, scint_thick, bar_width, 0, 0, 0, color, 0, digiName);
+            } else if (section == 3) {hcalDigiHit = drawer_->drawRectPrism((hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+(bar+1/2)*bar_width, scint_thick, 150, bar_width, 0, 0, 0, color, 0, digiName);
+            } else if (section == 2) {hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), -(hcal_ecal_xy/2+hcal_layer_thick*layer), ecal_front_z+(bar+1/2)*bar_width, 150, scint_thick, bar_width, 0, 0, 0, color, 0, digiName);
+            } else if (section == 4) {hcalDigiHit = drawer_->drawRectPrism(-(hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+(bar+1/2)*bar_width, scint_thick, 150, bar_width, 0, 0, 0, color, 0, digiName);
             }
 
             if (hcalDigiHit != 0) {
@@ -205,35 +208,39 @@ namespace ldmx {
 
         hcalHits_->SetPickableRecursively(1);
         hits_->AddElement(hcalHits_);
-
     }
 
     void EventObjects::drawRecoilHits(TClonesArray* hits) {
 
         ldmx::SimTrackerHit* hit;
+        int iter = 0;
         for (TIter next(hits); hit = (ldmx::SimTrackerHit*)next();) {
 
             std::vector<float> xyzPos = hit->getPosition();
+            double energy = hit->getEdep();
+
+            TString recoilName;
+            recoilName.Form("Recoil Hit %d", iter);
 
             if ((xyzPos[2] > 4 && xyzPos[2] < 5) || (xyzPos[2] > 19 && xyzPos[2] < 20) || (xyzPos[2] > 34 && xyzPos[2] < 35) || (xyzPos[2] > 49 && xyzPos[2] < 50)) {
 
-                TEveBox *recoilHit = drawer_->drawBox(xyzPos[0], 0, xyzPos[2], 1, stereo_strip_length, xyzPos[2]+recoil_sensor_thick, 0, kRed+1, 0, "Recoil Hit");
+                TEveGeoShape *recoilHit = drawer_->drawRectPrism(xyzPos[0], 0, xyzPos[2], 1, stereo_strip_length, recoil_sensor_thick, 0, 0, 0, kRed+1, 0, recoilName);
                 recoilTrackerHits_->AddElement(recoilHit);
 
             } else if ((xyzPos[2] > 10 && xyzPos[2] < 11) || (xyzPos[2] > 40 && xyzPos[2] < 41)) {
 
                 TVector3 rotPos = {xyzPos[0], xyzPos[1], xyzPos[2]};
-                rotPos.RotateZ(-stereo_angle);
+                rotPos.RotateZ(-stereo_angle*M_PI/180);
 
-                TEveBox *recoilHit = drawer_->drawBox(rotPos[0], 0, xyzPos[2], 1, stereo_strip_length, xyzPos[2]+recoil_sensor_thick, stereo_angle, kRed+1, 0, "Recoil Hit");
+                TEveGeoShape *recoilHit = drawer_->drawRectPrism(rotPos[0], 0, xyzPos[2], 1, stereo_strip_length, recoil_sensor_thick, 0, 0, stereo_angle, kRed+1, 0, recoilName);
                 recoilTrackerHits_->AddElement(recoilHit);
 
             } else if ((xyzPos[2] > 25 && xyzPos[2] < 26) || (xyzPos[2] > 55 && xyzPos[2] < 56)) {
 
                 TVector3 rotPos = {xyzPos[0], xyzPos[1], xyzPos[2]};
-                rotPos.RotateZ(stereo_angle);
+                rotPos.RotateZ(stereo_angle*M_PI/180);
 
-                TEveBox *recoilHit = drawer_->drawBox(rotPos[0], 0, xyzPos[2], 1, stereo_strip_length, xyzPos[2]+recoil_sensor_thick, -stereo_angle, kRed+1, 0, "Recoil Hit");
+                TEveGeoShape *recoilHit = drawer_->drawRectPrism(rotPos[0], 0, xyzPos[2], 1, stereo_strip_length, recoil_sensor_thick, 0, 0, -stereo_angle, kRed+1, 0, recoilName);
                 recoilTrackerHits_->AddElement(recoilHit);
 
             } else if (xyzPos[2] > 65) {
@@ -241,15 +248,18 @@ namespace ldmx {
 
                     if (xyzPos[1] > 0) {
 
-                        TEveBox *recoilHit = drawer_->drawBox(xyzPos[0], mono_strip_length/2+1, xyzPos[2], 1, mono_strip_length, xyzPos[2]+recoil_sensor_thick, 0, kRed, 0, "Recoil Hit");
+                        TEveGeoShape *recoilHit = drawer_->drawRectPrism(xyzPos[0], mono_strip_length/2+1, xyzPos[2], 1, mono_strip_length, recoil_sensor_thick, 0, 0, 0, kRed, 0, recoilName);
+
                         recoilTrackerHits_->AddElement(recoilHit);
                     } else {
 
-                        TEveBox *recoilHit = drawer_->drawBox(xyzPos[0], -mono_strip_length/2-1, xyzPos[2], 1, mono_strip_length, xyzPos[2]+recoil_sensor_thick, 0, kRed, 0, "Recoil Hit");
+                        TEveGeoShape *recoilHit = drawer_->drawRectPrism(xyzPos[0], -mono_strip_length/2-1, xyzPos[2], 1, mono_strip_length, recoil_sensor_thick, 0, 0, 0, kRed, 0, recoilName);
+
                         recoilTrackerHits_->AddElement(recoilHit);
                     }
                 }
             }
+            iter++;
         }
 
         hits_->AddElement(recoilTrackerHits_);
@@ -285,7 +295,7 @@ namespace ldmx {
                 TColor* aColor = new TColor();
                 Int_t color = aColor->GetColor((Int_t)rgb[0], (Int_t)rgb[1], (Int_t)rgb[2]);
     
-                TEveBox *ecalDigiHit = drawer_->drawBox(xyPos.first, xyPos.second, layerZPos[layer]+ecal_front_z-1.5, 3, 3, layerZPos[layer]+ecal_front_z+1.5, 0, color, 0, "RecHit");
+                TEveGeoShape* ecalDigiHit = drawer_->drawHexPrism(xyPos.first, xyPos.second, layerZPos[layer]+ecal_front_z, 0, 0, 0, 3, 4.47, color, 0, "RecHit");
                 ecalCluster->AddElement(ecalDigiHit);
 
                 if (numHits < 2) { 

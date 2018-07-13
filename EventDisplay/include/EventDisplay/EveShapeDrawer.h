@@ -1,8 +1,14 @@
 #ifndef EVENTDISPLAY_EVESHAPEDRAWER_H_
 #define EVENTDISPLAY_EVESHAPEDRAWER_H_
 
-#include "TEveStraightLineSet.h"
-#include "TEveBox.h"
+#include "TEveGeoShape.h"
+#include "TGeoTube.h"
+#include "TGeoShape.h"
+#include "TGeoMatrix.h"
+
+#include "TVector3.h"
+#include <math.h>
+#include <iostream>
 
 namespace ldmx {
 
@@ -10,79 +16,41 @@ namespace ldmx {
 
         public:
 
-            TEveStraightLineSet* drawHexColumn(Double_t xCenter, Double_t yCenter, Double_t frontZ, Double_t backZ, Double_t h, Int_t color, const char* colName) {
+            TEveGeoShape* drawHexPrism(Double_t xPos, Double_t yPos, Double_t zPos, Double_t xRot, Double_t yRot, Double_t zRot, Double_t h, Double_t r, Int_t color, Int_t transparency, TString name) {
             
-                TEveStraightLineSet* lineset = new TEveStraightLineSet(colName);
-                // Add the bins
-                Double_t x[6], y[6];
-                Double_t sqrt_three = sqrt(3);
-                Double_t a = h / sqrt_three;
-                Double_t xstart = xCenter - a;
-                Double_t ystart = yCenter;
-            
-                // Go around the hexagon
-                x[0] = xstart;
-                y[0] = ystart;
-                x[1] = x[0] + a / 2.0;
-                y[1] = y[0] + a * sqrt_three / 2.0;
-                x[2] = x[1] + a;
-                y[2] = y[1];
-                x[3] = x[2] + a / 2.0;
-                y[3] = y[1] - a * sqrt_three / 2.0;
-                x[4] = x[2];
-                y[4] = y[3] - a * sqrt_three / 2.0;
-                x[5] = x[1];
-                y[5] = y[4];
-            
-                for (int nline = 0; nline < 6; ++nline) {
-            
-                    int nextpt = nline+1;
-                    if (nline == 5) {
-                        nextpt = 0;
-                    }
-            
-                    lineset->AddLine(x[nline], y[nline], frontZ, x[nextpt], y[nextpt], frontZ);
-                    lineset->AddLine(x[nline], y[nline], backZ, x[nextpt], y[nextpt], backZ);
-                    lineset->AddLine(x[nline], y[nline], frontZ, x[nline], y[nline], backZ);
-                }
-            
-                lineset->SetLineColor(color);
-                return lineset;
+                TGeoCombiTrans* locAndOrien = new TGeoCombiTrans(xPos, yPos, zPos, new TGeoRotation(name, xRot, yRot, zRot));
+
+                TEveGeoShape* hexPrism = new TEveGeoShape(name);
+                TGeoShape* tube = new TGeoTube(name, 0, r, h/2);
+                tube->SetUniqueID(uid_++);
+                hexPrism->SetShape(tube);
+                hexPrism->SetFillColor(color);
+                hexPrism->SetMainTransparency(transparency);
+                hexPrism->SetNSegments(6);
+                hexPrism->SetTransMatrix(*locAndOrien);
+
+                return hexPrism;
             }
+
+            TEveGeoShape* drawRectPrism(Double_t xPos, Double_t yPos, Double_t zPos, Double_t dX, Double_t dY, Double_t dZ, Double_t xRot, Double_t yRot, Double_t zRot, Int_t color, Int_t transparency, TString name) {
+        
+                TGeoCombiTrans* locAndOrien = new TGeoCombiTrans(xPos, yPos, zPos, new TGeoRotation(name, xRot, yRot, zRot));
+
+                TEveGeoShape* rectPrism = new TEveGeoShape(name);
+                TGeoShape* box = new TGeoBBox(name, dX/2, dY/2, dZ/2);
+                box->SetUniqueID(uid_++);
+                rectPrism->SetShape(box);
+                rectPrism->SetFillColor(color);
+                rectPrism->SetMainTransparency(transparency);
+                rectPrism->SetTransMatrix(*locAndOrien);
             
-            TEveBox* drawBox(Float_t xPos, Float_t yPos, Float_t frontZ, Float_t xWidth, Float_t yWidth, Float_t backZ, Float_t zRotateAngle, Int_t lineColor, Int_t transparency, const char* name) {
-            
-                TEveBox *box = new TEveBox(name);
-            
-                Float_t vs[8][3] = {
-                        {xPos-xWidth/2,  yPos-yWidth/2,  frontZ},
-                        {xPos-xWidth/2,  yPos+yWidth/2,  frontZ},
-                        {xPos+xWidth/2,  yPos+yWidth/2,  frontZ},
-                        {xPos+xWidth/2,  yPos-yWidth/2,  frontZ},
-                        {xPos-xWidth/2,  yPos-yWidth/2,  backZ},
-                        {xPos-xWidth/2,  yPos+yWidth/2,  backZ},
-                        {xPos+xWidth/2,  yPos+yWidth/2,  backZ},
-                        {xPos+xWidth/2,  yPos-yWidth/2,  backZ}
-                };
-            
-                Float_t rotatedvs[8][3];
-            
-                for (int m = 0; m < 8; ++m) {
-            
-                    TVector3 rotatedVec = {vs[m][0],vs[m][1],vs[m][2]};
-                    rotatedVec.RotateZ(zRotateAngle);
-                    rotatedvs[m][0] = rotatedVec[0];
-                    rotatedvs[m][1] = rotatedVec[1];
-                    rotatedvs[m][2] = rotatedVec[2];
-                }
-            
-                box->SetVertices(*rotatedvs);
-                box->SetLineColor(lineColor);
-                box->SetFillColor(lineColor);
-                box->SetMainTransparency(transparency);
-            
-                return box;
+                return rectPrism;
             }
+
+        private:
+
+            UInt_t uid_ = 0;
+
     };
 }
 

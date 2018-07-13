@@ -31,10 +31,32 @@ namespace ldmx {
             EventDisplay(TEveManager* manager);
 
             ~EventDisplay() {
+
                 file_->Close();
+                delete file_;
+                delete tree_;
                 delete theDetector_;
                 delete eventObjects_;
-                Cleanup();
+                
+                delete ecalDigiHits_;
+                delete hcalDigiHits_;
+                delete recoilHits_;
+                delete ecalClusters_;
+                delete ecalSimParticles_;
+
+                delete textBox1_;
+                delete textBox2_;
+                delete textBox3_;
+                delete textBox4_;
+                delete textBox5_;
+                delete textBox6_;
+                delete textBox7_;
+                delete textBox8_;
+                delete textBox9_;
+                delete textBox10_;
+                delete textBox11_;
+
+                delete manager_;
             }
 
             void NextEvent();

@@ -20,7 +20,7 @@ static const std::vector<double> monoSensorYPos = {-mono_y_width/2, mono_y_width
 static const std::vector<double> recoilLayerZPos = {7.5, 22.5, 37.5, 52.5, 90.0, 180.0};
 
 // In radians
-static const double stereo_angle = 0.1; 
+static const double stereo_angle = 0.1*180/M_PI; 
 
 // ECAL Geometry Constants, In mm
 static const double ecal_z_length = 290.0;
@@ -52,7 +52,15 @@ namespace ldmx {
 
             DetectorGeometry();
 
-            ~DetectorGeometry() {}
+            ~DetectorGeometry() {
+
+                delete hcal_;
+                delete sidehcal_;
+                delete ecal_;
+                delete recoilTracker_;
+                delete detector_;
+                delete shapeDrawer_;
+            }
 
             void drawECAL();
 
