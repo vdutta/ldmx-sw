@@ -225,7 +225,7 @@ namespace ldmx {
             
             int l = *it;
             if ( l < seedlayer_ - conedepth_ or l > seedlayer_ + conedepth_ ) { //layer outside of cone
-                layerlist_.push_back( *it );
+                layerlist_.push_back( l );
             } else { //layer inside cone
                 
                 int centerstrip, lowstrip, upstrip;
@@ -276,7 +276,7 @@ namespace ldmx {
         while ( !cone_.empty() ) { //loop through cone to find mips
             
             SearchByKey( cone_.front().first , cone_.front().second , track );
-            cone_.pop_back();
+            cone_.pop_front();
 
         } //loop through cone to find mips
 
@@ -292,7 +292,7 @@ namespace ldmx {
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
-            layerlist_.pop_back();
+            layerlist_.pop_front();
             
             //calculate extremes for given layer oritentation
             //Find leftmost, secondleftmost, rightmost, secondrightmost (left and right sides could be equal)
