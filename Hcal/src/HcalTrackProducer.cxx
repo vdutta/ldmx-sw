@@ -98,14 +98,18 @@ namespace ldmx {
 
     void HcalTrackProducer::RemoveTrack( const HcalTrack *track ) {
         
+        bool alreadywarned = false;
         for ( int i = 0; i < track->getNHits(); i++ ) {
             
             std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track->getHit(i) ) );
             if ( toremove == log_.end() ) {
-                std::cout << "[ HcalTrackProducer::RemoveTrack ]: ";
-                std::cout << "Unable to locate hit to be removed from log." << std::endl;
-                std::cout << "                                    ";
-                std::cout << "This bodes ill for how this producer was defined." << std::endl;
+                if ( !alreadywarned ) {
+                    std::cout << "[ HcalTrackProducer::RemoveTrack ]: ";
+                    std::cout << "Unable to locate hit to be removed from log." << std::endl;
+                    std::cout << "                                    ";
+                    std::cout << "This bodes ill for how this producer was defined." << std::endl;
+                    alreadywarned = true;
+                }
             } else {
                 log_.erase( toremove );
             }
