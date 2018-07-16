@@ -31,7 +31,7 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() : TObject(), nhits_(0), nlayhits_(0), seedlayer_(0), seedstrip_(0) { }
+            HcalTrack() : TObject(), nhits_(0), nlayhits_(0), seedlayer_(1000), seedstrip_(1000) { }
             
             /**
              * Destructor
@@ -51,8 +51,8 @@ namespace ldmx {
                 nhits_ = 0;
                 nlayhits_ = 0;
 
-                seedlayer_ = 0;
-                seedstrip_ = 0;
+                seedlayer_ = 1000;
+                seedstrip_ = 1000;
 
                 return;
             }
@@ -110,10 +110,12 @@ namespace ldmx {
             /**
              * Get seed information
              */
-            void getSeed( int &seedlayer , int &seedstrip ) const {
-                seedlayer = seedlayer_;
-                seedstrip = seedstrip_;
-                return;
+            int getSeedLayer() const {
+                return seedlayer_;
+            }
+
+            int getSeedStrip() const {
+                return seedstrip_;
             }
 
             /**
