@@ -72,11 +72,10 @@ namespace ldmx {
             /**
              * Attempt to reconstruct a track from a seed layer.
              *
-             * @param seedlayer layer index for seed
              * @param track plausible track - should be empty
              * @return true if a track was found
              */
-            bool TrackSearch( int seedlayer , HcalTrack *track );
+            bool TrackSearch( HcalTrack *track );
    
             /**
              * Function to generate key from section,layer,hit information.

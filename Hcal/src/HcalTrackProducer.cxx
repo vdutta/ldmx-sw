@@ -66,18 +66,18 @@ namespace ldmx {
 
         //search for tracks
         HcalTrack *track = new HcalTrack();
-        int seedlayer = firstseedlayer_;
+        seedlayer_ = firstseedlayer_;
         int trackcnt = 0;
-        while( TrackSearch( seedlayer , track ) and trackcnt < maxtrackcnt_ ) {
+        while( TrackSearch( track ) and trackcnt < maxtrackcnt_ ) {
             //add track to collection
             HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
-            *toadd = *track; 
+            *toadd = *track;
 
             //Remove track from log
             RemoveTrack( track );
 
             track->Clear(); //re-initialize track
-            seedlayer = *layercheck_.begin(); //change seedlayer
+            seedlayer_ = *layercheck_.begin(); //change seedlayer
             trackcnt++;
         } //keep searching for tracks until can't find anymore
 
@@ -119,9 +119,8 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack *track ) {
+    bool HcalTrackProducer::TrackSearch( HcalTrack *track ) {
         
-        seedlayer_ = seedlayer;
         seedstrip_ = 0;
         while ( FindSeed() ) { //seed found
             
