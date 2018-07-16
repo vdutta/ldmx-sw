@@ -47,7 +47,7 @@ namespace ldmx {
         } //tracks in event (i)
         
         //Drop non-interesting events
-        if ( ntracks > 1 )
+        if ( ntracks != 1 )
             setStorageHint( hint_mustKeep );
         else
             setStorageHint( hint_mustDrop );
