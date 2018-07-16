@@ -220,9 +220,10 @@ namespace ldmx {
         float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
 
         //Set Cone and Layer Lists 
-        for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
+        for ( int l = 1; l < nlayers_+1; l++ ) {
+        //for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
             
-            int l = *it;
+        //    int l = *it;
             if ( l < seedlayer_ - conedepth_ or l > seedlayer_ + conedepth_ ) { //layer outside of cone
                 layerlist_.push_back( l );
             } else { //layer inside cone
