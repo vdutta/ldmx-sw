@@ -31,7 +31,7 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() : TObject(), nhits_(0), nlayhits_(0) { }
+            HcalTrack() : TObject(), nhits_(0), nlayhits_(0), seedlayer_(0), seedstrip_(0) { }
             
             /**
              * Destructor
@@ -51,6 +51,9 @@ namespace ldmx {
                 nhits_ = 0;
                 nlayhits_ = 0;
 
+                seedlayer_ = 0;
+                seedstrip_ = 0;
+
                 return;
             }
 
@@ -68,6 +71,15 @@ namespace ldmx {
              */
             void incLayHit() {
                 nlayhits_++;
+                return;
+            }
+
+            /**
+             * Set seed information
+             */
+            void setSeed(int seedlayer , int seedstrip) {
+                seedlayer_ = seedlayer;
+                seedstrip_ = seedstrip;
                 return;
             }
 
@@ -94,6 +106,15 @@ namespace ldmx {
             int getNLayHits() const {
                 return nlayhits_;
             }
+            
+            /**
+             * Get seed information
+             */
+            void getSeed( int &seedlayer , int &seedstrip ) const {
+                seedlayer = seedlayer_;
+                seedstrip = seedstrip_;
+                return;
+            }
 
             /**
              * Get hit at a certain index in track.
@@ -114,6 +135,9 @@ namespace ldmx {
             TRefArray hits_; //* references to hits in the track
             int nhits_; //* number of hits in the track
             int nlayhits_; //* number of layers hit in the track
+            
+            int seedlayer_; //* layer of seed for this track
+            int seedstrip_; //* strip of seed for this track
 
             /**
              * ROOT Class Definition
