@@ -55,23 +55,6 @@ namespace ldmx {
             }
 
             /**
-             * Copy the track
-             */
-            void Copy( TObject &obj ) const {
-                
-                TObject::Copy( obj );
-                
-                HcalTrack& track = (HcalTrack&)(obj);
-                
-                track.hits_ = TRefArray( this->hits_ );
-
-                track.nhits_ = this->nhits_;
-                track.nlayhits_ = this->nlayhits_;
-
-                return;
-            }
-
-            /**
              * Add a hit to the track.
              */
             void addHit( HitPtr hit ) {
