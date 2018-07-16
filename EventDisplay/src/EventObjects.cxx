@@ -345,6 +345,10 @@ namespace ldmx {
                 //empty tracks list
                 break;
             }
+            
+            int seedlayer,seedstrip;
+            track->getSeed( seedlayer , seedstrip );
+            std::cout << "Seed: " << seedlayer << " " << seedstrip << std::endl;
 
             //construct track, drawing hcal hits
             TString trackname;
