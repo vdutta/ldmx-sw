@@ -121,6 +121,8 @@ namespace ldmx {
         seedstrip_ = 0;
         while ( FindSeed() ) { //seed found
             
+            track->setSeed( seedlayer_ , seedstrip_ );
+            
             SetSearchCone();
             
             //Checks if track is started successfully and then tries to
