@@ -110,19 +110,14 @@ namespace ldmx {
              * Recursively looks through more different seed layers if doesn't find one in input layer.
              * Will return false if it exhausts its layer options for a seed.
              *
-             * @param seedlayer starting seedlayer to search for mip
-             * @param seedstrip strip number of seed if mip is found
-             * @return true if found a seed (seedlayer and seedstrip are its position)
+             * @return true if found a seed (seedlayer_ and seedstrip_ are its position)
              */
-            bool FindSeed( int &seedlayer , int &seedstrip );
+            bool FindSeed();
             
             /**
              * Constructs search cone around seed and list of layers that aren't in cone or seed.
-             *
-             * @param seedlayer layer number of seed
-             * @param seedstrip strip number of seed
              */
-            void SetSearchCone( const int seedlayer , const int seedstrip );
+            void SetSearchCone();
             
             /**
              * Begins partial track by searching through cone around seed.
@@ -195,6 +190,9 @@ namespace ldmx {
             int mintracklayhits_; //* minimum number of layers hit in a full track for it to be accepted
             
             int maxtrackcnt_; //* maximum number of tracks that can be found before exiting
+
+            int seedlayer_; //* current layer number used as seed for current track
+            int seedstrip_; //* current strip number used as seed for current track
 
             std::string hcaltracksname_; //* name of track collection to be put into event bus
             TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event

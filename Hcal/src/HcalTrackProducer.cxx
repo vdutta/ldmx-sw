@@ -117,10 +117,11 @@ namespace ldmx {
     
     bool HcalTrackProducer::TrackSearch( int seedlayer , HcalTrack *track ) {
         
-        int seedstrip = 0;
-        while ( FindSeed( seedlayer , seedstrip ) ) { //seed found
+        seedlayer_ = seedlayer;
+        seedstrip_ = 0;
+        while ( FindSeed() ) { //seed found
             
-            SetSearchCone( seedlayer , seedstrip );
+            SetSearchCone();
             
             //Checks if track is started successfully and then tries to
             // extend the track.
@@ -129,7 +130,7 @@ namespace ldmx {
             }
             
             //bad seed
-            badseeds_.insert( seedlayer*layermod_ + seedstrip );
+            badseeds_.insert( KeyGen( 0 , seedlayer_ , seedstrip_ ) );
 
         } //while possible good seed found
 
@@ -158,20 +159,20 @@ namespace ldmx {
         return;
     }
     
-    bool HcalTrackProducer::FindSeed( int &seedlayer , int &seedstrip ) {
+    bool HcalTrackProducer::FindSeed() {
         
         if ( layercheck_.empty() ) { //no more layers to check
             return false;
         }
        
-        //check if seedlayer has been searched before
-        std::set<int>::iterator seedlayer_it = layercheck_.find( seedlayer );
+        //check if seedlayer_ has been searched before
+        std::set<int>::iterator seedlayer_it = layercheck_.find( seedlayer_ );
 
-        if ( seedlayer_it != layercheck_.end() ) { //seedlayer hasn't been searched before
+        if ( seedlayer_it != layercheck_.end() ) { //seedlayer_ hasn't been searched before
            
             //set keys to cover entire layer
-            int lowkey = seedlayer*layermod_;
-            int upkey = (seedlayer+1)*layermod_ - 1;
+            int lowkey = seedlayer_*layermod_;
+            int upkey = (seedlayer_+1)*layermod_ - 1;
             
             HcalTrack *trackseed = new HcalTrack(); //temp HcalTrack for SearchByKey
             int seedkey = lowkey - 1; //preserve lowkey when entering loop
@@ -181,8 +182,8 @@ namespace ldmx {
                 lowkey = seedkey+1;//move range up to start after bad seed
                 mipfound = SearchByKey( lowkey , upkey , trackseed );//search for another mip 
                 if ( mipfound ) { //mip found
-                    seedstrip = static_cast<int>( trackseed->getHit(0)->getStrip() ); //reset seedstrip
-                    seedkey = seedlayer*layermod_ + seedstrip; //reset seedkey
+                    seedstrip_ = static_cast<int>( trackseed->getHit(0)->getStrip() ); //reset seedstrip
+                    seedkey = KeyGen( 0 , seedlayer_ , seedstrip_ ); //reset seedkey
                     badseedfound = ( badseeds_.find( seedkey ) != badseeds_.end() ); //see if new seed is bad
                 } else {
                     badseedfound = false; //no mip found so exit loop
@@ -197,14 +198,14 @@ namespace ldmx {
             //entire layer searched, no good seeds
             layercheck_.erase( seedlayer_it );
 
-        } //seedlayer hasn't been searched before
+        } //seedlayer_ hasn't been searched before
 
         //Function would exit by now if it hadn't found a seed
-        seedlayer = *layercheck_.begin();
-        return ( FindSeed( seedlayer , seedstrip ) );
+        seedlayer_ = *layercheck_.begin();
+        return ( FindSeed() );
     }
 
-    void HcalTrackProducer::SetSearchCone( const int seedlayer , const int seedstrip ) {
+    void HcalTrackProducer::SetSearchCone() {
         
         //reset lists
         while ( !cone_.empty() ) {
@@ -222,17 +223,17 @@ namespace ldmx {
         for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
             
             int l = *it;
-            if ( l < seedlayer - conedepth_ or l > seedlayer + conedepth_ ) { //layer outside of cone
+            if ( l < seedlayer_ - conedepth_ or l > seedlayer_ + conedepth_ ) { //layer outside of cone
                 layerlist_.push( *it );
             } else { //layer inside cone
                 
                 int centerstrip, lowstrip, upstrip;
                 if ( true ) { //!(( seedlayer ^ l ) & 1 ) ) { 
                     //current layer and seedlayer have same parity (same orientation)
-                    centerstrip = seedstrip; 
+                    centerstrip = seedstrip_; 
                 
                     //calculate current halfwidth of cone
-                    float halfwidth = std::abs(slope*(l - seedlayer))/2.0;
+                    float halfwidth = std::abs(slope*(l - seedlayer_))/2.0;
                 
                     lowstrip = static_cast<int>(std::floor( centerstrip - halfwidth ));
                     upstrip = static_cast<int>(std::ceil( centerstrip + halfwidth ));
