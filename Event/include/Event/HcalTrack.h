@@ -48,6 +48,7 @@ namespace ldmx {
 
                 hits_.Delete(); //Clear();
                 nhits_ = 0;
+                nlayhits_ = 0;
 
                 return;
             }

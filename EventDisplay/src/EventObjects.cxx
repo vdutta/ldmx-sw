@@ -133,8 +133,7 @@ namespace ldmx {
             } //iterate through hits in track (hit)
 
         } //iterate through tracks (track)
-
-    }
+}
 
     void EventObjects::drawECALHits(TClonesArray* hits) {
 
@@ -339,9 +338,14 @@ namespace ldmx {
         
         //iterate through tracks
         int iT = 0;
-        HcalTrack* track;
+        ldmx::HcalTrack* track;
         for (TIter next(tracks); track = (ldmx::HcalTrack*)next();) {
             
+            if ( track == nullptr ) {
+                //empty tracks list
+                break;
+            }
+
             //construct track, drawing hcal hits
             TString trackname;
             trackname.Form("Hcal Track %d", iT);

@@ -42,7 +42,7 @@ namespace ldmx {
 
             void drawECALClusters(TClonesArray* clusters);
             
-            void drawHCALTracks(TClonesArray* hcalTracks);
+            void drawHCALTracks(TClonesArray* tracks);
 
             void drawECALSimParticles(TClonesArray* ecalSimParticles);
 
@@ -86,8 +86,7 @@ namespace ldmx {
             double simThresh_ = 0;
             TRandom r_;
             std::vector<Color_t> colors_ = {kRed, kBlue, kGreen, kYellow, kMagenta, kBlack, kOrange, kPink};
-            std::vector<Color_t> hcaltrackcolors_ = {kRed , kMagenta};
-
+            std::vector<Color_t> hcaltrackcolors_ = {kRed , kMagenta , kPink};
     };
 }
 
