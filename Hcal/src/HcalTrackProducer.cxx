@@ -51,14 +51,6 @@ namespace ldmx {
             layercheck_.insert( i );
         }
 
-        while ( !cone_.empty() ) {
-            cone_.pop();
-        }
-
-        while ( !layerlist_.empty() ) {
-            layerlist_.pop();
-        }
-
         badseeds_.clear();
 
         //obtain list of hits
@@ -226,11 +218,13 @@ namespace ldmx {
         //calculate slope of cone
         float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
 
-        for ( int l = seedlayer - conedepth_; l < seedlayer + conedepth_ + 1; l++ ) {
-
-            std::set<int>::iterator l_it = layercheck_.find( l );
+        //Set Cone and Layer Lists 
+        for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
             
-            if ( l_it != layercheck_.end() ) { //current layer hasn't been check entirely
+            int l = *it;
+            if ( l < seedlayer - conedepth_ or l > seedlayer + conedepth_ ) { //layer outside of cone
+                layerlist_.push( *it );
+            } else { //layer inside cone
                 
                 int centerstrip, lowstrip, upstrip;
                 if ( true ) { //!(( seedlayer ^ l ) & 1 ) ) { 
@@ -257,17 +251,11 @@ namespace ldmx {
                 //add keys to cone
                 cone_.push( std::pair<int,int>( KeyGen( 0 , l , lowstrip ), KeyGen( 0 , l , upstrip ) ) );
 
-            } //current layer hasn't been exhaustively checked
-        } //iterate through layers in cone (l)
-
-        //Set Layer List (layers outside cone that haven't been searched exhaustively
-        for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
-            
-            if ( *it < seedlayer - conedepth_ or *it > seedlayer + conedepth_ ) { //layer outside of cone
-                layerlist_.push( *it );
-            }
+            } //layer in or out of cone
 
         } //iterate through layercheck_ (it)
+
+        //sort layerlist according to proximity to seed?
 
         return;
     }
@@ -375,7 +363,7 @@ namespace ldmx {
     }
     
     bool HcalTrackProducer::isAcceptableTrack( const HcalTrack *track ) const {
-        //For now, only going by number of hits in track
+        //For now, only going by number of layer hits in track
         return ( track->getNLayHits() > mintracklayhits_ );
     }
 
