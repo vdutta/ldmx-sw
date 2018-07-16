@@ -350,11 +350,12 @@ namespace ldmx {
             TString trackname;
             trackname.Form("Hcal Track %d", iT);
             TEveElement *trackray = new TEveElementList(trackname);
-            for (int i = 0; i < track->getNHits(); i++) {
+            int nhits = track->getNHits();
+            for (int iH = 0; iH < nhits; iH++) {
                 
-                ldmx::HcalHit* chit = track->getHit( i );
+                ldmx::HcalHit* chit = track->getHit( iH );
                 
-                bool isNoise = chit->getZ() == 0;
+                bool isNoise = (chit->getZ() == 0);
                 
                 int pe = chit->getPE();
                 int bar = chit->getStrip();

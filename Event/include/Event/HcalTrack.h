@@ -31,14 +31,15 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() : nhits_(0), nlayhits_(0) { }
+            HcalTrack() : TObject(), nhits_(0), nlayhits_(0) { }
             
             /**
-             * Copy Constructor
+             * Destructor
              */
-            HcalTrack( const HcalTrack& tocopy ) : 
-                hits_(tocopy.hits_),nhits_(tocopy.nhits_),nlayhits_(tocopy.nlayhits_) { }
-
+            ~HcalTrack() {
+                Clear();
+            }
+            
             /**
              * Clear the track
              */
@@ -46,7 +47,7 @@ namespace ldmx {
 
                 TObject::Clear();
 
-                hits_.Delete(); //Clear();
+                hits_.Clear();
                 nhits_ = 0;
                 nlayhits_ = 0;
 
@@ -57,7 +58,7 @@ namespace ldmx {
              * Add a hit to the track.
              */
             void addHit( HitPtr hit ) {
-                hits_.Add( hit );
+                hits_.AddAtFree( hit );
                 nhits_++;
                 return;
             }
