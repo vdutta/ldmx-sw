@@ -208,13 +208,8 @@ namespace ldmx {
     void HcalTrackProducer::SetSearchCone() {
         
         //reset lists
-        while ( !cone_.empty() ) {
-            cone_.pop();
-        }
-        
-        while ( !layerlist_.empty() ) {
-            layerlist_.pop();
-        } 
+        cone_.clear();
+        layerlist_.clear();
         
         //calculate slope of cone
         float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
@@ -224,7 +219,7 @@ namespace ldmx {
             
             int l = *it;
             if ( l < seedlayer_ - conedepth_ or l > seedlayer_ + conedepth_ ) { //layer outside of cone
-                layerlist_.push( *it );
+                layerlist_.push_back( *it );
             } else { //layer inside cone
                 
                 int centerstrip, lowstrip, upstrip;
@@ -250,13 +245,17 @@ namespace ldmx {
                 CorrectStrip( upstrip );
 
                 //add keys to cone
-                cone_.push( std::pair<int,int>( KeyGen( 0 , l , lowstrip ), KeyGen( 0 , l , upstrip ) ) );
+                cone_.push_back( std::pair<int,int>( KeyGen( 0 , l , lowstrip ), KeyGen( 0 , l , upstrip ) ) );
 
             } //layer in or out of cone
 
         } //iterate through layercheck_ (it)
 
-        //sort layerlist according to proximity to seed?
+        //sort layerlist according to proximity to seed
+//        std::sort( layerlist_.begin() , layerlist_.end() , 
+//            [&]( const int &a , const int &b ) -> bool {
+//                return ( std::abs(a - this->seedlayer_) < std::abs(b - this->seedlayer_) );
+//            });
 
         return;
     }
@@ -271,7 +270,7 @@ namespace ldmx {
         while ( !cone_.empty() ) { //loop through cone to find mips
             
             SearchByKey( cone_.front().first , cone_.front().second , track );
-            cone_.pop();
+            cone_.pop_back();
 
         } //loop through cone to find mips
 
@@ -287,7 +286,7 @@ namespace ldmx {
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
-            layerlist_.pop();
+            layerlist_.pop_back();
             
             //calculate extremes for given layer oritentation
             //Find leftmost, secondleftmost, rightmost, secondrightmost (left and right sides could be equal)

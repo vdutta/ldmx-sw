@@ -11,11 +11,12 @@
 #include <iostream> //Checks to std::cout for development purposes
 #include <vector> //Vector of hits per layer
 #include <map> //std::map for storage tree
-#include <queue> //std::queue for search cone and layer list
+#include <list> //std::queue for search cone and layer list
 #include <set> //std::set for layers that haven't been checked yet
 #include <utility> //std::pair for storage tree
 #include <iterator> //std::next and std::prev for search through map
 #include <cmath> //floor and ceil for stripbounds calculations
+#include <algorithm> //std::sort for layerlist
 
 //ROOT
 #include "TClonesArray.h" //Add new array of tracks to event bus
@@ -201,8 +202,8 @@ namespace ldmx {
 
             std::set< int > layercheck_; //* set of layers that haven't been checked exhaustively yet 
 
-            std::queue< std::pair< int , int > > cone_; //* search cone in keys around seed
-            std::queue< int > layerlist_; //* list of layers to go through after partial track is begun
+            std::list< std::pair< int , int > > cone_; //* search cone in keys around seed
+            std::list< int > layerlist_; //* list of layers to go through after partial track is begun
             std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
             
     };
