@@ -52,7 +52,7 @@ namespace ldmx {
             std::string trackcollname_; //* name of the collection of HcalTracks 
             
             TH1F* h_tracksperevent_; //* number of tracks per event
-            TH1F* h_layhitspertrack_[10]; //* number of layer hits per track, index i is the ith track found in the event
+            TH1F* h_layhitspertrack_[3]; //* number of layer hits per track, index i is the ith track found in the event
     };
 }
 

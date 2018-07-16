@@ -22,15 +22,15 @@ namespace ldmx {
         h_tracksperevent_->Fill( ntracks );
         for( int i = 0; i < ntracks; i++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(i) );
-            if (i < 9 ) {
+            if (i < 3 ) {
                 h_layhitspertrack_[i]->Fill( curr_track->getNLayHits() );
             } else {
-                std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 9 tracks!" << std::endl;
+                std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
         }
         
         //Drop non-interesting events
-        if ( ntracks > 1 )
+        if ( ntracks != 1 )
             setStorageHint( hint_mustKeep );
         else
             setStorageHint( hint_mustDrop );
@@ -45,7 +45,7 @@ namespace ldmx {
         h_tracksperevent_ = new TH1F( "h_tracksperevent_" , "Tracks Per Event" ,
             11 , -0.5 , 10.5 );
         
-        for ( int i = 0; i < 9; i++ ) {
+        for ( int i = 0; i < 3; i++ ) {
             h_layhitspertrack_[i] = new TH1F( ("h_layhitspertrack_"+std::to_string(i)).c_str() ,
                 ("Layer Hits Per Track "+std::to_string(i)).c_str() ,
                 201 , -0.5 , 200.5 );
