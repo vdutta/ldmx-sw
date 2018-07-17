@@ -29,7 +29,7 @@ namespace ldmx {
         coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
         minconehits_ = ps.getInteger( "MinConeHits" , 3 );
         
-        trackwidth_ = ps.getInteger( "TrackWidth" , 3 );
+        trackwidth_ = ps.getInteger( "TrackWidth" , 6 );
         
         mintracklayhits_ = ps.getInteger( "MinTrackLayerHits" , 20 );
         
