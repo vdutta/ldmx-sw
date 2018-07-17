@@ -17,7 +17,7 @@ namespace ldmx {
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
         
         const TClonesArray* tracks = event.getCollection(trackcollname_);
-        std::set<int> trackhitkeys;
+//        std::set<int> trackhitkeys;
         
         int ntracks = tracks->GetEntriesFast();
         h_tracksperevent_->Fill( ntracks );
@@ -28,12 +28,13 @@ namespace ldmx {
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
-            //Log hits in track
+/*            //Log hits in track
             int nhits = curr_track->getNHits();
             for ( int iH = 0; iH < nhits; iH++ ) {
                 HitPtr curr_hit = curr_track->getHit( iH );
                 trackhitkeys.insert( static_cast<int>( curr_hit->getLayer()*100 + curr_hit->getStrip() ) );
             } //hits in track (iH)
+*/
         } //tracks in event (iT)
 /*
         const TClonesArray* hits = event.getCollection("hcalDigis");
@@ -84,7 +85,7 @@ namespace ldmx {
             h_layhitspertrack_[i]->SetLineColor( i+1 );
         }
 
-
+/* Histograms to study track behavior
         h_pe_nonnoise_ = new TH1F( "h_pe_nonnoise_" , "PE Per Non-Noise Hit" , 600 , 0.0 , 600.0 ); 
         h_pe_notrack_ = new TH1F( "h_pe_notrack_" , "PE Per No Track Hit" , 600 , 0.0 , 600.0 ); 
 
@@ -93,7 +94,7 @@ namespace ldmx {
 
         h_strip_nonnoise_ = new TH1F( "h_strip_nonnoise_" , "Strip Per Non-Noise Hit" , 40 , 0.0 , 40.0 );
         h_strip_notrack_ = new TH1F( "h_strip_notrack_" , "Strip Per No Track Hit" , 40 , 0.0 , 40.0 );
-
+*/
         return;
     }
 
