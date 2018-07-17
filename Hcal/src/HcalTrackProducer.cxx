@@ -285,75 +285,42 @@ namespace ldmx {
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
+        std::cout << "In HcalTrackProducer::ExtendTrack" << std::endl;
+        bool addednewhit = true; //SearchByKey added something to track
         
-        float leftslope, rightslope;
-        std::pair< HitPtr , HitPtr > leftmost( track->getHit(0), track->getHit(1) ), rightmost( track->getHit(0) , track->getHit(1) );
- 
+        float layers[1000], strips[1000];
+        std::cout << "Declared float arrays" << std::endl;
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
             layerlist_.pop_front();
-            
-            //calculate extremes for given layer oritentation
-            //Find leftmost, secondleftmost, rightmost, secondrightmost (left and right sides could be equal)
-            for ( int i = 0; i < track->getNHits(); i++ ) {
-            
-                HitPtr curr_hit = track->getHit( i );
+            std::cout << "Obtained next layer to search " << layer << std::endl;
+            //get layers and strips to be fitted from track
+            int npts = 0;
+            for ( int iH = 0; iH < track->getNHits(); iH++ ) {
+                
+                HitPtr curr_hit = track->getHit( iH );
                 float curr_strip = curr_hit->getStrip();
                 float curr_layer = curr_hit->getLayer();
-                if ( true ) { //!(( layer ^ curr_layer ) & 1 ) ) { 
-                //current layer and layer have same parity (same orientation)
-                 
-                    bool isdifleftlayer = ( std::abs(curr_layer - leftmost.first->getLayer()) >= 1.0 );
-                    bool isdifrightlayer = ( std::abs(curr_layer - rightmost.first->getLayer()) >= 1.0 );
+                if ( true ) { // !(( layer ^ static_cast<int>(curr_layer) ) & 1 ) )  { //layer and curr_layer have same parity 
+                    
+                    layers[ npts ] = curr_layer;
+                    strips[ npts ] = curr_strip;
+                    npts++;
+                   
+                } //layer and curr_layer have same parity
 
-                    //Check if curr_strip is first or second most left
-                    if ( curr_strip < leftmost.first->getStrip() ) {
-                        if ( isdifleftlayer ) {
-                            leftmost.second = leftmost.first;
-                        } //check to make sure second most left is not on same layer
-                        leftmost.first = curr_hit;
-                    } else if ( curr_strip < leftmost.second->getStrip() and isdifleftlayer ) {
-                        leftmost.second = curr_hit;
-                    } //check to update second most (and make sure it isn't on the same level)
+            } //iterate through hits in track (iH)
+            std::cout << "Filled float arrays up to " << npts << std::endl;
+            //Linearly extrapolate ponts to layer
+            TGraph fitgr( npts , layers , strips );
+            std::cout << "Declared TGraph" << std::endl;
+            float centerstrip = fitgr.Eval( layer );
+            std::cout << "Evaluated TGraph" << std::endl;
             
-                    //Check if curr_strip is first or second most right
-                    if ( curr_strip > rightmost.first->getStrip() ) {
-                        if ( isdifrightlayer ) {
-                            rightmost.second = rightmost.first;
-                        }
-                        rightmost.first = curr_hit;
-                    } else if ( curr_strip > rightmost.second->getStrip() and isdifrightlayer ) {
-                        rightmost.second = curr_hit;
-                    }
- 
-                } //skip curr_hit if not same orientation as layer
-           
-            } //iterate through partial track (it)
-        
-            //Extend from leftmost to layer
-            if ( leftmost.first->getLayer() - leftmost.second->getLayer() > 0.01 ) {
-                leftslope = (leftmost.first->getStrip() - leftmost.second->getStrip())/(leftmost.first->getLayer() - leftmost.second->getLayer());
-            } else {
-                leftslope = 0.0;
-            }
-
-            //Extend from rightmost to layer
-            if ( rightmost.first->getLayer() - rightmost.second->getLayer() > 0.01 ) {
-                rightslope = (rightmost.first->getStrip() - rightmost.second->getStrip())/(rightmost.first->getLayer() - rightmost.second->getLayer());
-            } else {
-                rightslope = 0.0;
-            }
-
-            float leftedge = (layer - leftmost.first->getLayer())*leftslope + leftmost.first->getStrip();
-            float rightedge = (layer - rightmost.first->getLayer())*rightslope + rightmost.first->getStrip();
-
-            //Arithmetic mean of right edge and left edge
-            float centertrack = (leftedge+rightedge)/2;
-        
             //Define lowstrip and upstrip
-            int lowstrip = static_cast<int>(std::floor( centertrack - trackwidth_/2.0 ));
-            int upstrip = static_cast<int>(std::ceil( centertrack + trackwidth_/2.0 ));
+            int lowstrip = static_cast<int>(std::floor( centerstrip - trackwidth_/2.0 ));
+            int upstrip = static_cast<int>(std::ceil( centerstrip + trackwidth_/2.0 ));
             CorrectStrip( lowstrip );
             CorrectStrip( upstrip );
 
@@ -361,7 +328,7 @@ namespace ldmx {
             int lowkey = KeyGen( 0 , layer , lowstrip );
             int upkey = KeyGen( 0 , layer , upstrip );
 
-            SearchByKey( lowkey , upkey , track );
+            addednewhit = SearchByKey( lowkey , upkey , track );
 
         } //loop through elements of layerlist
 
