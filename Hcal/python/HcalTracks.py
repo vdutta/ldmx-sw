@@ -3,7 +3,7 @@
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
-HcalTracks = ldmxcfg.Producer("HcalTracks", "ldmx::HcalTrackProducer")
+HcalTracks = ldmxcfg.Producer( "HcalTracks" , "ldmx::HcalTrackProducer" )
 
 # name of collection that contains the hcal hits 
 HcalTracks.parameters["HitCollectionName"] = "hcalDigis"
