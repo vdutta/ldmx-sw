@@ -122,7 +122,13 @@ namespace ldmx {
              * Get hit at a certain index in track.
              */
             HitPtr getHit( int i ) const {
-                return (HitPtr)(hits_.At(i));
+                
+                HitPtr h = (HitPtr)(hits_.At(i));
+                if ( h == nullptr ) {
+                    std::cout << "[ HcalTrack::getHit ] : Mismatch! Returning nullptr! Did you access the TClonesArray of HcalHits after setting this HcalTrack?" << std::endl;
+                }
+                
+                return h;
             }
 
             /**
