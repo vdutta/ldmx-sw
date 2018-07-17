@@ -285,16 +285,16 @@ namespace ldmx {
     }
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
-        std::cout << "In HcalTrackProducer::ExtendTrack" << std::endl;
+        
         bool addednewhit = true; //SearchByKey added something to track
         
         float layers[1000], strips[1000];
-        std::cout << "Declared float arrays" << std::endl;
+        
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
             layerlist_.pop_front();
-            std::cout << "Obtained next layer to search " << layer << std::endl;
+       
             //get layers and strips to be fitted from track
             int npts = 0;
             for ( int iH = 0; iH < track->getNHits(); iH++ ) {
@@ -311,12 +311,10 @@ namespace ldmx {
                 } //layer and curr_layer have same parity
 
             } //iterate through hits in track (iH)
-            std::cout << "Filled float arrays up to " << npts << std::endl;
+      
             //Linearly extrapolate ponts to layer
             TGraph fitgr( npts , layers , strips );
-            std::cout << "Declared TGraph" << std::endl;
             float centerstrip = fitgr.Eval( layer );
-            std::cout << "Evaluated TGraph" << std::endl;
             
             //Define lowstrip and upstrip
             int lowstrip = static_cast<int>(std::floor( centerstrip - trackwidth_/2.0 ));
