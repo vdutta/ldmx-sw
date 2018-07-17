@@ -35,7 +35,7 @@ namespace ldmx {
                 trackhitkeys.insert( static_cast<int>( curr_hit->getLayer()*100 + curr_hit->getStrip() ) );
             } //hits in track (iH)
         } //tracks in event (iT)
-
+/*
         const TClonesArray* hits = event.getCollection("hcalDigis");
         int nhits = hits->GetEntriesFast();
         for ( int iH = 0; iH < nhits; iH++ ) {
@@ -60,7 +60,7 @@ namespace ldmx {
             } //check in nonnoise
             
         } //hits in event (iH)
-        
+*/        
         //Drop non-interesting events
         if ( ntracks != 1 )
             setStorageHint( hint_mustKeep );
