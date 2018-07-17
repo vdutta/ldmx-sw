@@ -148,14 +148,16 @@ namespace ldmx {
 
             /**
              * Function to search a specific range of a log for a hit.
-             * Returns a pair of nullptrs if failed to find an isolated hit.
+             * Will add hit(s) to track that it considers to be the preferred mip.
+             * If more than one mip is found, the one closest to prefkey is the one added.
              *
              * @param lowkey lower bound key
              * @param upkey upper bound key
              * @param track partial track to add hit to if found
+             * @param prefkey hit key that is given preference if multiple hits are found
              * @return true if successfully found a hit in the given key range 
              */
-            bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track );
+            bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track , const float prefkey = -1.0 );
 
             /**
              * Function to determine whether a group of hits can be considered a mip.
