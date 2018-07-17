@@ -54,7 +54,7 @@ namespace ldmx {
             
             TH1F* h_tracksperevent_; //* number of tracks per event
             TH1F* h_layhitspertrack_[3]; //* number of layer hits per track, index i is the ith track found in the event
-
+/* Histograms to study track behavior
             TH1F* h_pe_nonnoise_; //* pe distribution of all non-noise hits
             TH1F* h_pe_notrack_; //* pe distribution of all hits not in a track
 
@@ -63,6 +63,7 @@ namespace ldmx {
 
             TH1F* h_strip_nonnoise_; //* strip number distribution of all non-noise hits
             TH1F* h_strip_notrack_; //* strip number distribution of all hits not in a track
+*/
     };
 }
 
