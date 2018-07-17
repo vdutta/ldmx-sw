@@ -9,7 +9,7 @@
 namespace ldmx {
     
     void HcalTrackAnalyzer::configure(const ldmx::ParameterSet& ps) {
-        trackcollname_ = ps.getString( "HcalTrackCollectionName" , "HcalTracks" );
+        trackcollname_ = ps.getString( "HcalTrackCollectionName" );
        
         return;
     }
