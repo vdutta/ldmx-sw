@@ -20,7 +20,7 @@ namespace ldmx {
         layermod_ = (int)(pow( 10 , std::ceil( log10( nstrips_ ) ) ));
         sectionmod_ = (int)(pow( 10 , std::ceil( log10( nlayers_ ) ) ));
 
-        minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 0.0 ) );
+        minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 5.5 ) );
         maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" , 4000.0 ) );
 
         firstseedlayer_ = ps.getInteger( "FirstSeedLayer" , 1 );
