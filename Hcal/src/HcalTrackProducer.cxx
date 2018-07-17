@@ -326,7 +326,7 @@ namespace ldmx {
             int lowkey = KeyGen( 0 , layer , lowstrip );
             int upkey = KeyGen( 0 , layer , upstrip );
 
-            addednewhit = SearchByKey( lowkey , upkey , track );
+            addednewhit = SearchByKey( lowkey , upkey , track , centerstrip );
 
         } //loop through elements of layerlist
 
@@ -338,7 +338,7 @@ namespace ldmx {
         return ( track->getNLayHits() > mintracklayhits_ );
     }
 
-    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track ) {
+    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track , const float prefstrip ) {
         
         bool success = false;
 
@@ -390,25 +390,48 @@ namespace ldmx {
         
             //mipvec has group(s) considered mips
             //cases based on how many mips were found
-            switch( mipvec.size() ) {
-                case 0:
-                    //no mips in this key range
-                    break;
-                case 1:
-                    //one mip in this key range
-                    track->incLayHit(); //think about moving this to a more general spot (avoid double counting a layer)
-                    track->addGroup( mipvec[0] );
-                    success = true;
-                    break;
-                default:
-                    //more than one mip found
-                    std::cout << "[ HcalTrackProducer::SearchByKey ] More than one MIP found in key range " << lowkey << "->" << upkey << "\n";
-                    std::cout << "                                   Adding first one found." << std::endl;
-                    track->incLayHit();
-                    track->addGroup( mipvec[0] );
-                    success = true;
-                    break;
-            } //cases based on how many mips were found
+            int nmips = mipvec.size();
+            if ( nmips > 0 ) { //there are some mips
+                
+                auto bestmip = mipvec.begin();
+                if ( prefstrip > 0 ) {
+                    
+                    if ( nmips > 1 ) { //need to choose between multiple mips
+                        float beststripdif, currstripdif;
+                        
+                        //calculate beststripdif
+                        float beststrip = 0.0;
+                        for ( int i = 0; i < bestmip->size(); i++ ) {
+                            beststrip += bestmip->at(i)->getStrip();
+                        } //iterate throug bestmip (i)
+                        beststrip = beststrip/bestmip->size();
+                        beststripdif = std::abs( prefstrip - beststrip );
+    
+                        for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
+                            //calculate beststripdif
+                            float currstrip = 0.0;
+                            for ( int i = 0; i < it->size(); i++ ) {
+                                currstrip += it->at(i)->getStrip();
+                            } //iterate throug currmip (i)
+                            currstrip = currstrip/it->size();
+                            currstripdif = std::abs( prefstrip - currstrip );
+                            
+                            if ( currstripdif < beststripdif ) {
+                                beststripdif = currstripdif;
+                                bestmip = it;
+                            } //check if currmip is better
+                            
+                        } //iterate through all mips found (it)
+                    
+                    } //check if more than one mip
+                    
+                } //check if there is an preferred key
+                
+                track->incLayHit();
+                track->addGroup( *bestmip );
+                success = true;
+
+            } //some mips were found
 
         } //make sure inputs are correct
         
