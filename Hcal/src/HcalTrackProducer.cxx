@@ -10,32 +10,32 @@ namespace ldmx {
     
     void HcalTrackProducer::configure( const ParameterSet& ps ) {
         
-        hitcollname_ = ps.getString( "HitCollectionName" , "hcalDigis" );
-        hitpassname_ = ps.getString( "HitPassName" , "recon" );
+        hitcollname_ = ps.getString( "HitCollectionName" );
+        hitpassname_ = ps.getString( "HitPassName" );
 
-        nlayers_ = ps.getInteger( "NumHcalLayers" , 81 );
-        nstrips_ = ps.getInteger( "NumHcalStrips" , 34 );
+        nlayers_ = ps.getInteger( "NumHcalLayers" );
+        nstrips_ = ps.getInteger( "NumHcalStrips" );
 
         //setting moduli to next highest order of 10
         layermod_ = (int)(pow( 10 , std::ceil( log10( nstrips_ ) ) ));
         sectionmod_ = (int)(pow( 10 , std::ceil( log10( nlayers_ ) ) ));
 
-        minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" , 5.5 ) );
-        maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" , 4000.0 ) );
+        minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" ) );
+        maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" ) );
 
-        firstseedlayer_ = ps.getInteger( "FirstSeedLayer" , 1 );
+        firstseedlayer_ = ps.getInteger( "FirstSeedLayer" );
         
-        conedepth_ = ps.getInteger( "SearchConeDepth" , 3 );
-        coneangle_ = ps.getInteger( "SearchConeAngle" , 3 );
-        minconehits_ = ps.getInteger( "MinConeHits" , 3 );
+        conedepth_ = ps.getInteger( "SearchConeDepth" );
+        coneangle_ = ps.getInteger( "SearchConeAngle" );
+        minconehits_ = ps.getInteger( "MinConeHits" );
         
-        trackwidth_ = ps.getInteger( "TrackWidth" , 6 );
+        trackwidth_ = ps.getInteger( "TrackWidth" );
         
-        mintracklayhits_ = ps.getInteger( "MinTrackLayerHits" , 20 );
+        mintracklayhits_ = ps.getInteger( "MinTrackLayerHits" );
         
-        maxtrackcnt_ = ps.getInteger( "MaxTrackCount", 100 );
+        maxtrackcnt_ = ps.getInteger( "MaxTrackCount" );
 
-        hcaltracksname_ = ps.getString( "HcalTrackCollectionName" , "HcalTracks" );
+        hcaltracksname_ = ps.getString( "HcalTrackCollectionName" );
         hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
         
         return; 
