@@ -63,10 +63,12 @@ namespace ldmx {
         } //hits in event (iH)
 */        
         //Drop non-interesting events
-        if ( ntracks != 1 )
+        if ( ntracks != 1 ) {
             setStorageHint( hint_mustKeep );
-        else
+            std::cout << "KEEPING" << std::endl;
+        } else {
             setStorageHint( hint_mustDrop );
+        }
         
         return;
     }
