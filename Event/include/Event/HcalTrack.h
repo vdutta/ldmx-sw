@@ -39,7 +39,7 @@ namespace ldmx {
              * Destructor
              */
             ~HcalTrack() {
-                Clear();
+                TObject::Clear();
                 delete hits_;
             }
             
