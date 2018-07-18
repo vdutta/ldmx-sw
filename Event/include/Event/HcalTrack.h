@@ -32,15 +32,14 @@ namespace ldmx {
              * Default Constructor
              */
             HcalTrack() 
-                : TObject(), hits_(new TRefArray()), nlayhits_(0),
+                : TObject(), hits_(), nlayhits_(0),
                   seedlayer_(0), seedstrip_(0) { }
             
             /**
              * Destructor
              */
             ~HcalTrack() {
-                TObject::Clear();
-                //delete hits_;
+                Clear();
             }
             
             /**
@@ -50,7 +49,7 @@ namespace ldmx {
 
                 TObject::Clear();
 
-                hits_->Delete();
+                hits_.Delete();
                 nlayhits_ = 0;
 
                 seedlayer_ = 0;
@@ -63,7 +62,7 @@ namespace ldmx {
              * Add a hit to the track.
              */
             void addHit( HitPtr hit ) {
-                hits_->Add( hit ); //static_cast<TObject*>(hit) );
+                hits_.Add( hit ); //static_cast<TObject*>(hit) );
                 return;
             }
 
@@ -98,7 +97,7 @@ namespace ldmx {
              * Get number of hits in track
              */
             int getNHits() const {
-                return hits_->GetEntriesFast();
+                return hits_.GetEntriesFast();
             }
 
             /**
@@ -125,12 +124,12 @@ namespace ldmx {
              * Get hit at a certain index in track.
              */
             HitPtr getHit( int i ) const {
-                return ( (HitPtr)(hits_->At(i)) );
+                return ( (HitPtr)(hits_.At(i)) );
             }
 
         private:
             
-            TRefArray *hits_; //* references to hits in the track
+            TRefArray hits_; //* references to hits in the track
             int nlayhits_; //* number of layers hit in the track
             
             int seedlayer_; //* layer of seed for this track
@@ -139,7 +138,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 7 );
+            ClassDef( HcalTrack , 10 );
 
     };
 
