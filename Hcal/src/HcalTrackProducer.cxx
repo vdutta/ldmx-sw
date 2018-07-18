@@ -59,7 +59,7 @@ namespace ldmx {
         //pre-process hits and add to log
         for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
             HitPtr curr_hit = (HitPtr)(rawhits->At(i));
-            if ( curr_hit->getPE() > minPE_  and curr->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
+            if ( curr_hit->getPE() > minPE_  and curr_hit->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
                 AddHit( curr_hit );
             } //curr_hit is not noise
         } //iterate through rawhits (i)
@@ -397,23 +397,19 @@ namespace ldmx {
                 if ( prefstrip > 0 ) {
                     
                     if ( nmips > 1 ) { //need to choose between multiple mips
-                        float beststripdif, currstripdif;
                         
-                        //calculate beststripdif
-                        float beststrip = 0.0;
-                        for ( int i = 0; i < bestmip->size(); i++ ) {
-                            beststrip += bestmip->at(i)->getStrip();
-                        } //iterate throug bestmip (i)
-                        beststrip = beststrip/bestmip->size();
-                        beststripdif = std::abs( prefstrip - beststrip );
-    
+                        float beststripdif = static_cast<float>( nstrips_+1 ), currstripdif;
                         for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
-                            //calculate beststripdif
+                            //calculate currstrip (energy weighted average of strips in group)
                             float currstrip = 0.0;
+                            float currenergy = 0.0;
                             for ( int i = 0; i < it->size(); i++ ) {
-                                currstrip += it->at(i)->getStrip();
+                                float en = it->at(i)->getEnergy();
+                                currstrip += it->at(i)->getStrip()*en;
+                                currenergy += en;
                             } //iterate throug currmip (i)
-                            currstrip = currstrip/it->size();
+                            currstrip = currstrip/currenergy;
+
                             currstripdif = std::abs( prefstrip - currstrip );
                             
                             if ( currstripdif < beststripdif ) {
@@ -422,9 +418,9 @@ namespace ldmx {
                             } //check if currmip is better
                             
                         } //iterate through all mips found (it)
-                    
+                             
                     } //check if more than one mip
-                    
+                   
                 } //check if there is an preferred key
                 
                 track->incLayHit();
