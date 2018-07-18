@@ -32,7 +32,7 @@ namespace ldmx {
              * Default Constructor
              */
             HcalTrack() 
-                : TObject(), hits_(new TRefArray()), nhits_(0), nlayhits_(0),
+                : TObject(), hits_(new TRefArray()), nlayhits_(0),
                   seedlayer_(0), seedstrip_(0) { }
             
             /**
@@ -40,7 +40,7 @@ namespace ldmx {
              */
             ~HcalTrack() {
                 TObject::Clear();
-                delete hits_;
+                //delete hits_;
             }
             
             /**
@@ -51,7 +51,6 @@ namespace ldmx {
                 TObject::Clear();
 
                 hits_->Delete();
-                nhits_ = 0;
                 nlayhits_ = 0;
 
                 seedlayer_ = 0;
@@ -65,7 +64,6 @@ namespace ldmx {
              */
             void addHit( HitPtr hit ) {
                 hits_->Add( static_cast<TObject*>(hit) );
-                nhits_++;
                 return;
             }
 
@@ -100,7 +98,7 @@ namespace ldmx {
              * Get number of hits in track
              */
             int getNHits() const {
-                return nhits_;
+                return hits_->GetEntriesFast();
             }
 
             /**
@@ -133,7 +131,6 @@ namespace ldmx {
         private:
             
             TRefArray *hits_; //* references to hits in the track
-            int nhits_; //* number of hits in the track
             int nlayhits_; //* number of layers hit in the track
             
             int seedlayer_; //* layer of seed for this track
@@ -142,7 +139,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 3 );
+            ClassDef( HcalTrack , 6 );
 
     };
 
