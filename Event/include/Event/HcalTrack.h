@@ -33,7 +33,7 @@ namespace ldmx {
              */
             HcalTrack() 
                 : TObject(), hits_(new TRefArray()), nhits_(0), nlayhits_(0),
-                  seedlayer_(1000), seedstrip_(1000) { }
+                  seedlayer_(0), seedstrip_(0) { }
             
             /**
              * Destructor
@@ -46,7 +46,7 @@ namespace ldmx {
             /**
              * Clear the track
              */
-            void Clear() {
+            void Clear(Option_t *opt = "") {
 
                 TObject::Clear();
 
@@ -54,8 +54,8 @@ namespace ldmx {
                 nhits_ = 0;
                 nlayhits_ = 0;
 
-                seedlayer_ = 1000;
-                seedstrip_ = 1000;
+                seedlayer_ = 0;
+                seedstrip_ = 0;
 
                 return;
             }
@@ -142,7 +142,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 1 );
+            ClassDef( HcalTrack , 2 );
 
     };
 
