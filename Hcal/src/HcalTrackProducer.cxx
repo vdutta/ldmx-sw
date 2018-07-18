@@ -59,7 +59,7 @@ namespace ldmx {
         //pre-process hits and add to log
         for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
             HitPtr curr_hit = (HitPtr)(rawhits->At(i));
-            if ( curr_hit->getPE() > minPE_ ) { //curr_hit is not noise
+            if ( curr_hit->getPE() > minPE_  and curr->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
                 AddHit( curr_hit );
             } //curr_hit is not noise
         } //iterate through rawhits (i)
