@@ -63,7 +63,7 @@ namespace ldmx {
              * Add a hit to the track.
              */
             void addHit( HitPtr hit ) {
-                hits_->Add( static_cast<TObject*>(hit) );
+                hits_->Add( hit ); //static_cast<TObject*>(hit) );
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 6 );
+            ClassDef( HcalTrack , 7 );
 
     };
 
