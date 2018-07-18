@@ -43,48 +43,53 @@ namespace ldmx {
 
     void HcalTrackProducer::produce( Event& event ) {
 
-        int ievent = event.getEventHeader()->getEventNumber();
-        if ( ievent == 2981 or ievent == 3586 or ievent == 5200 or ievent == 7547 ) { //only hard cases
-            //initialize event containters
-            log_.clear();
-            
-            layercheck_.clear();
-            for ( int i = 1; i < nlayers_+1; i++ ) {
-                layercheck_.insert( i );
-            }
-    
-            badseeds_.clear();
-    
-            //obtain list of hits
-            const TClonesArray *rawhits = event.getCollection( hitcollname_ , hitpassname_ );
-    
-            //pre-process hits and add to log
-            for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
-                HitPtr curr_hit = (HitPtr)(rawhits->At(i));
-                if ( curr_hit->getPE() > minPE_  and curr_hit->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
-                    AddHit( curr_hit );
-                } //curr_hit is not noise
-            } //iterate through rawhits (i)
-    
-            //search for tracks
-            HcalTrack *track = new HcalTrack();
-            seedlayer_ = firstseedlayer_;
-            int trackcnt = 0;
-            while( TrackSearch( track ) and trackcnt < maxtrackcnt_ ) {
-                //add track to collection
-                HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
-                *toadd = *track;
-    
-                //Remove track from log
-                RemoveTrack( track );
-    
-                track->Clear(); //re-initialize track
-                seedlayer_ = *layercheck_.begin(); //change seedlayer
-                trackcnt++;
-            } //keep searching for tracks until can't find anymore
-        } //only hard cases
+        //initialize event containters
+        log_.clear();
+        
+        layercheck_.clear();
+        for ( int i = 1; i < nlayers_+1; i++ ) {
+            layercheck_.insert( i );
+        }
+
+        badseeds_.clear();
+
+        //obtain list of hits
+        const TClonesArray *rawhits = event.getCollection( hitcollname_ , hitpassname_ );
+
+        //pre-process hits and add to log
+        for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
+            HitPtr curr_hit = (HitPtr)(rawhits->At(i));
+            if ( curr_hit->getPE() > minPE_  and curr_hit->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
+                AddHit( curr_hit );
+            } //curr_hit is not noise
+        } //iterate through rawhits (i)
+
+        //search for tracks
+        HcalTrack *track = new HcalTrack();
+        seedlayer_ = firstseedlayer_;
+        int trackcnt = 0;
+        while( TrackSearch( track ) and trackcnt < maxtrackcnt_ ) {
+            //add track to collection
+            HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
+            *toadd = *track;
+            std::cout << "Added New Track" << std::endl; 
+            //Remove track from log
+            RemoveTrack( track );
+
+            track->Clear(); //re-initialize track
+            seedlayer_ = *layercheck_.begin(); //change seedlayer
+            trackcnt++;
+        } //keep searching for tracks until can't find anymore
+        
         //add collection to event bus
         event.add( hcaltracksname_ , hcaltracks_ );
+
+        if ( trackcnt > 1 ) {
+            setStorageHint( hint_mustKeep );
+            std::cout << "KEEPING" << std::endl;
+        } else {
+            setStorageHint( hint_mustDrop );
+        }
         
         return;
     }
