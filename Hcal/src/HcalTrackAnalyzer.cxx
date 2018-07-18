@@ -27,7 +27,39 @@ namespace ldmx {
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
+            //Log hits in track
+            int nhits = curr_track->getNHits();
+            for ( int iH = 0; iH < nhits; iH++ ) {
+                HitPtr curr_hit = curr_track->getHit( iH );
+                float curr_Layer = curr_hit->getLayer();
+            } //hits in track (iH)
+
         } //tracks in event (iT)
+        std::cout << "Made track histograms" << std::endl;
+        const TClonesArray* hits = event.getCollection("hcalDigis");
+        int nhits = hits->GetEntriesFast();
+        for ( int iH = 0; iH < nhits; iH++ ) {
+            
+            const HitPtr curr_hit = (const HitPtr)(hits->At(iH));
+            float curr_PE = curr_hit->getPE();
+            float curr_Energy = curr_hit->getEnergy();
+            float curr_Strip = curr_hit->getStrip();
+           
+        } //hits in event (iH)
+        std::cout << "Touched via TClonesArray" << std::endl;
+        for( int iT = 0; iT < ntracks; iT++ ) {
+            HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
+            //Log hits in track
+            int nhits = curr_track->getNHits();
+            for ( int iH = 0; iH < nhits; iH++ ) {
+                HitPtr curr_hit = curr_track->getHit( iH );
+                if ( curr_hit == nullptr ) {
+                    std::cout << "nullptr after touch by TClonesArray" << std::endl;
+                    break;
+                }
+            } //hits in track (iH)
+            break;
+        }
         
         //Drop non-interesting events
         if ( ntracks != 1 ) {
