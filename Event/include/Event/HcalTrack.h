@@ -47,7 +47,7 @@ namespace ldmx {
 
                 TObject::Clear();
 
-                hits_.Clear();
+                hits_->Clear();
                 nhits_ = 0;
                 nlayhits_ = 0;
 
@@ -61,7 +61,7 @@ namespace ldmx {
              * Add a hit to the track.
              */
             void addHit( HitPtr hit ) {
-                hits_.AddAtFree( hit );
+                hits_->Add( hit );
                 nhits_++;
                 return;
             }
@@ -123,7 +123,7 @@ namespace ldmx {
              */
             HitPtr getHit( int i ) const {
                 
-                HitPtr h = (HitPtr)(hits_.At(i));
+                HitPtr h = (HitPtr)(hits_->At(i));
                 if ( h == nullptr ) {
                     std::cout << "[ HcalTrack::getHit ] : Mismatch! Returning nullptr! Did you access the TClonesArray of HcalHits after setting this HcalTrack?" << std::endl;
                 }
@@ -140,7 +140,7 @@ namespace ldmx {
 
         private:
             
-            TRefArray hits_; //* references to hits in the track
+            TRefArray *hits_(new TRefArray()); //* references to hits in the track
             int nhits_; //* number of hits in the track
             int nlayhits_; //* number of layers hit in the track
             
