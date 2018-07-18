@@ -31,13 +31,16 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() : TObject(), nhits_(0), nlayhits_(0), seedlayer_(1000), seedstrip_(1000) { }
+            HcalTrack() 
+                : TObject(), hits_(new TRefArray()), nhits_(0), nlayhits_(0),
+                  seedlayer_(1000), seedstrip_(1000) { }
             
             /**
              * Destructor
              */
             ~HcalTrack() {
                 Clear();
+                delete hits_;
             }
             
             /**
@@ -47,7 +50,7 @@ namespace ldmx {
 
                 TObject::Clear();
 
-                hits_->Clear();
+                hits_->Delete();
                 nhits_ = 0;
                 nlayhits_ = 0;
 
@@ -78,8 +81,8 @@ namespace ldmx {
              * Set seed information
              */
             void setSeed(int seedlayer , int seedstrip) {
-                seedlayer_ = seedlayer;
-                seedstrip_ = seedstrip;
+                this->seedlayer_ = seedlayer;
+                this->seedstrip_ = seedstrip;
                 return;
             }
 
@@ -108,12 +111,14 @@ namespace ldmx {
             }
             
             /**
-             * Get seed information
+             * Get seed layer information
              */
             int getSeedLayer() const {
                 return seedlayer_;
-            }
-
+            } 
+            /**
+             * Get seed strip information
+             */
             int getSeedStrip() const {
                 return seedstrip_;
             }
@@ -122,25 +127,12 @@ namespace ldmx {
              * Get hit at a certain index in track.
              */
             HitPtr getHit( int i ) const {
-                
-                HitPtr h = (HitPtr)(hits_->At(i));
-                if ( h == nullptr ) {
-                    std::cout << "[ HcalTrack::getHit ] : Mismatch! Returning nullptr! Did you access the TClonesArray of HcalHits after setting this HcalTrack?" << std::endl;
-                }
-                
-                return h;
-            }
-
-            /**
-             * Get full TRefArray.
-             */
-            const TRefArray &getTrack() {
-                return hits_;
+                return ( (HitPtr)(hits_->At(i)) );
             }
 
         private:
             
-            TRefArray *hits_(new TRefArray()); //* references to hits in the track
+            TRefArray *hits_; //* references to hits in the track
             int nhits_; //* number of hits in the track
             int nlayhits_; //* number of layers hit in the track
             
