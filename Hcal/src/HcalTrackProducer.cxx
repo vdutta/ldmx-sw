@@ -404,35 +404,32 @@ namespace ldmx {
             if ( nmips > 0 ) { //there are some mips
                 
                 auto bestmip = mipvec.begin();
-                if ( prefstrip > 0 ) {
+                if ( prefstrip > 0  and nmips > 1 ) {
                     std::cout << "PrefStrip: " << prefstrip << std::endl;
-                    if ( nmips > 1 ) { //need to choose between multiple mips
-                        
-                        float beststripdif = static_cast<float>( nstrips_+1 ), currstripdif;
-                        for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
-                            //calculate currstrip (energy weighted average of strips in group)
-                            float currstrip = 0.0;
-                            float currenergy = 0.0;
-                            for ( int i = 0; i < it->size(); i++ ) {
-                                float en = it->at(i)->getEnergy();
-                                currstrip += it->at(i)->getStrip()*en;
-                                currenergy += en;
-                            } //iterate throug currmip (i)
-                            currstrip = currstrip/currenergy;
+                    
+                    float beststripdif = static_cast<float>( nstrips_+1 ), currstripdif;
+                    for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
+                        //calculate currstrip (energy weighted average of strips in group)
+                        float currstrip = 0.0;
+                        float currenergy = 0.0;
+                        for ( int i = 0; i < it->size(); i++ ) {
+                            float en = it->at(i)->getEnergy();
+                            currstrip += it->at(i)->getStrip()*en;
+                            currenergy += en;
+                        } //iterate throug currmip (i)
+                        currstrip = currstrip/currenergy;
 
-                            currstripdif = std::abs( prefstrip - currstrip );
-                            
-                            if ( currstripdif < beststripdif ) {
-                                beststripdif = currstripdif;
-                                bestmip = it;
-                            } //check if currmip is better
-                          std::cout << "CurrStripDif: " << currstripdif << std::endl;
-                        } //iterate through all mips found (it)
-                        std::cout << "BestStripDif: " << beststripdif << std::endl; 
-                    } //check if more than one mip
-                   
-                } //check if there is an preferred key
-                std::cout << "Mip Strip Added: " << bestmip->at(0)->getStrip() << std::endl;
+                        currstripdif = std::abs( prefstrip - currstrip );
+                        
+                        if ( currstripdif < beststripdif ) {
+                            beststripdif = currstripdif;
+                            bestmip = it;
+                        } //check if currmip is better
+                      std::cout << "CurrStripDif: " << currstripdif << std::endl;
+                    } //iterate through all mips found (it)
+                    std::cout << "BestStripDif: " << beststripdif << std::endl; 
+                    std::cout << "Mip Strip Added: " << bestmip->at(0)->getStrip() << std::endl;
+                } //check if there is an preferred key and a decision needs to be made
                 track->incLayHit();
                 track->addGroup( *bestmip );
                 success = true;
