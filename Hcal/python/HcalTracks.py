@@ -25,7 +25,7 @@ HcalTracks.parameters["FirstSeedLayer"] = 1
 # Search Cone around seed specifications
 #  Depth - number of layers to search away from seed
 #  Angle - number of strips to search across first layer away from seed
-#  Minimum Hits - minimum number of hits needed to be found around seed
+#  Minimum Hits - minimum number of hits needed to be found around seed in order to continue
 HcalTracks.parameters["SearchConeDepth"] = 3
 HcalTracks.parameters["SearchConeAngle"] = 3
 HcalTracks.parameters["MinConeHits"] = 3
@@ -33,8 +33,8 @@ HcalTracks.parameters["MinConeHits"] = 3
 # Width of search in each layer (by number of strips) when extending track
 HcalTracks.parameters["TrackWidth"] = 6
 
-# Minimum number of hits in track to be considered valid track
-HcalTracks.parameters["MinTrackLayerHits"] = 20
+# Minimum number of layers hit in track to be considered valid track
+HcalTracks.parameters["MinTrackLayerHits"] = 5
 
 # Maximum number of tracks to allowed to be found (prevents infinite loop)
 HcalTracks.parameters["MaxTrackCount"] = 100
