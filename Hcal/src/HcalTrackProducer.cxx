@@ -42,7 +42,7 @@ namespace ldmx {
     }
 
     void HcalTrackProducer::produce( Event& event ) {
-
+   
         //initialize event containters
         log_.clear();
         
@@ -52,10 +52,10 @@ namespace ldmx {
         }
 
         badseeds_.clear();
-
+    
         //obtain list of hits
         const TClonesArray *rawhits = event.getCollection( hitcollname_ , hitpassname_ );
-
+     
         //pre-process hits and add to log
         for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
             HitPtr curr_hit = (HitPtr)(rawhits->At(i));
@@ -63,7 +63,7 @@ namespace ldmx {
                 AddHit( curr_hit );
             } //curr_hit is not noise
         } //iterate through rawhits (i)
-
+      
         //search for tracks
         HcalTrack *track = new HcalTrack();
         seedlayer_ = firstseedlayer_;
