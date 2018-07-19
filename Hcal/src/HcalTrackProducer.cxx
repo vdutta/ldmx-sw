@@ -83,6 +83,9 @@ namespace ldmx {
         
         //add collection to event bus
         event.add( hcaltracksname_ , hcaltracks_ );
+        
+        //memory clean up
+        delete track;
 
         if ( trackcnt > 1 ) {
             setStorageHint( hint_mustKeep );
