@@ -15,9 +15,9 @@ namespace ldmx {
     }
 
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
-        
+        std::cout << "In Analyzer" << std::endl;
         const TClonesArray* tracks = event.getCollection(trackcollname_);
-        
+        std::cout << "Got tracks" << std::endl;
         int ntracks = tracks->GetEntriesFast();
         h_tracksperevent_->Fill( ntracks );
         for( int iT = 0; iT < ntracks; iT++ ) {
@@ -37,7 +37,7 @@ namespace ldmx {
 
         } //tracks in event (iT)
         std::cout << "Made track histograms" << std::endl;
-        const TClonesArray* hits = event.getCollection("hcalDigis");
+        //const TClonesArray* hits = event.getCollection("hcalDigis");
         std::cout << "Touched via TClonesArray" << std::endl;
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
@@ -46,21 +46,23 @@ namespace ldmx {
             std::cout << "NHits: " << nhits << std::endl;
             for ( int iH = 0; iH < nhits; iH++ ) {
                 HitPtr curr_hit = curr_track->getHit( iH );
+                
                 if ( curr_hit == nullptr ) {
                     std::cout << "nullptr after touch by TClonesArray" << std::endl;
                     break;
                 }
-            } //hits in track (iH)
-            break;
+                std::cout << iH << "\r";
+            } //hits in track (iHi)
+            std::cout << "Done with Track" << std::endl;
         }
-        
+        std::cout << "Setting Storage Hint" << std::endl;
         //Drop non-interesting events
         if ( ntracks != 1 ) {
             setStorageHint( hint_mustKeep );
         } else {
             setStorageHint( hint_mustDrop );
         }
-        
+        std::cout << "Exiting Analysis" << std::endl;
         return;
     }
 
