@@ -49,7 +49,7 @@ namespace ldmx {
 
                 TObject::Clear();
 
-                hits_.Delete();
+                hits_.Clear(); //Delete();
                 nlayhits_ = 0;
 
                 seedlayer_ = 0;
@@ -138,7 +138,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 10 );
+            ClassDef( HcalTrack , 12 );
 
     };
 
