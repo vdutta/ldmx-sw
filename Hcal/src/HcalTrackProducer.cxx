@@ -323,8 +323,10 @@ namespace ldmx {
             } //iterate through hits in track (iH)
       
             //Linearly extrapolate ponts to layer
-            TGraph fitgr( npts , layers , strips );
-            float centerstrip = fitgr.Eval( layer );
+            TGraph *fitgr = new TGraph( npts , layers , strips );
+            fitgr->Fit("pol1", "Q");
+            TF1 *fitres = fitgr->GetFunction("pol1");
+            float centerstrip = fitres->Eval( layer );
             
             //Define lowstrip and upstrip
             int lowstrip = static_cast<int>(std::floor( centerstrip - trackwidth_/2.0 ));
@@ -429,6 +431,7 @@ namespace ldmx {
                     } //iterate through all mips found (it)
                     std::cout << "BestStripDif: " << beststripdif << std::endl; 
                     std::cout << "Mip Strip Added: " << bestmip->at(0)->getStrip() << std::endl;
+                    std::cout << "Mip Layer Added: " << bestmip->at(0)->getLayer() << std::endl;
                 } //check if there is an preferred key and a decision needs to be made
                 track->incLayHit();
                 track->addGroup( *bestmip );
