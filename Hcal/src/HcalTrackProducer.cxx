@@ -86,13 +86,14 @@ namespace ldmx {
         
         //memory clean up
         delete track;
-
+        
+        /* Skim Rule depending on number of tracks
         if ( trackcnt > 1 ) {
             setStorageHint( hint_mustKeep );
         } else {
             setStorageHint( hint_mustDrop );
         }
-        
+        */        
         return;
     }
 
