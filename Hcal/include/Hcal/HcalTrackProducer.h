@@ -21,6 +21,7 @@
 //ROOT
 #include "TClonesArray.h" //Add new array of tracks to event bus
 #include "TGraph.h" //Linearly extrapolate strip to new layer
+#include "TF1.h" //Linearly extrapolate strip to new layer
 
 //LDMX Framework
 #include "Event/Event.h" //add new TConesArray to event bus
