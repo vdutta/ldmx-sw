@@ -72,7 +72,7 @@ namespace ldmx {
             //add track to collection
             HcalTrack *toadd = (HcalTrack *)(hcaltracks_->ConstructedAt(trackcnt));
             *toadd = *track;
-            std::cout << "Added New Track" << std::endl; 
+            
             //Remove track from log
             RemoveTrack( track );
 
@@ -89,7 +89,6 @@ namespace ldmx {
 
         if ( trackcnt > 1 ) {
             setStorageHint( hint_mustKeep );
-            std::cout << "KEEPING" << std::endl;
         } else {
             setStorageHint( hint_mustDrop );
         }
@@ -407,7 +406,6 @@ namespace ldmx {
                 
                 auto bestmip = mipvec.begin();
                 if ( prefstrip > 0  and nmips > 1 ) {
-                    std::cout << "PrefStrip: " << prefstrip << std::endl;
                     
                     float beststripdif = static_cast<float>( nstrips_+1 ), currstripdif;
                     for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
@@ -427,12 +425,11 @@ namespace ldmx {
                             beststripdif = currstripdif;
                             bestmip = it;
                         } //check if currmip is better
-                      std::cout << "CurrStripDif: " << currstripdif << std::endl;
+                 
                     } //iterate through all mips found (it)
-                    std::cout << "BestStripDif: " << beststripdif << std::endl; 
-                    std::cout << "Mip Strip Added: " << bestmip->at(0)->getStrip() << std::endl;
-                    std::cout << "Mip Layer Added: " << bestmip->at(0)->getLayer() << std::endl;
+                
                 } //check if there is an preferred key and a decision needs to be made
+                
                 track->incLayHit();
                 track->addGroup( *bestmip );
                 success = true;
