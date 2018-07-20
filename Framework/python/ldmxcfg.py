@@ -42,7 +42,7 @@ class Process:
         self.libraries=[]
         self.skimDefaultIsKeep=True
         self.skimRules=[]
-        self.willPause=True
+        self.willPause=False
         Process.lastProcess=self
 
     def skimDefaultIsSave(self):
