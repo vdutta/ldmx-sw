@@ -42,6 +42,7 @@ class Process:
         self.libraries=[]
         self.skimDefaultIsKeep=True
         self.skimRules=[]
+        self.willPause=True
         Process.lastProcess=self
 
     def skimDefaultIsSave(self):
@@ -95,5 +96,7 @@ class Process:
             print "Shared libraries to load:"
             for afile in self.libraries:
                 print "   %s"%(afile)
-
+        if self.willPause :
+            print "Pres [Enter] to continue, ctrl+C to exit."
+            raw_input()
     
