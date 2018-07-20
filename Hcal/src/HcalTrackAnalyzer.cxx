@@ -28,15 +28,15 @@ namespace ldmx {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
             
-            checkForNullPtr( track );
+            checkForNullPtr( curr_track );
         } //tracks in event (iT)
         std::cout << "Made track histograms" << std::endl;
-        const TClonesArray* hits = event.getCollection("hcalDigis");
+        //const TClonesArray* hits = event.getCollection("hcalDigis");
         std::cout << "Touched via TClonesArray" << std::endl;
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
             
-            checkForNullPtr( track );
+            checkForNullPtr( curr_track );
 
         }
         std::cout << "Setting Storage Hint" << std::endl;
