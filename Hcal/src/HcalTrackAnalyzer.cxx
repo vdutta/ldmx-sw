@@ -6,6 +6,8 @@
 
 #include "Hcal/HcalTrackAnalyzer.h"
 
+#include "TROOT.h"
+
 namespace ldmx {
     
     void HcalTrackAnalyzer::configure(const ldmx::ParameterSet& ps) {
@@ -31,8 +33,18 @@ namespace ldmx {
             checkForNullPtr( curr_track );
         } //tracks in event (iT)
         std::cout << "Made track histograms" << std::endl;
-        //const TClonesArray* hits = event.getCollection("hcalDigis");
-        std::cout << "Touched via TClonesArray" << std::endl;
+        gDirectory->pwd();
+        gDirectory->cd();
+        gDirectory->pwd();
+        gDirectory->ls("-m");
+        char ans;
+        std::cin >> ans;
+        if ( true ) {
+            const TClonesArray* hits = event.getCollection("hcalDigis");
+            std::cout << "Touched via TClonesArray" << std::endl;
+        }
+        gDirectory->ls("-m");
+        std::cin >> ans;
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
             
@@ -70,14 +82,16 @@ namespace ldmx {
     void HcalTrackAnalyzer::checkForNullPtr( HcalTrack *track ) const {
         int nhits = track->getNHits();
         std::cout << "NHits: " << nhits << std::endl;
-        for ( int iH = 0; iH < nhits; iH++ ) {
+        int iH;
+        for ( iH = 0; iH < nhits; iH++ ) {
             HitPtr curr_hit = track->getHit( iH );
             if ( curr_hit == nullptr ) {
-                std::cout << "nullptr after touch by TClonesArray" << std::endl;
+                std::cout << "nullptr in track" << std::endl;
                 break;
             }
             std::cout << iH << "\r";
-        } //hits in track (iHi)
+        } //hits in track (iH)
+        std::cout << iH << std::endl;
         return;
     }
 }
