@@ -27,33 +27,17 @@ namespace ldmx {
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
-            //Log hits in track
-            int nhits = curr_track->getNHits();
-            std::cout << "NHits: " << nhits << std::endl;
-            for ( int iH = 0; iH < nhits; iH++ ) {
-                HitPtr curr_hit = curr_track->getHit( iH );
-                float curr_Layer = curr_hit->getLayer();
-            } //hits in track (iH)
-
+            
+            checkForNullPtr( track );
         } //tracks in event (iT)
         std::cout << "Made track histograms" << std::endl;
-        //const TClonesArray* hits = event.getCollection("hcalDigis");
+        const TClonesArray* hits = event.getCollection("hcalDigis");
         std::cout << "Touched via TClonesArray" << std::endl;
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
-            //Log hits in track
-            int nhits = curr_track->getNHits();
-            std::cout << "NHits: " << nhits << std::endl;
-            for ( int iH = 0; iH < nhits; iH++ ) {
-                HitPtr curr_hit = curr_track->getHit( iH );
-                
-                if ( curr_hit == nullptr ) {
-                    std::cout << "nullptr after touch by TClonesArray" << std::endl;
-                    break;
-                }
-                std::cout << iH << "\r";
-            } //hits in track (iHi)
-            std::cout << "Done with Track" << std::endl;
+            
+            checkForNullPtr( track );
+
         }
         std::cout << "Setting Storage Hint" << std::endl;
         //Drop non-interesting events
@@ -82,7 +66,20 @@ namespace ldmx {
 
         return;
     }
-
+    
+    void HcalTrackAnalyzer::checkForNullPtr( HcalTrack *track ) const {
+        int nhits = track->getNHits();
+        std::cout << "NHits: " << nhits << std::endl;
+        for ( int iH = 0; iH < nhits; iH++ ) {
+            HitPtr curr_hit = track->getHit( iH );
+            if ( curr_hit == nullptr ) {
+                std::cout << "nullptr after touch by TClonesArray" << std::endl;
+                break;
+            }
+            std::cout << iH << "\r";
+        } //hits in track (iHi)
+        return;
+    }
 }
 
 DECLARE_ANALYZER_NS(ldmx, HcalTrackAnalyzer);

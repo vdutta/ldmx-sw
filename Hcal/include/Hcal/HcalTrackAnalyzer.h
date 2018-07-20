@@ -50,6 +50,9 @@ namespace ldmx {
             virtual void onProcessEnd() {}
 
         private:
+            
+            void checkForNullPtr( HcalTrack *track ) const;
+            
             std::string trackcollname_; //* name of the collection of HcalTracks 
             
             TH1F* h_tracksperevent_; //* number of tracks per event
