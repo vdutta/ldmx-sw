@@ -31,7 +31,7 @@ HcalTracks.parameters["SearchConeAngle"] = 3
 HcalTracks.parameters["MinConeHits"] = 3
 
 # Width of search in each layer (by number of strips) when extending track
-HcalTracks.parameters["TrackWidth"] = 6
+HcalTracks.parameters["TrackWidth"] = 4
 
 # Minimum number of layers hit in track to be considered valid track
 HcalTracks.parameters["MinTrackLayerHits"] = 5
