@@ -44,6 +44,22 @@ namespace ldmx {
             }
             
             /**
+             * Assignment Operator
+             */
+            HcalTrack& operator= ( const HcalTrack &track ) {
+                
+                if ( this != &track ) { //self-assignment guard
+                    
+                    this->hits_ = new TRefArray( *track.hits_ );
+                    this->setSeed( track.getSeedLayer() , track.getSeedStrip() );
+                    this->nlayhits_ = track.getNLayHits();
+
+                }
+
+                return *this;
+            }
+            
+            /**
              * Clear the track
              */
             void Clear(Option_t *opt = "") {
@@ -139,7 +155,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 13 );
+            ClassDef( HcalTrack , 16 );
 
     };
 
