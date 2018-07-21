@@ -319,7 +319,7 @@ namespace ldmx {
             int layer = layerlist_.front();
             layerlist_.pop_front();
             
-            if ( true ) {//layer % 2 == 1 ) { //odd layer
+            if ( true ) { //layer % 2 == 1 ) { //odd layer
                 currgr = oddgr;
             } else { //even layer
                 currgr = evengr;
@@ -345,7 +345,7 @@ namespace ldmx {
                 HitPtr chit = track->getHit( track->getNHits()-1 );
                 float cstrip = chit->getStrip();
                 float clayer = chit->getLayer();
-                if ( true ) { //layer % 2 == 1 ) { //odd layer
+                if ( true ) { //clayer % 2 == 1 ) { //odd layer
                     oddgr->SetPoint( oddgr->GetN() , clayer , cstrip );
                 } else { //even layer
                     evengr->SetPoint( evengr->GetN() , clayer , cstrip );
