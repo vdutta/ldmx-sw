@@ -1,6 +1,6 @@
 /**
  * @file HcalTrack.h
- * @brief Class implementation of a track through the Hcal
+ * @brief Class declaration of a track through the Hcal
  * @author Tom Eichlersmith, University of Minnesota
  */
 
@@ -37,112 +37,66 @@ namespace ldmx {
             
             /**
              * Destructor
+             * Clears the TRefArray and Frees the memory
              */
-            ~HcalTrack() {
-                Clear();
-                hits_->Delete();
-            }
+            ~HcalTrack(); 
             
             /**
              * Assignment Operator
+             * Explicity copies over every member variable including the information in the TRefArray (using its copy constructor).
              */
-            HcalTrack& operator= ( const HcalTrack &track ) {
-                
-                if ( this != &track ) { //self-assignment guard
-                    
-                    this->hits_ = new TRefArray( *track.hits_ );
-                    this->setSeed( track.getSeedLayer() , track.getSeedStrip() );
-                    this->nlayhits_ = track.getNLayHits();
+            HcalTrack& operator= ( const HcalTrack &track );  
 
-                }
-
-                return *this;
-            }
-            
             /**
              * Clear the track
+             * Sets member variables to zero and empties the TRefArray (does NONT free the memory).
              */
-            void Clear(Option_t *opt = "") {
-
-                TObject::Clear();
-
-                hits_->Clear(); 
-                nlayhits_ = 0;
-
-                seedlayer_ = 0;
-                seedstrip_ = 0;
-
-                return;
-            }
+            void Clear(Option_t *opt = ""); 
 
             /**
              * Add a hit to the track.
              */
-            void addHit( HitPtr hit ) {
-                hits_->Add( hit ); //static_cast<TObject*>(hit) );
-                return;
-            }
+            void addHit( HitPtr hit );
 
             /**
              * Increment the number of layers hit by one.
              */
-            void incLayHit() {
-                nlayhits_++;
-                return;
-            }
+            void incLayHit();
 
             /**
              * Set seed information
              */
-            void setSeed(int seedlayer , int seedstrip) {
-                this->seedlayer_ = seedlayer;
-                this->seedstrip_ = seedstrip;
-                return;
-            }
+            void setSeed(int seedlayer , int seedstrip);
 
             /**
              * Add a group of hits to the track.
              */
-            void addGroup( const std::vector<HitPtr> group ) {
-                for( auto it = group.begin(); it != group.end(); ++it ) {
-                    addHit( *it );
-                }
-                return;
-            }
+            void addGroup( const std::vector<HitPtr> group ); 
 
             /**
              * Get number of hits in track
              */
-            int getNHits() const {
-                return hits_->GetEntriesFast();
-            }
+            int getNHits() const; 
 
             /**
              * Get number of layers hit in track
              */
-            int getNLayHits() const {
-                return nlayhits_;
-            }
+            int getNLayHits() const; 
             
             /**
              * Get seed layer information
              */
-            int getSeedLayer() const {
-                return seedlayer_;
-            } 
+            int getSeedLayer() const;
+            
             /**
              * Get seed strip information
              */
-            int getSeedStrip() const {
-                return seedstrip_;
-            }
+            int getSeedStrip() const; 
 
             /**
              * Get hit at a certain index in track.
              */
-            HitPtr getHit( int i ) const {
-                return ( (HitPtr)(hits_->At(i)) );
-            }
+            HitPtr getHit( int i ) const; 
 
         private:
             
@@ -155,7 +109,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 16 );
+            ClassDef( HcalTrack , 17 );
 
     };
 
