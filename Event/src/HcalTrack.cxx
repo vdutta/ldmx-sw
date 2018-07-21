@@ -9,6 +9,11 @@
 ClassImp( ldmx::HcalTrack );
 
 namespace ldmx {
+    
+    HcalTrack::HcalTrack() 
+        : TObject(), hits_(new TRefArray()), nlayhits_(0),
+          seedlayer_(0), seedstrip_(0) { }
+            
 
     HcalTrack::~HcalTrack() {
         Clear();
