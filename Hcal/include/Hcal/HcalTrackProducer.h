@@ -35,6 +35,11 @@ namespace ldmx {
     /**
      * @class HcalTrackProducer
      * @brief Stores HitPtrs in a std::map for easy searching and track reconstruction.
+     *
+     * @note Currently, alternating bar/strip orientation is not implemented in the HCAL simulation.
+     *  Therefore, all of the functions in this class assume that all the layers have the same orientation.
+     *  In order to switch to alternating bar orientation, replace "true ) { //" with the empty string.
+     *  In vim and in command mode type ":%s/true\ )\ {\ \/\///g" when in the source file.
      */
     class HcalTrackProducer : public Producer {
         public:
