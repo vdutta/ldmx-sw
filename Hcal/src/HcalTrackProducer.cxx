@@ -296,36 +296,38 @@ namespace ldmx {
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
         
-        bool addednewhit = true; //SearchByKey added something to track
+        //Initialize fitting objects
+        TGraph *oddgr = new TGraph();
+        TGraph *evengr = new TGraph();
+        for ( int iH = 0; iH < track->getNHits(); iH++ ) {
+            HitPtr chit = track->getHit( iH );
+            float cstrip = chit->getStrip();
+            float clayer = chit->getLayer();
+            if ( true ) { //clayer % 2 == 1 ) { //odd layer
+                oddgr->SetPoint( oddgr->GetN() , clayer , cstrip );
+            } else { //even layer
+                evengr->SetPoint( evengr->GetN() , clayer , cstrip );
+            } //odd or even layer
+        } //iterate through hits in track (iH)
         
-        float layers[1000], strips[1000];
-        
+        //Iterate through list of layers to search for hits
+        bool addednewhit = true;
+        TGraph *currgr;
+        TF1 *fitres;
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
             layerlist_.pop_front();
-       
-            //get layers and strips to be fitted from track
-            int npts = 0;
-            for ( int iH = 0; iH < track->getNHits(); iH++ ) {
-                
-                HitPtr curr_hit = track->getHit( iH );
-                float curr_strip = curr_hit->getStrip();
-                float curr_layer = curr_hit->getLayer();
-                if ( true ) { // !(( layer ^ static_cast<int>(curr_layer) ) & 1 ) )  { //layer and curr_layer have same parity 
-                    
-                    layers[ npts ] = curr_layer;
-                    strips[ npts ] = curr_strip;
-                    npts++;
-                   
-                } //layer and curr_layer have same parity
-
-            } //iterate through hits in track (iH)
-      
-            //Linearly extrapolate ponts to layer
-            TGraph *fitgr = new TGraph( npts , layers , strips );
-            fitgr->Fit("pol1", "Q");
-            TF1 *fitres = fitgr->GetFunction("pol1");
+            
+            if ( true ) {//layer % 2 == 1 ) { //odd layer
+                currgr = oddgr;
+            } else { //even layer
+                currgr = evengr;
+            } //odd or even layer
+           
+            //Linearly extrapolate points to layer
+            currgr->Fit( "pol1" , "Q" );
+            fitres = currgr->GetFunction( "pol1" );
             float centerstrip = fitres->Eval( layer );
             
             //Define lowstrip and upstrip
@@ -339,7 +341,17 @@ namespace ldmx {
             int upkey = KeyGen( 0 , layer , upstrip );
 
             addednewhit = SearchByKey( lowkey , upkey , track , centerstrip );
-
+            if ( addednewhit ) { //new hit to be added to graphs
+                HitPtr chit = track->getHit( track->getNHits()-1 );
+                float cstrip = chit->getStrip();
+                float clayer = chit->getLayer();
+                if ( true ) { //layer % 2 == 1 ) { //odd layer
+                    oddgr->SetPoint( oddgr->GetN() , clayer , cstrip );
+                } else { //even layer
+                    evengr->SetPoint( evengr->GetN() , clayer , cstrip );
+                } //odd or even layer
+            } //new hit to be added to graphs
+            
         } //loop through elements of layerlist
 
         return isAcceptableTrack( track );
