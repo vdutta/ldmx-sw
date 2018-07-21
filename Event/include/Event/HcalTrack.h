@@ -31,9 +31,7 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalTrack() 
-                : TObject(), hits_(new TRefArray()), nlayhits_(0),
-                  seedlayer_(0), seedstrip_(0) { }
+            HcalTrack(); 
             
             /**
              * Destructor
