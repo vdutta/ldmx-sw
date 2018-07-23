@@ -13,6 +13,8 @@
 //ROOT
 #include "TRefArray.h" //store pointers to hits
 #include "TObject.h" //inherit from TObject
+#include "TF1.h" //fit function
+#include "TGraph.h" //store points for fit
 
 //LDMX Framework
 #include "Event/HcalHit.h" //Get Hcal Specific information from hit
@@ -36,6 +38,7 @@ namespace ldmx {
             /**
              * Destructor
              * Clears the TRefArray and Frees the memory
+             * Deltes the TGraphs and TF1s
              */
             ~HcalTrack(); 
             
@@ -47,12 +50,14 @@ namespace ldmx {
 
             /**
              * Clear the track
-             * Sets member variables to zero and empties the TRefArray (does NONT free the memory).
+             * Sets member variables to zero and empties the TRefArray (does NOT free the memory).
+             * Deletes the TGraphs and creates new (empty) ones.
              */
             void Clear(Option_t *opt = ""); 
 
             /**
              * Add a hit to the track.
+             * This function also adds the layer,strip information to the TGraphs for fitting
              */
             void addHit( HitPtr hit );
 
@@ -69,7 +74,12 @@ namespace ldmx {
             /**
              * Add a group of hits to the track.
              */
-            void addGroup( const std::vector<HitPtr> group ); 
+            void addGroup( const std::vector<HitPtr> group );
+            
+            /**
+             * Evaluate the fit at a given layer.
+             */
+            float evalFit( const int layer );
 
             /**
              * Get number of hits in track
@@ -104,10 +114,16 @@ namespace ldmx {
             int seedlayer_; //* layer of seed for this track
             int seedstrip_; //* strip of seed for this track
 
+            TF1* oddfitres_; //* most up-to-date fit to odd layers
+            TGraph* oddgr_; //* most up-to-date data points for odd layers
+
+            TF1* evenfitres_; //* most up-to-date fit to even layers
+            TGraph* evengr_; //* most up-to-date data points for even layers
+
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 17 );
+            ClassDef( HcalTrack , 21 );
 
     };
 
