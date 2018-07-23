@@ -125,7 +125,7 @@ namespace ldmx {
     }
     
     bool HcalTrack::isEmpty() const {
-        return ( getNHits() < 1 );
+        return ( hits_->IsEmpty() );
     }
 
     bool HcalTrack::isBroken() const {

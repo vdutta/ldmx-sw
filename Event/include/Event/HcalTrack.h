@@ -38,7 +38,7 @@ namespace ldmx {
             /**
              * Destructor
              * Clears the TRefArray and Frees the memory
-             * Deltes the TGraphs and TF1s
+             * Deltes the TGraphs
              */
             ~HcalTrack(); 
             
@@ -78,6 +78,7 @@ namespace ldmx {
             
             /**
              * Evaluate the fit at a given layer.
+             * Performs the fitting procedure on every call to make sure all hits are included.
              */
             float evalFit( const int layer );
 
@@ -126,8 +127,8 @@ namespace ldmx {
             int seedlayer_; //* layer of seed for this track
             int seedstrip_; //* strip of seed for this track
 
-            TGraph* oddgr_; //* most up-to-date data points for odd layers
-            TGraph* evengr_; //* most up-to-date data points for even layers
+            TGraph* oddgr_; //* data points for odd layers
+            TGraph* evengr_; //* data points for even layers
             
             TF1* fitres_; //* resulting function when fit is performed on TGraphs.
 
