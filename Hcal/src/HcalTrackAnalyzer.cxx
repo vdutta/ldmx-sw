@@ -17,9 +17,9 @@ namespace ldmx {
     }
 
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
-        std::cout << "In Analyzer" << std::endl;
+       
         const TClonesArray* tracks = event.getCollection(trackcollname_);
-        std::cout << "Got tracks" << std::endl;
+        
         int ntracks = tracks->GetEntriesFast();
         h_tracksperevent_->Fill( ntracks );
         for( int iT = 0; iT < ntracks; iT++ ) {
@@ -29,28 +29,15 @@ namespace ldmx {
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }
-            
-            checkForNullPtr( curr_track );
         } //tracks in event (iT)
-        std::cout << "Made track histograms" << std::endl;
-        if ( true ) {
-            const TClonesArray* hits = event.getCollection("hcalDigis");
-            std::cout << "Touched via TClonesArray" << std::endl;
-        }
-        for( int iT = 0; iT < ntracks; iT++ ) {
-            HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
-            
-            checkForNullPtr( curr_track );
-
-        }
-        std::cout << "Setting Storage Hint" << std::endl;
+        
         //Drop non-interesting events
         if ( ntracks != 1 ) {
             setStorageHint( hint_mustKeep );
         } else {
             setStorageHint( hint_mustDrop );
         }
-        std::cout << "Exiting Analysis" << std::endl;
+        
         return;
     }
 
@@ -68,22 +55,6 @@ namespace ldmx {
             h_layhitspertrack_[i]->SetLineColor( i+1 );
         }
 
-        return;
-    }
-    
-    void HcalTrackAnalyzer::checkForNullPtr( HcalTrack *track ) const {
-        int nhits = track->getNHits();
-        std::cout << "NHits: " << nhits << std::endl;
-        int iH;
-        for ( iH = 0; iH < nhits; iH++ ) {
-            HitPtr curr_hit = track->getHit( iH );
-            if ( curr_hit == nullptr ) {
-                std::cout << "nullptr in track" << std::endl;
-                break;
-            }
-            std::cout << iH << "\r";
-        } //hits in track (iH)
-        std::cout << iH << std::endl;
         return;
     }
 }
