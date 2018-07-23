@@ -33,18 +33,10 @@ namespace ldmx {
             checkForNullPtr( curr_track );
         } //tracks in event (iT)
         std::cout << "Made track histograms" << std::endl;
-        gDirectory->pwd();
-        gDirectory->cd();
-        gDirectory->pwd();
-        gDirectory->ls("-m");
-        char ans;
-        std::cin >> ans;
         if ( true ) {
             const TClonesArray* hits = event.getCollection("hcalDigis");
             std::cout << "Touched via TClonesArray" << std::endl;
         }
-        gDirectory->ls("-m");
-        std::cin >> ans;
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
             
