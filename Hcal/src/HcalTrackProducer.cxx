@@ -296,39 +296,16 @@ namespace ldmx {
             
     bool HcalTrackProducer::ExtendTrack( HcalTrack *track ) {
         
-        //Initialize fitting objects
-        TGraph *oddgr = new TGraph();
-        TGraph *evengr = new TGraph();
-        for ( int iH = 0; iH < track->getNHits(); iH++ ) {
-            HitPtr chit = track->getHit( iH );
-            float cstrip = chit->getStrip();
-            float clayer = chit->getLayer();
-            if ( true ) { //clayer % 2 == 1 ) { //odd layer
-                oddgr->SetPoint( oddgr->GetN() , clayer , cstrip );
-            } else { //even layer
-                evengr->SetPoint( evengr->GetN() , clayer , cstrip );
-            } //odd or even layer
-        } //iterate through hits in track (iH)
-        
         //Iterate through list of layers to search for hits
         bool addednewhit = true;
-        TGraph *currgr;
-        TF1 *fitres;
         while ( !layerlist_.empty() ) { //loop through elements of layerlist_
             
             int layer = layerlist_.front();
             layerlist_.pop_front();
             
-            if ( true ) { //layer % 2 == 1 ) { //odd layer
-                currgr = oddgr;
-            } else { //even layer
-                currgr = evengr;
-            } //odd or even layer
-           
             //Linearly extrapolate points to layer
-            currgr->Fit( "pol1" , "Q" );
-            fitres = currgr->GetFunction( "pol1" );
-            float centerstrip = fitres->Eval( layer );
+            // HcalTrack::evalFit calculates fit and then evaluates
+            float centerstrip = track->evalFit( layer );
             
             //Define lowstrip and upstrip
             int lowstrip = static_cast<int>(std::floor( centerstrip - trackwidth_/2.0 ));
@@ -341,16 +318,6 @@ namespace ldmx {
             int upkey = KeyGen( 0 , layer , upstrip );
 
             addednewhit = SearchByKey( lowkey , upkey , track , centerstrip );
-            if ( addednewhit ) { //new hit to be added to graphs
-                HitPtr chit = track->getHit( track->getNHits()-1 );
-                float cstrip = chit->getStrip();
-                float clayer = chit->getLayer();
-                if ( true ) { //clayer % 2 == 1 ) { //odd layer
-                    oddgr->SetPoint( oddgr->GetN() , clayer , cstrip );
-                } else { //even layer
-                    evengr->SetPoint( evengr->GetN() , clayer , cstrip );
-                } //odd or even layer
-            } //new hit to be added to graphs
             
         } //loop through elements of layerlist
 
