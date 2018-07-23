@@ -114,16 +114,15 @@ namespace ldmx {
             int seedlayer_; //* layer of seed for this track
             int seedstrip_; //* strip of seed for this track
 
-            TF1* oddfitres_; //* most up-to-date fit to odd layers
             TGraph* oddgr_; //* most up-to-date data points for odd layers
-
-            TF1* evenfitres_; //* most up-to-date fit to even layers
             TGraph* evengr_; //* most up-to-date data points for even layers
+            
+            TF1* fitres_; //* resulting function when fit is performed on TGraphs.
 
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 21 );
+            ClassDef( HcalTrack , 22 );
 
     };
 

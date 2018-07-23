@@ -13,7 +13,7 @@ namespace ldmx {
     HcalTrack::HcalTrack() 
         : TObject(), hits_(new TRefArray()), nlayhits_(0),
           seedlayer_(0), seedstrip_(0),
-          oddfitres_(nullptr), oddgr_(new TGraph()), evenfitres_(nullptr), evengr_(new TGraph()) { }
+          oddgr_(new TGraph()), evengr_(new TGraph()), fitres_(nullptr){ }
             
 
     HcalTrack::~HcalTrack() {
@@ -31,11 +31,9 @@ namespace ldmx {
             this->hits_ = new TRefArray( *track.hits_ );
             this->setSeed( track.getSeedLayer() , track.getSeedStrip() );
             this->nlayhits_ = track.getNLayHits();
-            this->oddfitres_ = nullptr; //re-set whenever evalFit is called on an odd layer 
             this->oddgr_ = new TGraph( *track.oddgr_ );
-            this->evenfitres_ = nullptr; //re-set whenever evalFit is called on an even layer
             this->evengr_ = new TGraph( *track.evengr_ );
-
+            this->fitres_ = nullptr; //re-set whenever evalFit is called
         }
 
         return *this;
@@ -94,18 +92,16 @@ namespace ldmx {
     }
 
     float HcalTrack::evalFit( const int layer ) {
-        float strip;
+        
         if ( true ) { //layer % 2 == 1 ) { //odd layer
             oddgr_->Fit( "pol1" , "Q" );
-            oddfitres_ = oddgr_->GetFunction( "pol1" );
-            strip = oddfitres_->Eval( layer );
+            fitres_ = oddgr_->GetFunction( "pol1" );
         } else { //even layer
             evengr_->Fit( "pol1" , "Q" );
-            evenfitres_ = evengr_->GetFunction( "pol1" );
-            strip = evenfitres_->Eval( layer );
+            fitres_ = evengr_->GetFunction( "pol1" );
         }
 
-        return strip;
+        return ( fitres_->Eval( layer ) );
     }
 
     int HcalTrack::getNHits() const {
