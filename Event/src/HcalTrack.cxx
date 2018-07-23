@@ -123,5 +123,17 @@ namespace ldmx {
     HitPtr HcalTrack::getHit( int i ) const {
         return ( (HitPtr)(hits_->At(i)) );
     }
+    
+    bool HcalTrack::isEmpty() const {
+        return ( getNHits() < 1 );
+    }
 
+    bool HcalTrack::isBroken() const {
+        for ( int iH = 0; iH < getNHits(); iH++ ) {
+            if ( getHit( iH ) == nullptr )
+                return true;
+        } //iterate through hits checking for nullptr (iH)
+
+        return false;
+    }
 }

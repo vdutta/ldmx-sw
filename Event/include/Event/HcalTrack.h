@@ -105,6 +105,18 @@ namespace ldmx {
              * Get hit at a certain index in track.
              */
             HitPtr getHit( int i ) const; 
+            
+            /**
+             * Check to see if HcalTrack is empty.
+             * Checks size of TRefArray.
+             */
+            bool isEmpty() const;
+
+            /**
+             * Check if HcalTrack is broken.
+             * There is a hit that is a nullptr.
+             */
+            bool isBroken() const;
 
         private:
             
@@ -122,7 +134,7 @@ namespace ldmx {
             /**
              * ROOT Class Definition
              */
-            ClassDef( HcalTrack , 22 );
+            ClassDef( HcalTrack , 23 );
 
     };
 
