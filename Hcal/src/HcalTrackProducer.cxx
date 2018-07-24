@@ -267,7 +267,7 @@ namespace ldmx {
 
         } //iterate through layercheck_ (it)
 
-        //sort layerlist according to proximity to seed
+        //sort layerlist according to proximity to seed RUNTIME ERROR
 //        std::sort( layerlist_.begin() , layerlist_.end() , 
 //            [&]( const int &a , const int &b ) -> bool {
 //                return ( std::abs(a - this->seedlayer_) < std::abs(b - this->seedlayer_) );
