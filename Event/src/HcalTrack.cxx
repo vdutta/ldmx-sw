@@ -121,7 +121,7 @@ namespace ldmx {
     }
 
     HitPtr HcalTrack::getHit( int i ) const {
-        return ( (HitPtr)(hits_->At(i)) );
+        return ( dynamic_cast<HitPtr>(hits_->At(i)) );
     }
     
     bool HcalTrack::isEmpty() const {
