@@ -133,8 +133,7 @@ namespace ldmx {
             bool BeginPartialTrack( HcalTrack *track );
 
             /**
-             * Search for next mip given layer and partial track.
-             * Will add to track if found a mip hit.
+             * Search through layers for mips to add to partial track.
              * Assumes track has AT LEAST two hits in it.
              *
              * @param track HcalTrack to be extended
