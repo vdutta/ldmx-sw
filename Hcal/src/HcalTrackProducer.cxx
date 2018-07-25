@@ -8,6 +8,15 @@
 
 namespace ldmx {
     
+    HcalTrackProducer::~HcalTrackProducer() {
+        //clean up class used for processing
+        for ( auto itS = mipLog_.begin(); itS != mipLog_.end(); ++itS ) {
+            for ( auto itH = (itS->second).begin(); itH != (itS->second).end(); ++itH ) {
+                delete itH->second;
+            } //iterate through hits in current section (itH)
+        } //iterate through sections in mipLog (itS)
+    }
+    
     void HcalTrackProducer::configure( const ParameterSet& ps ) {
         
         hitcollname_ = ps.getString( "HitCollectionName" );
@@ -56,9 +65,36 @@ namespace ldmx {
                 nonoiseLog_[ ckey ] = chit;
             } //chit is not noise
         } //iterate through rawhits (i)
-
+        
+        //filter rawLog_ into mip hits
+        std::vector< HitPtr > cgroup;
         for ( auto itH = rawLog_.begin(); itH != rawLog_.end(); ++itH ) {
+            
+            if ( itH != rawLog_.begin() ) {
+                //itH has a previous iterator     
+                auto previtH = std::prev( itH );
 
+                int keydif = itH->first - previtH->first;
+
+                if ( keydif > 1 ) {
+                    //different group of hits
+                    if ( isMIP( cgroup ) ) {
+                        //cgroup is a mip
+                        //add new MipHit to mipLog
+                        MipHitPtr cmip = new MipHit( cgroup );
+                        if ( cmip->SetUp() ) {
+                            HcalSection csect = cmip->getSection();
+                            int ckey = KeyGen( cmip );
+                            mipLog_[ csect ][ ckey ] = cmip;
+                        } else {
+                            std::cout << "Setting up MIP Hit went wrong" << std::endl;
+                            delete cmip;
+                        }
+                    } //is cgroup a mip
+                } //are we in a different group
+            } //does itH have a previous iterator
+
+            cgroup.push_back( itH->second );
         } //iterate through rawLog_, grouping hits into mip hits (itH)
       
         //search for tracks
@@ -149,6 +185,13 @@ namespace ldmx {
         int layer = static_cast<int>( hit->getLayer() );
         int strip = static_cast<int>( hit->getStrip() );
         return KeyGen( section , layer , strip );
+    }
+
+    int HcalTrackProducer::KeyGen( MipHitPtr mip ) const {
+        int section = static_cast<int>( mip->getSection() );
+        int layer = mip->getLayer();
+        int lowstrip = mip->getLowStrip();
+        return KeyGen( section , layer , lowstrip );
     }
     
     void HcalTrackProducer::CorrectStrip( int &strip ) const {

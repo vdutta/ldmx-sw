@@ -27,7 +27,7 @@
 #include "Framework/ParameterSet.h" //get parameters from config script
 #include "Event/HcalTrack.h" //store tracks generated
 #include "DetDescr/HcalID.h" //for HcalSection enum
-#include "Hcal/MIPHit.h" //for MIPHit class
+#include "Hcal/MipHit.h" //for MipHit class
 
 namespace ldmx {
 
@@ -43,8 +43,11 @@ namespace ldmx {
             /**
              * Default Constructor.
              */
-            HcalTrackProducer( const std::string& name , Process& process ) : Producer( name , process ) {}
+            HcalTrackProducer( const std::string& name , Process& process ) : Producer( name , process ) { }
             
+            /** Destructor */
+            ~HcalTrackProducer();
+
             virtual void configure( const ParameterSet& ps );
 
             virtual void produce( Event& event );
@@ -92,6 +95,14 @@ namespace ldmx {
              * @return integer key value
              */
             int KeyGen( HitPtr hit ) const;
+
+            /**
+             * Function to generate key for a given mip.
+             *
+             * @param mip pointer to MipHit instance that a key is needed for
+             * @return integer key value
+             */
+            int KeyGen( MipHitPtr mip ) const;
 
             /**
              * Corrects for strip numbers outside of real range.
@@ -192,7 +203,7 @@ namespace ldmx {
 
             std::map< int , HitPtr > nonoiseLog_; //* map that will be used to store the hits that aren't noise (above minPE)
 
-            std::map< HcalSection , std::map< int , MIPHit > > mipLog_ //* map that stores the pre-processed mips
+            std::map< HcalSection , std::map< int , MipHitPtr > > mipLog_ //* map that stores the pre-processed mips
 
     };
 
