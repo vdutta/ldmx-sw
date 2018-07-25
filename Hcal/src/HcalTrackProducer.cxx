@@ -12,31 +12,29 @@ namespace ldmx {
         
         hitcollname_ = ps.getString( "HitCollectionName" );
         hitpassname_ = ps.getString( "HitPassName" );
-
-        nlayers_ = ps.getInteger( "NumHcalLayers" );
-        nstrips_ = ps.getInteger( "NumHcalStrips" );
-
+        
+        nLayersBack_ = ps.getInteger( "NumBackHcalLayers" );
+        nStripsBack_ = ps.getInteger( "NumBackHcalStrips" );
+        nLayersTopBot_ = ps.getInteger( "NumTopBottomHcalLayers" );
+        nStripsTopBot_ = ps.getInteger( "NumTopBottomHcalStrips" );
+        nLayersLeftRight_ = ps.getInteger( "NumLeftRightHcalLayers" );
+        nStripsLeftRight_ = ps.getInteger( "NumLeftRightHcalStrips" );
+            
         //setting moduli to next highest order of 10
-        layermod_ = (int)(pow( 10 , std::ceil( log10( nstrips_ ) ) ));
-        sectionmod_ = (int)(pow( 10 , std::ceil( log10( nlayers_ ) ) ));
+        layerMod_ = (int)(pow( 10 , std::ceil( log10( nStripsBack_ ) ) ));
+        sectionMod_ = (int)(pow( 10 , std::ceil( log10( nLayersBack_ ) ) ));
 
         minPE_ = static_cast<float>( ps.getDouble( "MinimumPE" ) );
         maxEnergy_ = static_cast<float>( ps.getDouble( "MaximumEnergy" ) );
 
-        firstseedlayer_ = ps.getInteger( "FirstSeedLayer" );
+        trackWidth_ = ps.getInteger( "TrackWidth" );
         
-        conedepth_ = ps.getInteger( "SearchConeDepth" );
-        coneangle_ = ps.getInteger( "SearchConeAngle" );
-        minconehits_ = ps.getInteger( "MinConeHits" );
+        minTrackLayHits_ = ps.getInteger( "MinTrackLayerHits" );
         
-        trackwidth_ = ps.getInteger( "TrackWidth" );
-        
-        mintracklayhits_ = ps.getInteger( "MinTrackLayerHits" );
-        
-        maxtrackcnt_ = ps.getInteger( "MaxTrackCount" );
+        maxTrackCnt_ = ps.getInteger( "MaxTrackCount" );
 
-        hcaltracksname_ = ps.getString( "HcalTrackCollectionName" );
-        hcaltracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
+        hcalTracksName_ = ps.getString( "HcalTrackCollectionName" );
+        hcalTracks_ = new TClonesArray( "ldmx::HcalTrack" , 1000 );
         
         return; 
     }
@@ -44,25 +42,24 @@ namespace ldmx {
     void HcalTrackProducer::produce( Event& event ) {
    
         //initialize event containters
-        log_.clear();
-        
-        layercheck_.clear();
-        for ( int i = 1; i < nlayers_+1; i++ ) {
-            layercheck_.insert( i );
-        }
-
-        badseeds_.clear();
+        nonoiseLog_.clear();
+        mipLog_.clear();
     
         //obtain list of hits
         const TClonesArray *rawhits = event.getCollection( hitcollname_ , hitpassname_ );
      
-        //pre-process hits and add to log
+        //add rawhits to rawLog_ so that they get sorted
         for ( size_t i = 0; i < rawhits->GetEntriesFast(); i++ ) {
-            HitPtr curr_hit = (HitPtr)(rawhits->At(i));
-            if ( curr_hit->getPE() > minPE_  and curr_hit->getSection() == 0 ) { //curr_hit is not noise and is in the BACK HCAL
-                AddHit( curr_hit );
-            } //curr_hit is not noise
+            HitPtr chit = (HitPtr)(rawhits->At(i));
+            int ckey = KeyGen( chit );
+            if ( chit->getPE() > minPE_ ) { //chit is not noise
+                nonoiseLog_[ ckey ] = chit;
+            } //chit is not noise
         } //iterate through rawhits (i)
+
+        for ( auto itH = rawLog_.begin(); itH != rawLog_.end(); ++itH ) {
+
+        } //iterate through rawLog_, grouping hits into mip hits (itH)
       
         //search for tracks
         HcalTrack *track = new HcalTrack();
@@ -94,15 +91,6 @@ namespace ldmx {
             setStorageHint( hint_mustDrop );
         }
         */        
-        return;
-    }
-
-    void HcalTrackProducer::AddHit( HitPtr hit ) {
-        
-        int key = KeyGen( hit );
-        
-        log_[ key ] = hit;
-
         return;
     }
 
@@ -153,7 +141,7 @@ namespace ldmx {
     }
 
     int HcalTrackProducer::KeyGen( const int section , const int layer , const int strip ) const {
-        return( section*sectionmod_*layermod_ + layer*layermod_ + strip );
+        return( section*sectionMod_*layerMod_ + layer*layerMod_ + strip );
     }
     
     int HcalTrackProducer::KeyGen( HitPtr hit ) const {
