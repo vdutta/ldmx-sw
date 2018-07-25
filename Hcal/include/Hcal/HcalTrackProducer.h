@@ -27,6 +27,7 @@
 #include "Framework/ParameterSet.h" //get parameters from config script
 #include "Event/HcalTrack.h" //store tracks generated
 #include "DetDescr/HcalID.h" //for HcalSection enum
+#include "Hcal/MIPHit.h" //for MIPHit class
 
 namespace ldmx {
 
@@ -35,9 +36,7 @@ namespace ldmx {
      * @brief Stores HitPtrs in a std::map for easy searching and track reconstruction.
      *
      * @note Currently, alternating bar/strip orientation is not implemented in the HCAL simulation.
-     *  Therefore, all of the functions in this class assume that all the layers have the same orientation.
-     *  In order to switch to alternating bar orientation, replace "true ) { //" with the empty string.
-     *  In vim and in command mode type ":%s/true\ )\ {\ \/\///g" when in the source file.
+     *  Therefore, all of the functions in this class assume that all the layers in the BACK HCAL have the same orientation.
      */
     class HcalTrackProducer : public Producer {
         public:
@@ -59,13 +58,6 @@ namespace ldmx {
             virtual void onProcessEnd() { }
 
         private:
- 
-            /**
-             * Add hit to log_.
-             *
-             * @param hit pointer to hit that will be added to log_.
-             */
-            void AddHit( HitPtr hit );
             
             /**
              * Remove list of hits for a track.
@@ -173,44 +165,35 @@ namespace ldmx {
              */
             bool isMIP( const std::vector< HitPtr > &group ) const;
             
-            std::string hitcollname_; //* name of collection of hits
-            std::string hitpassname_; //* name of pass that made hit collection
+            std::string hitCollName_; //* name of collection of hits
+            std::string hitPassName_; //* name of pass that made hit collection
 
-            int nlayers_; //* number of layers in detector
-            int nstrips_; //* number of strips per layer
+            int nLayersBack_; //* number of layers in Back HCAL
+            int nStripsBack_; //* number of strips per layer in Back HCAL
+            int nLayersTopBot_; //* number of layers in Top and Bottom HCAL
+            int nStripsTopBot_; //* number of strips per layer in Top and Bottom HCAL
+            int nLayersLeftRight_; //* number of layers in Left and Right HCAL
+            int nStripsLeftRight_; //* number of strips per layer in Left and Right HCAL
             
-            int layermod_; //* layer modulus to use for hit keys
-            int sectionmod_; //* section modulus to use for hit keys
+            int layerMod_; //* layer modulus to use for hit keys
+            int sectionMod_; //* sectio modulus to use for hit keys
 
             float minPE_; //* Minimum number of PEs to not be considered noise
             float maxEnergy_; //* Maximum energy of a hit to not be considered a non-mip
             
-            int firstseedlayer_; //* first seed layer to try
-
-            int conedepth_; //* depth of search cone around seed in layers
-            int coneangle_; //* angular opening of cone around seed in strips across the first layer
-            int minconehits_; //* minimum number of hits in cone around seed to allow for seed to be accepted
-
-            int trackwidth_; //* width of extended track to search in number of strips
+            int trackWidth_; //* width of extended track to search in number of strips
             
-            int mintracklayhits_; //* minimum number of layers hit in a full track for it to be accepted
+            int minTrackLayHits_; //* minimum number of layers hit in a full track for it to be accepted
             
-            int maxtrackcnt_; //* maximum number of tracks that can be found before exiting
+            int maxTrackCnt_; //* maximum number of tracks that can be found before exiting
 
-            int seedlayer_; //* current layer number used as seed for current track
-            int seedstrip_; //* current strip number used as seed for current track
+            std::string hcalTracksName_; //* name of track collection to be put into event bus
+            TClonesArray* hcalTracks_; //* array of HcalTracks that are found in a given event
 
-            std::string hcaltracksname_; //* name of track collection to be put into event bus
-            TClonesArray* hcaltracks_; //* array of HcalTracks that are found in a given event
+            std::map< int , HitPtr > nonoiseLog_; //* map that will be used to store the hits that aren't noise (above minPE)
 
-            std::map< int , HitPtr > log_; //* map that will be used to store the hits
+            std::map< HcalSection , std::map< int , MIPHit > > mipLog_ //* map that stores the pre-processed mips
 
-            std::set< int > layercheck_; //* set of layers that haven't been checked exhaustively yet 
-
-            std::list< std::pair< int , int > > cone_; //* search cone in keys around seed
-            std::list< int > layerlist_; //* list of layers to go through after partial track is begun
-            std::set< int > badseeds_; //* set of seedkeys that end up not being able to start a track
-            
     };
 
 }
