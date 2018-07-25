@@ -37,6 +37,10 @@ namespace ldmx {
      *
      * @note Currently, alternating bar/strip orientation is not implemented in the HCAL simulation.
      *  Therefore, all of the functions in this class assume that all the layers in the BACK HCAL have the same orientation.
+     *
+     * @note The idea to incorporate the different sections and the alternating orientations in the Back Hcal is to resolve
+     *  tracks in each section separately and then see if any can be joined. The horizontal layers and the vertical layers
+     *  in the Back Hcal will be treated as separte sections.
      */
     class HcalTrackProducer : public Producer {
         public:
@@ -63,12 +67,12 @@ namespace ldmx {
         private:
             
             /**
-             * Attempt to reconstruct a track from a seed layer.
+             * Attempt to find reconstruct tracks in the input section.
              *
-             * @param track plausible track - should be empty
-             * @return true if a track was found
+             * @param section HcalSection to search
+             * @return true if at least one track was found
              */
-            bool TrackSearch( HcalTrack *track );
+            bool TrackSearch( HcalSection section );
    
             /**
              * Function to generate key from section,layer,hit information.
@@ -98,43 +102,31 @@ namespace ldmx {
             int KeyGen( MipHitPtr mip ) const;
 
             /**
-             * Begins partial track by searching through cone around seed.
+             * Function to produce end points for a given section.
              *
-             * @param track HcalTrack that stores beginning of track
-             * @return true if successfully started track
+             * @param section HcalSection to search
+             * @param endpts std::pair of MipHitPtrs that will be the end points
+             * @return true if endponts were found
              */
-            bool BeginPartialTrack( HcalTrack *track );
-
+            bool findEndPts( HcalSection section , std::pair< MipHitPtr > &endpts );
+            
             /**
-             * Search through layers for mips to add to partial track.
-             * Assumes track has AT LEAST two hits in it.
+             * Connect Given End Points into a possible track.
              *
-             * @param track HcalTrack to be extended
-             * @return true if acceptable track was created
+             * @param section HcalSection to search through
+             * @param endpts std::pair of MipHitPtrs that are the end points to use
+             * @param possibletrack std::vector of MipHitPtrs that contain the possible track
+             * @return true if possibletrack is acceptable as a track
              */
-            bool ExtendTrack( HcalTrack *track );
+            bool connectTrack( HcalSection section , const std::pair< MipHitPtr > &endpts , std::vector< MipHitPtr > possibletrack );
 
             /**
              * Check if plausible track is acceptable.
              *
-             * @param track HcalTrack to check
+             * @param track vector of MipHitPtrs to check
              * @return true if acceptable
              */
-            bool isAcceptableTrack( const HcalTrack *track ) const;
-
-            /**
-             * Function to search a specific range of a log for a hit.
-             * Will add hit(s) to track that it considers to be the preferred mip.
-             * If more than one mip is found, the one closest to prefkey is the one added.
-             *
-             * @param log std::map that contains the Mip Hits to search
-             * @param lowkey lower bound key
-             * @param upkey upper bound key
-             * @param track partial track to add hit to if found
-             * @param prefkey hit key that is given preference if multiple hits are found
-             * @return true if successfully found a hit in the given key range 
-             */
-            bool SearchByKey( const std::mapt< int , MipHitPtr > log , const int lowkey , const int upkey , HcalTrack *track , const float prefkey = -1.0 );
+            bool isAcceptableTrack( const std::vector< MipHitPtr > &track ) const;
 
             /**
              * Function to determine whether a group of hits can be considered a mip.
@@ -146,7 +138,7 @@ namespace ldmx {
              * @return true if considered a mip
              */
             bool isMIP( const std::vector< HitPtr > &group ) const;
-            
+
             std::string hitCollName_; //* name of collection of hits
             std::string hitPassName_; //* name of pass that made hit collection
 
@@ -174,7 +166,11 @@ namespace ldmx {
 
             std::map< int , HitPtr > nonoiseLog_; //* map that will be used to store the hits that aren't noise (above minPE)
 
-            std::map< HcalSection , std::map< int , MipHitPtr > > mipLog_ //* map that stores the pre-processed mips
+            std::map< int , MipHitPtr > mipLog_ //* map that stores the pre-processed mips
+
+            std::map< int , HcalTrackPtr > trackLog_; //* map that stores the tracks found in each section
+
+            std::set< int > badEndPts_; //* set of mip keys that do not produce good tracks
 
     };
 
