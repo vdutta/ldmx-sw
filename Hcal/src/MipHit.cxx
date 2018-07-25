@@ -1,36 +1,38 @@
 /**
- * @file MIPHit.cxx
- * @brief Implementation file for class MIPHit
+ * @file MipHit.cxx
+ * @brief Implementation file for class MipHit
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/MIPHit.h"
+#include "Hcal/MipHit.h"
 
 namespace ldmx {
 
-    MIPHit::MIPHIt() : hcalHits_(), section_(0), layer_(0), lowstrip_(0), upstrip_(0)_, totalEnergy_(0.0),
+    MipHit::MipHit() : section_(0), layer_(0), lowstrip_(0), upstrip_(0)_, totalEnergy_(0.0),
         boxCenter_( 3 , -1.0 ), xMin_(0.0), xMax_(0.0), yMin_(0.0), yMax_(0.0), zMin_(0.0), zMax_(0.0) 
         {  }
 
-    void MIPHit::addHit( HitPtr hit ) {
+    MipHit::MipHit( std::vector< HitPtr > hcalHits ) : MipHit(), hcalHits_( hcalHits ) { }
+
+    void MipHit::addHit( HitPtr hit ) {
         hcalHits_.push_back( hit );
         return;
     }
 
-    bool MIPHit::Eval() {
+    bool MipHit::setUp() {
         
         setTotalEnergy();
 
-        if ( setBoxPlanes() ) {
-            setBoxCenter();
-        } else {
+        if ( !setBoxPlanes() ) {
             return false;
         }
+
+        setBoxCenter();
         
         return true;
     }
 
-    bool MIPHit::setSLS() {
+    bool MipHit::setSLS() {
         
         layer_ = static_cast<int>(hcalHits_[0]->getLayer());
         section_ = hcalHits_[0]->getSection();
@@ -38,10 +40,10 @@ namespace ldmx {
         upstrip_ = hcalHits_[0]->getStrip();
         for ( auto it = hcalHits_.begin(); it != hcalHits_.end(); ++it ) {
             if ( static_cast<int>((*it)->getLayer()) != layer ) {
-                std::cout << "[ MIPHit::setBoxCorners ] : Different layers were grouped into the same MIPHit." << std::endl;
+                std::cout << "[ MipHit::setBoxCorners ] : Different layers were grouped into the same MipHit." << std::endl;
                 return false;
             } else if ( (*it)->getSection() != section ) {
-                std::cout << "[ MIPHit::setBoxCorners ] : Different sections were grouped into the same MIPHit." << std::endl;
+                std::cout << "[ MipHit::setBoxCorners ] : Different sections were grouped into the same MipHit." << std::endl;
                 return false;
             }
             
@@ -56,7 +58,7 @@ namespace ldmx {
         return true;
     }
     
-    bool MIPHit::setBoxPlanes() {
+    bool MipHit::setBoxPlanes() {
         
         bool success = false;
         if ( !hcalHits_.empty() ) {
@@ -115,7 +117,7 @@ namespace ldmx {
                     yMin_ = -hcal_ecal_xy/2;
                     yMax_ = hcal_y_width/2;
                 } else {
-                    std::cout << "[ MIPHit::setBoxPlanes ] : Unknown HcalSection!" << std::endl;
+                    std::cout << "[ MipHit::setBoxPlanes ] : Unknown HcalSection!" << std::endl;
                     return false;
                 }
             
@@ -128,14 +130,14 @@ namespace ldmx {
         return success;
     }
 
-    void MIPHit::setBoxCenter() {
+    void MipHit::setBoxCenter() {
         boxCenter_[0] = (xMin_ + xMax_)/2;
         boxCenter_[1] = (yMin_ + yMax_)/2;
         boxCenter_[2] = (zMin_ + zMax_)/2;
         return;
     }
 
-    void MIPHit::setTotalEnergy() {
+    void MipHit::setTotalEnergy() {
         totalEnergy_ = 0.0;
         for ( unsigned int i = 0; i < hcalHits_.size(); i++ ) {
             totalEnergy_ += hcalHits_[i]->getEnergy();

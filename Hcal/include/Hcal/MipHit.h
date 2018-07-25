@@ -1,7 +1,7 @@
 /**
- * @file MIPHit.h
+ * @file MipHit.h
  * @author Tom Eichlersmith, University of Minnesota
- * @brief Header file for class MIPHit
+ * @brief Header file for class MipHit
  */
 
 #ifndef HCAL_MIPHIT_H
@@ -20,29 +20,35 @@
 namespace ldmx {
     
     /**
-     * @class MIPHit
+     * @class MipHit
      * @brief Stores pointers to HcalHits that are considered a single MIP hit (usually due to proximity).
      */
-    class MIPHit {
+    class MipHit {
         public:
             /**
              * Default Constructor
              */
-            MIPHit();
+            MipHit();
 
             /**
-             * Add an HcalHit to the MIPHit
+             * Preferred Constructor
+             * Uses input hit list to initialize mip.
+             */
+            MipHit( std::vector< HitPtr > hcalHits );
+
+            /**
+             * Add an HcalHit to the MipHit
              */
             void addHit( HitPtr hit );
             
             /**
-             * Evaluate this MIPHit. Once this MIPHit has the HcalHits added to it,
+             *  Set Up this MipHit. Once this MipHit has the HcalHits added to it,
              *  running this function will calculate the other member variables from the
              *  HcalHits stored in this class.
              * 
              * @return true if successful
              */
-            bool Eval();
+            bool setUp();
 
             /**
              * Get the section.
@@ -65,17 +71,17 @@ namespace ldmx {
             int getUpStrip() const { return upstrip_; }
             
             /**
-             * Get the total energy of the MIPHit
+             * Get the total energy of the MipHit
              */
             float getEnergy() const { return totalEnergy_; }
 
             /**
-             * Get the number of HcalHits in this MIPHit
+             * Get the number of HcalHits in this MipHit
              */
             int getNumHits() const { return hcalHits_.size(); }
 
             /**
-             * Get MIPHit box center
+             * Get MipHit box center
              */
             const std::vector<float> &getBoxCenter() const { return boxCenter_; }
 
@@ -88,24 +94,21 @@ namespace ldmx {
             bool setSLS();
 
             /**
-             * Determine the six planes of the MIPHit box in detector coordinates.
+             * Determine the six planes of the MipHit box in detector coordinates.
              *
              * @return true if successful
              */
             bool setBoxPlanes();
 
             /**
-             * Calculate the center of the MIPHit box in detector coordinates.
+             * Calculate the center of the MipHit box in detector coordinates.
              */
             void setBoxCenter();
 
             /**
-             * Calculate the total energy of the MIPHit.
+             * Calculate the total energy of the MipHit.
              */
             void setTotalEnergy();
-
-            /** Storage vector of pointers to HcalHits */
-            std::vector< HitPtr > hcalHits_;
 
             /** Section of the Hits */
             HcalSection section_;
@@ -116,15 +119,22 @@ namespace ldmx {
             /** low and up strip of Hits (may be equal) */
             int lowstrip_, upstrip_;
 
-            /** The total energy of the MIPHit */
+            /** The total energy of the MipHit */
             float totalEnergy_;
 
-            /** The center of the MIPHit box in detector coordinates */
+            /** The center of the MipHit box in detector coordinates */
             std::vector< float > boxCenter_;
 
-            /** The planes of the MIPHit box in detector coordinates */
+            /** The planes of the MipHit box in detector coordinates */
             float xMin_, xMax_ , yMin_, yMax_, zMin_, zMax_;
-    };
+ 
+            /** Storage vector of pointers to HcalHits */
+            std::vector< HitPtr > hcalHits_;
+   };
+
+    /** Pointer to MipHit instance */
+    typedef MipHit * MipHitPtr
+
 }
 
 #endif /* HCAL_MIPHIT_H */
