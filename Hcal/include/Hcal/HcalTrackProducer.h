@@ -63,13 +63,6 @@ namespace ldmx {
         private:
             
             /**
-             * Remove list of hits for a track.
-             *
-             * @param track HcalTrack to be removed.
-             */
-            void RemoveTrack( const HcalTrack *track );
-
-            /**
              * Attempt to reconstruct a track from a seed layer.
              *
              * @param track plausible track - should be empty
@@ -105,29 +98,6 @@ namespace ldmx {
             int KeyGen( MipHitPtr mip ) const;
 
             /**
-             * Corrects for strip numbers outside of real range.
-             * Negative strip numbers are set to zero and numbers greater
-             *  than the number of strips are set to nstrips_.
-             *
-             * @param strip the strip number to correct
-             */
-            void CorrectStrip( int &strip) const;
-            
-            /**
-             * Finds a seed strip given a seed layer.
-             * Recursively looks through more different seed layers if doesn't find one in input layer.
-             * Will return false if it exhausts its layer options for a seed.
-             *
-             * @return true if found a seed (seedlayer_ and seedstrip_ are its position)
-             */
-            bool FindSeed();
-            
-            /**
-             * Constructs search cone around seed and list of layers that aren't in cone or seed.
-             */
-            void SetSearchCone();
-            
-            /**
              * Begins partial track by searching through cone around seed.
              *
              * @param track HcalTrack that stores beginning of track
@@ -157,13 +127,14 @@ namespace ldmx {
              * Will add hit(s) to track that it considers to be the preferred mip.
              * If more than one mip is found, the one closest to prefkey is the one added.
              *
+             * @param log std::map that contains the Mip Hits to search
              * @param lowkey lower bound key
              * @param upkey upper bound key
              * @param track partial track to add hit to if found
              * @param prefkey hit key that is given preference if multiple hits are found
              * @return true if successfully found a hit in the given key range 
              */
-            bool SearchByKey( const int lowkey , const int upkey , HcalTrack *track , const float prefkey = -1.0 );
+            bool SearchByKey( const std::mapt< int , MipHitPtr > log , const int lowkey , const int upkey , HcalTrack *track , const float prefkey = -1.0 );
 
             /**
              * Function to determine whether a group of hits can be considered a mip.
