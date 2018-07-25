@@ -91,7 +91,11 @@ namespace ldmx {
                             delete cmip;
                         }
                     } //is cgroup a mip
+
+                    cgroup.clear(); //wipe current group
+
                 } //are we in a different group
+
             } //does itH have a previous iterator
 
             cgroup.push_back( itH->second );
@@ -99,7 +103,6 @@ namespace ldmx {
       
         //search for tracks
         HcalTrack *track = new HcalTrack();
-        seedlayer_ = firstseedlayer_;
         int trackcnt = 0;
         while( TrackSearch( track ) and trackcnt < maxtrackcnt_ ) {
             //add track to collection
@@ -127,29 +130,6 @@ namespace ldmx {
             setStorageHint( hint_mustDrop );
         }
         */        
-        return;
-    }
-
-    void HcalTrackProducer::RemoveTrack( const HcalTrack *track ) {
-        
-        bool alreadywarned = false;
-        for ( int i = 0; i < track->getNHits(); i++ ) {
-            
-            std::map< int , HitPtr >::iterator toremove = log_.find( KeyGen( track->getHit(i) ) );
-            if ( toremove == log_.end() ) {
-                if ( !alreadywarned ) {
-                    std::cout << "[ HcalTrackProducer::RemoveTrack ]: ";
-                    std::cout << "Unable to locate hit to be removed from log." << std::endl;
-                    std::cout << "                                    ";
-                    std::cout << "This bodes ill for how this producer was defined." << std::endl;
-                    alreadywarned = true;
-                }
-            } else {
-                log_.erase( toremove );
-            }
-        
-        } //iterate through track and remove each hit (i)
-
         return;
     }
     
@@ -192,17 +172,6 @@ namespace ldmx {
         int layer = mip->getLayer();
         int lowstrip = mip->getLowStrip();
         return KeyGen( section , layer , lowstrip );
-    }
-    
-    void HcalTrackProducer::CorrectStrip( int &strip ) const {
-        
-        if ( strip < 0 ) {
-            strip = 0;
-        } else if ( strip > nstrips_ ) {
-            strip = nstrips_;
-        }
-        
-        return;
     }
     
     bool HcalTrackProducer::FindSeed() {
@@ -250,63 +219,6 @@ namespace ldmx {
         seedlayer_ = *layercheck_.begin();
         return ( FindSeed() );
     }
-
-    void HcalTrackProducer::SetSearchCone() {
-        
-        //reset lists
-        cone_.clear();
-        layerlist_.clear();
-        
-        //calculate slope of cone
-        float slope = static_cast<float>( coneangle_ )/( conedepth_*2.0 );
-
-        //Set Cone and Layer Lists 
-        for ( int l = 1; l < nlayers_+1; l++ ) {
-        //for ( std::set<int>::iterator it = layercheck_.begin(); it != layercheck_.end(); ++it ) {
-            
-        //    int l = *it;
-            if ( l < seedlayer_ - conedepth_ or l > seedlayer_ + conedepth_ ) { //layer outside of cone
-                layerlist_.push_back( l );
-            } else { //layer inside cone
-                
-                int centerstrip, lowstrip, upstrip;
-                if ( true ) { //!(( seedlayer ^ l ) & 1 ) ) { 
-                    //current layer and seedlayer have same parity (same orientation)
-                    centerstrip = seedstrip_; 
-                
-                    //calculate current halfwidth of cone
-                    float halfwidth = std::abs(slope*(l - seedlayer_))/2.0;
-                
-                    lowstrip = static_cast<int>(std::floor( centerstrip - halfwidth ));
-                    upstrip = static_cast<int>(std::ceil( centerstrip + halfwidth ));
-                
-                } else { 
-                    //current layer has different orientation
-                    //no way to determine centerstrip because we have no track direction yet
-                    //search entire layer
-                    lowstrip = 0;
-                    upstrip = nstrips_;
-                }
- 
-                CorrectStrip( lowstrip );
-                CorrectStrip( upstrip );
-
-                //add keys to cone
-                cone_.push_back( std::pair<int,int>( KeyGen( 0 , l , lowstrip ), KeyGen( 0 , l , upstrip ) ) );
-
-            } //layer in or out of cone
-
-        } //iterate through layercheck_ (it)
-
-        //sort layerlist according to proximity to seed RUNTIME ERROR
-//        std::sort( layerlist_.begin() , layerlist_.end() , 
-//            [&]( const int &a , const int &b ) -> bool {
-//                return ( std::abs(a - this->seedlayer_) < std::abs(b - this->seedlayer_) );
-//            });
-
-        return;
-    }
-    
     bool HcalTrackProducer::BeginPartialTrack( HcalTrack *track ) {
         
         //make sure track is empty
@@ -360,7 +272,7 @@ namespace ldmx {
         return ( track->getNLayHits() > mintracklayhits_ );
     }
 
-    bool HcalTrackProducer::SearchByKey( const int lowkey , const int upkey , HcalTrack *track , const float prefstrip ) {
+    bool HcalTrackProducer::SearchByKey( const std::map< int , MipHitPtr > log , const int lowkey , const int upkey , HcalTrack *track , const float prefstrip ) {
         
         bool success = false;
 
@@ -369,77 +281,28 @@ namespace ldmx {
             std::cout << "Returning an empty search" << std::endl;
         } else { //inputs are correct form
             
-            auto lowbound = log_.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
-            auto upbound = log_.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
-            std::vector< std::vector<HitPtr> > mipvec; //list of mips in this key range
+            auto lowbound = log.lower_bound( lowkey ); //points to first key that is not before lowkey (equivalent or after) (map::end if all are before lowkey)
+            auto upbound = log.upper_bound( upkey ); //points to first key after upkey (map::end if nothing after upkey)
 
-            //group hits based on key separation and then check if a group is a mip
-            std::vector<HitPtr> curr_group;
+            //count number of mips and determine which one is closest to prefstrip
+            int nmips = 0;
+            MipHitPtr bestmip;
+            float beststripdif = 10000.0;
             for( auto it = lowbound; it != upbound; ++it ) {
-                
-               if ( it == log_.begin() ) {
-                    //beginning of log, isolated on left
-                    if ( curr_group.size() > 0 ) {
-                        std::cout << "[ HcalTrackProducer::SearchByKey ] Iterator reached begining of log after adding to a group.\n";
-                        std::cout << "                                   Something was jumbled." << std::endl;
-                        curr_group.clear();
-                    }
+                nmips++;
+                MipHitPtr cmip = it->second;
+                float cstrip = static_cast<float>(cmip->getLowStrip() + cmip->getUpStrip())/2.0;
 
-                } else {
-                    //inside log, find previous hit
-                    auto previt = std::prev( it );
- 
-                    int keydif = it->first - previt->first;
-                    
-                    if ( keydif != 1 ) {
-                        //different group
-                        if ( isMIP( curr_group ) ) {
-                            mipvec.push_back( curr_group );
-                        }
-                        curr_group.clear();
-                    } //checking key difference 
-                } //if it is log_.begin()
-                
-                curr_group.push_back( it->second );
-            
+                float cstripdif = std::abs( prefstrip - cstrip );
+
+                if ( cstripdif < beststripdif ) {
+                    beststripdif = cstripdif;
+                    bestmip = cmip;
+                } //is cmip closer than bestmip to prefstrip
             } //iterate through [lowbound, upbound) range of log (it)
-            
-            //check last group (may include upbound)
-            // improve? need to scan past upbound to finish constructing last group?
-            if ( isMIP( curr_group ) ) {
-                mipvec.push_back( curr_group );
-            }
         
-            //mipvec has group(s) considered mips
             //cases based on how many mips were found
-            int nmips = mipvec.size();
             if ( nmips > 0 ) { //there are some mips
-                
-                auto bestmip = mipvec.begin();
-                if ( prefstrip > 0  and nmips > 1 ) {
-                    
-                    float beststripdif = static_cast<float>( nstrips_+1 ), currstripdif;
-                    for ( auto it = mipvec.begin(); it != mipvec.end(); ++it ) {
-                        //calculate currstrip (energy weighted average of strips in group)
-                        float currstrip = 0.0;
-                        float currenergy = 0.0;
-                        for ( int i = 0; i < it->size(); i++ ) {
-                            float en = it->at(i)->getEnergy();
-                            currstrip += it->at(i)->getStrip()*en;
-                            currenergy += en;
-                        } //iterate throug currmip (i)
-                        currstrip = currstrip/currenergy;
-
-                        currstripdif = std::abs( prefstrip - currstrip );
-                        
-                        if ( currstripdif < beststripdif ) {
-                            beststripdif = currstripdif;
-                            bestmip = it;
-                        } //check if currmip is better
-                 
-                    } //iterate through all mips found (it)
-                
-                } //check if there is an preferred key and a decision needs to be made
                 
                 track->incLayHit();
                 track->addGroup( *bestmip );
