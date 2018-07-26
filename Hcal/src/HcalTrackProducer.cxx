@@ -86,7 +86,7 @@ namespace ldmx {
                         if ( cmip->SetUp() ) {
                             HcalSection csect = cmip->getSection();
                             int ckey = KeyGen( cmip );
-                            mipLog_[ csect ][ ckey ] = cmip;
+                            mipLog_[ ckey ] = cmip;
                         } else {
                             std::cout << "Setting up MIP Hit went wrong" << std::endl;
                             delete cmip;
@@ -125,7 +125,7 @@ namespace ldmx {
         //Find all mips within traversing cylinder
         //Check if track is acceptable
         // YES: add track to trackLog and remove hits from mipLog
-        // NO: add end points to badendpoints set
+        // NO : add end points to badendpoints set
         //Repeat until out of possible end point pairs
 
         return false;
@@ -153,7 +153,7 @@ namespace ldmx {
         
         bool success = false;
 
-        if ( !mipLog_[section].empty() ) { //mip log for this section is nonempty
+        if ( !mipLog_.empty() ) { //mip log for this section is nonempty
             //Get first mip
             //Iterate through log finding mip furthest from start that isn't in badEndPts
             //Call this mip end

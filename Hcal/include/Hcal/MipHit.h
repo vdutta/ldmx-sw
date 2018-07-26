@@ -42,7 +42,7 @@ namespace ldmx {
             void addHit( HitPtr hit );
             
             /**
-             *  Set Up this MipHit. Once this MipHit has the HcalHits added to it,
+             * Set Up this MipHit. Once this MipHit has the HcalHits added to it,
              *  running this function will calculate the other member variables from the
              *  HcalHits stored in this class.
              * 
@@ -84,6 +84,11 @@ namespace ldmx {
              * Get MipHit box center
              */
             const std::vector<float> &getBoxCenter() const { return boxCenter_; }
+
+            /**
+             * Get vector of HcalHits in this MipHit
+             */
+            const std::vector< HitPtr > &getHcalHits() const { return hcalHits_; }
 
         private:
             
