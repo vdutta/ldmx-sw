@@ -28,13 +28,13 @@ namespace ldmx {
 
             virtual void produce(const ldmx::Event& event);
 
-            virtual void onFileOpen();
+            virtual void onFileOpen() { }
 
-            virtual void onFileClose();
+            virtual void onFileClose() { }
 
-            virtual void onProcessStart(); 
+            virtual void onProcessStart() { } 
 
-            virtual void onProcessEnd();
+            virtual void onProcessEnd() { }
 
         private:
             
@@ -78,8 +78,8 @@ namespace ldmx {
             };
             
             /** list of orientation enum */
-            static const std::vector< HcalOrientation > HcalOrientationList_({ BACK_EVEN , BACK_ODD , TOP , BOTTOM , LEFT , RIGHT })
-            
+            static const std::vector< HcalOrientation > HcalOrientationList_({ BACK_EVEN , BACK_ODD , TOP , BOTTOM , LEFT , RIGHT });
+
             /** struct to help organize hitLog */
             struct HitLogNode {
                 /** ID of hit in log */
@@ -92,27 +92,35 @@ namespace ldmx {
             /** Hits sorted by their orientations and stored as their raw IDs */
             std::map< HcalOrientation , std::map< DetectorID::RawValue , HitLogNode > > hitLog_;
 
-            /** Bad End Points for each HcalOrientation */
-            std::map< HcalOrientation , std::set< DetectorID::RawValue > > badEndPts_;
-
             /** Current Starting Point */
             HcalID* startPt_;
 
             /** Current Finish Point */
             HcalID* finishPt_;
             
-            /** Name of HcalHit collection and pass */
-            std::string hitCollName_;
-            std::string hitPassName_;
+            /** map of layers in each orientation */
+            std::map< HcalOrientation , int > nLayersPerOrientation_;
 
-            /** Minimum Number of Layers Hit to be considered a MIP */
-            int minLayersHit_;
+            /** Name of HcalHit collection */
+            std::string hitCollName_;
+
+            /** Name of HcalHit pass */
+            std::string hitPassName_;
+            
+            /** Maximum Difference Between a hit and the center line of track */
+            float maxStripDif_;
+
+            /** Minimum Fraction of Layers Hit to be considered a MIP */
+            float minFracLayersHit_;
 
             /** Maximum Energy of a HcalHit to be considered a MIP */
             float maxEnergy_;
 
             /** Minimum PE of a HcalHit to be considered a real hit (not noise) */
             float minPE_;
+
+            /** Name of this trigger object */
+            std::string triggerObjectName_;
     };
 }
 
