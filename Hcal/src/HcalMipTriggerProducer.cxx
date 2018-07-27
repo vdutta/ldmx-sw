@@ -1,7 +1,7 @@
 /**
  * @file HcalMipTriggerProducer.cxx
- * @brief 
- * @author 
+ * @brief Implementaiton of HcalMipTriggerProducer class
+ * @author Tom Eichlersmith, University of Minnesota
  */
 
 #include "Hcal/HcalMipTriggerProducer.h"
@@ -9,6 +9,30 @@
 namespace ldmx {
 
     void HcalMipTriggerProducer::configure(const ldmx::ParameterSet& ps) {
+        
+        hitCollName_ = ps.getString( "HcalHitCollectionName" );
+        hitPassName_ = ps.getString( "HcalHitPassName" );
+        
+        nBackLayers = ps.getInteger( "NumLayersBackHcal" );
+        nLayersPerOrientation_[ HcalOrientation::BACK_EVEN ] = nBackLayers/2;
+        nLayersPerOrientation_[ HcalOrientation::BACK_ODD ] = nBackLayers/2;
+        if ( nBackLayers % 2 == 1 ) { //odd number back layers
+            nLayersPerOrientation_[ HcalOrientation::BACK_ODD ] ++;
+        }
+        nLayersPerOrientation_[ HcalOrientation::TOP ] = ps.getInteger( "NumLayersTopHcal" );
+        nLayersPerOrientation_[ HcalOrientation::BOTTOM ] = ps.getInteger( "NumLayersBottomHcal" );
+        nLayersPerOrientation_[ HcalOrientation::LEFT ] = ps.getInteger( "NumLayersLeftHcal" );
+        nLayersPerOrientation_[ HcalOrientation::RIGHT ] = ps.getInteger( "NumLayersRightHcal" );
+
+        maxStripDif_ = ps.getDouble( "MaximumStripDifference" );
+
+        minFracLayersHit_ = ps.getDouble( "MinimumFractionLayersHit" );
+
+        maxEnergy_ = ps.getDouble( "MaximumEnergy" );
+
+        minPE_ = ps.getDouble( "MinimumPE" );
+
+        triggerObjectName_ = ps.getString( "HcalMipTriggerObjectName" );
 
         return;
     }
@@ -17,7 +41,6 @@ namespace ldmx {
         
         //initialize event containers
         hitLog_.clear();
-        badEndPts_.clear();
         
         //obtain list of raw hits
         const TClonesArray *rawhits = event.getCollection( hitCollName_ , hitPassName_ );
@@ -87,12 +110,14 @@ namespace ldmx {
                     } //iterate through hitLog of current orientation (chit)
                 
                 } //startPt and finishPt are not on the same layer
+                
+                float layfrac = static_cast<float>( laycnt ) / static_cast<float>( nLayersPerOrientation_.at( corient ) );
 
-                if ( laycnt > minLayersHit_ ) {
+                if ( layfrac > minFracLayersHit_ ) { 
                     //good track found
-                    for ( DectorID::RawValue hcalID : track ) {
-                        removeHcalID( corient , hcalID );
-                    } //iterate through track (hcalID)
+                    for ( DectorID::RawValue rawID : track ) {
+                        removeHcalID( corient , rawID );
+                    } //iterate through track (rawID)
                     
                     trackcnt++;
 
@@ -105,26 +130,6 @@ namespace ldmx {
             } //while good end points are still being found
 
         } //for each orientation
-
-        return;
-    }
-    
-    void HcalMipTriggerProducer::onFileOpen() {
-
-        return;
-    }
-
-    void HcalMipTriggerProducer::onFileClose() {
-
-        return;
-    }
-
-    void HcalMipTriggerProducer::onProcessStart() {
-
-        return;
-    }
-
-    void HcalMipTriggerProducer::onProcessEnd() {
 
         return;
     }
