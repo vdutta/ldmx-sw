@@ -42,7 +42,7 @@ namespace ldmx {
                 HcalID cID;
                 cID.setRawValue( chit->getID() );
                 cID.unpack();
-                hitLog_[ corient ][ chit->getID() ] = cID;
+                hitLog_[ corient ][ chit->getID() ] = HitLogNode( cID , true );
             } //could be a MIP
         } //iterate through rawhits (iH)
 
@@ -67,7 +67,7 @@ namespace ldmx {
                     std::set<int> countedLayers; //layers that already have been counted
                     for ( auto it : hitLog_[ corient ] ) {
                         
-                        HcalID* chit = &( it->second );
+                        HcalID* chit = &( (it->second).id );
     
                         int cstrip = chit->getStrip();
                         int clayer = chit->getLayerID();
@@ -97,11 +97,14 @@ namespace ldmx {
                     trackcnt++;
 
                 } else {
-                    badEndPts_.insert( startPt_->getRawValue() );
-                    badEndPts_.insert( finishPt_->getRawValue() );
+                    //mark the end points as not good end points
+                    hitLog_[ corient ][ startPt_->getRawValue() ].isGood = false;
+                    hitLog_[ corient ][ finishPt_->getRawValue() ].isGood = false;
                 } //what to do if track is good
 
             } //while good end points are still being found
+
+        } //for each orientation
 
         return;
     }
@@ -139,14 +142,12 @@ namespace ldmx {
             
             for ( auto itH : hitLog_[ orientation ] ) {
 
-                HcalID *chit = &( itH->second );
+                HcalID *chit = &( (itH->second).id );
                 int clayer = chit->getLayerID();
-
-                bool isGoodEndPt = ( badEndPts.find( itH->first ) == badEndPts.end() );
 
                 if ( startPt_ ) {
                     
-                    if ( clayer < startPt_->getLayerID() and isGoodEndPt ) {
+                    if ( clayer < startPt_->getLayerID() and (itH->second).isGood ) {
                         startPt_ = chit;
                     } //if chit could be a good start point
 
@@ -156,7 +157,7 @@ namespace ldmx {
 
                 if ( finishPt_ ) {
                     
-                    if ( clayer > finishPt_->getLayerID() and isGoodEndPt ) {
+                    if ( clayer > finishPt_->getLayerID() and (itH->second).isGood ) {
                         finishPt_ = chit;
                     } //if chit could be a good finish point
 

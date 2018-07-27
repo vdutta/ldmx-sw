@@ -80,8 +80,17 @@ namespace ldmx {
             /** list of orientation enum */
             static const std::vector< HcalOrientation > HcalOrientationList_({ BACK_EVEN , BACK_ODD , TOP , BOTTOM , LEFT , RIGHT })
             
+            /** struct to help organize hitLog */
+            struct HitLogNode {
+                /** ID of hit in log */
+                HcalID id;
+
+                /** flag if hit could be a good end point */
+                bool isGood;
+            };
+
             /** Hits sorted by their orientations and stored as their raw IDs */
-            std::map< HcalOrientation , std::map< DetectorID::RawValue , HcalID > > hitLog_;
+            std::map< HcalOrientation , std::map< DetectorID::RawValue , HitLogNode > > hitLog_;
 
             /** Bad End Points for each HcalOrientation */
             std::map< HcalOrientation , std::set< DetectorID::RawValue > > badEndPts_;
