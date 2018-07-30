@@ -55,13 +55,7 @@ findable_track = ldmxcfg.Producer("findable", "ldmx::FindableTrackProcessor")
 
 p.histogramFile = "histo.root"
 
-p.sequence=[ecalDigis, 
-            hcalDigis, 
-            ecalVeto, 
-            hcalVeto, 
-            trigger, 
-            findable_track
-            ]
+p.sequence=[ecalDigis, hcalDigis, ecalVeto, NonFidecalVeto, hcalVeto, trigger, findable_track]
 
 p.maxEvents=-1
 p.inputFiles=["$input_file"]
