@@ -13,16 +13,16 @@ namespace ldmx {
         hitCollName_ = ps.getString( "HcalHitCollectionName" );
         hitPassName_ = ps.getString( "HcalHitPassName" );
         
-        nBackLayers = ps.getInteger( "NumLayersBackHcal" );
-        nLayersPerOrientation_[ HcalOrientation::BACK_EVEN ] = nBackLayers/2;
-        nLayersPerOrientation_[ HcalOrientation::BACK_ODD ] = nBackLayers/2;
+        int nBackLayers = ps.getInteger( "NumLayersBackHcal" );
+        nLayersPerOrientation_[ 0 ] = nBackLayers/2;
+        nLayersPerOrientation_[ 1 ] = nBackLayers/2;
         if ( nBackLayers % 2 == 1 ) { //odd number back layers
-            nLayersPerOrientation_[ HcalOrientation::BACK_ODD ] ++;
+            nLayersPerOrientation_[ 1 ] ++;
         }
-        nLayersPerOrientation_[ HcalOrientation::TOP ] = ps.getInteger( "NumLayersTopHcal" );
-        nLayersPerOrientation_[ HcalOrientation::BOTTOM ] = ps.getInteger( "NumLayersBottomHcal" );
-        nLayersPerOrientation_[ HcalOrientation::LEFT ] = ps.getInteger( "NumLayersLeftHcal" );
-        nLayersPerOrientation_[ HcalOrientation::RIGHT ] = ps.getInteger( "NumLayersRightHcal" );
+        nLayersPerOrientation_[ 2 ] = ps.getInteger( "NumLayersTopHcal" );
+        nLayersPerOrientation_[ 3 ] = ps.getInteger( "NumLayersBottomHcal" );
+        nLayersPerOrientation_[ 4 ] = ps.getInteger( "NumLayersLeftHcal" );
+        nLayersPerOrientation_[ 5 ] = ps.getInteger( "NumLayersRightHcal" );
 
         maxStripDif_ = ps.getDouble( "MaximumStripDifference" );
 
@@ -40,23 +40,24 @@ namespace ldmx {
     void HcalMipTriggerProducer::produce(const ldmx::Event& event) {
         
         //initialize event containers
-        hitLog_.clear();
+        for ( int iO = 0; iO < 6; iO++ ) {
+            hitLog_[ iO ].clear();
+        }
         
         //obtain list of raw hits
         const TClonesArray *rawhits = event.getCollection( hitCollName_ , hitPassName_ );
 
         //add only plausible mip hits to hitLog_
         for ( size_t iH = 0; iH < rawhits->GetEntriesFast(); iH++ ) {
-            HcalHit* chit = (HcalHit*)(rawhits->At(iH));
+            ldmx::HcalHit* chit = (ldmx::HcalHit*)(rawhits->At(iH));
             if ( isPlausibleMip( chit ) ) { //could be a MIP
                 
-                HcalSection csect = chit->getSection();
+                int corient = chit->getSection();
                 int clayer = chit->getLayer();
-                HcalOrientation corient = csect;
                 
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
-                if ( csect != HcalSection::BACK or (csect = HcalSection::BACK and clayer % 2 == 1 ) ) {
+                if ( csect != HcalSection::BACK or clayer % 2 == 1 ) {
                     corient++;
                 }
                 
@@ -65,12 +66,14 @@ namespace ldmx {
                 HcalID cID;
                 cID.setRawValue( chit->getID() );
                 cID.unpack();
-                hitLog_[ corient ][ chit->getID() ] = HitLogNode( cID , true );
+                HitLogNode cNode;
+                cNode.id = cID;
+                cNode.isGood = true;
+                hitLog_[ corient ][ chit->getID() ] = cNode;
             } //could be a MIP
         } //iterate through rawhits (iH)
 
-        //for each HcalOrientation
-        for ( HcalOrientation corient : HcalOrientationList_ ) {
+        for ( int corient = 0; corient < 6; corient++ ) {
             
             //while good end points are being found
             int trackcnt = 0;
@@ -88,9 +91,10 @@ namespace ldmx {
                     
                     //count hits in this orientation that are in the cylinder
                     std::set<int> countedLayers; //layers that already have been counted
-                    for ( auto it : hitLog_[ corient ] ) {
+                    std::vector< DetectorID::RawValue > track;
+                    for ( auto node : hitLog_[ corient ] ) {
                         
-                        HcalID* chit = &( (it->second).id );
+                        HcalID* chit = &( (node.second).id );
     
                         int cstrip = chit->getStrip();
                         int clayer = chit->getLayerID();
@@ -111,11 +115,11 @@ namespace ldmx {
                 
                 } //startPt and finishPt are not on the same layer
                 
-                float layfrac = static_cast<float>( laycnt ) / static_cast<float>( nLayersPerOrientation_.at( corient ) );
+                float layfrac = static_cast<float>( laycnt ) / static_cast<float>( nLayersPerOrientation_[ corient ] );
 
                 if ( layfrac > minFracLayersHit_ ) { 
                     //good track found
-                    for ( DectorID::RawValue rawID : track ) {
+                    for ( DetectorID::RawValue rawID : track ) {
                         removeHcalID( corient , rawID );
                     } //iterate through track (rawID)
                     
@@ -129,30 +133,30 @@ namespace ldmx {
 
             } //while good end points are still being found
 
-        } //for each orientation
+        } //for each orientation (corient)
 
         return;
     }
 
-    bool HcalMipTriggerProducer::isPlausibleMip( HcalHit* hit ) const {
+    bool HcalMipTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
         return ( hit->getPE() > minPE_ and hit->getEnergy() < maxEnergy_ );
     }
 
-    bool HcalMipTriggerProducer::findEndPoints( HcalOrientation orientation ) {
+    bool HcalMipTriggerProducer::findEndPoints( int orientation ) {
         
         startPt_ = nullptr;
         finishPt_ = nullptr;
 
-        if ( hitLog_[orientation].size() > 1 ) {
+        if ( hitLog_[ orientation ].size() > 1 ) {
             
-            for ( auto itH : hitLog_[ orientation ] ) {
+            for ( auto node : hitLog_[ orientation ] ) {
 
-                HcalID *chit = &( (itH->second).id );
+                HcalID *chit = &( (node.second).id );
                 int clayer = chit->getLayerID();
 
                 if ( startPt_ ) {
                     
-                    if ( clayer < startPt_->getLayerID() and (itH->second).isGood ) {
+                    if ( clayer < startPt_->getLayerID() and (node.second).isGood ) {
                         startPt_ = chit;
                     } //if chit could be a good start point
 
@@ -162,7 +166,7 @@ namespace ldmx {
 
                 if ( finishPt_ ) {
                     
-                    if ( clayer > finishPt_->getLayerID() and (itH->second).isGood ) {
+                    if ( clayer > finishPt_->getLayerID() and (node.second).isGood ) {
                         finishPt_ = chit;
                     } //if chit could be a good finish point
 
@@ -170,7 +174,7 @@ namespace ldmx {
                     finishPt_ = chit;
                 } //if finishPt_ is nullptr
             
-            } //iterate through hits in this orientation hitlog (chit)
+            } //iterate through hits in this orientation hitlog (node)
         
         } //two ore more hits in this part of the log
 
@@ -178,7 +182,7 @@ namespace ldmx {
 
     }
 
-    void HcalMipTriggerProducer::removeHcalID( HcalOrientation orientation , DetectorID::RawValue rawID ) {
+    void HcalMipTriggerProducer::removeHcalID( int orientation , DetectorID::RawValue rawID ) {
         
         hitLog_[ orientation ].erase( rawID );
 

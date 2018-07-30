@@ -7,11 +7,17 @@
 #ifndef HCAL_HCALMIPTRIGGERPRODUCER_H
 #define HCAL_HCALMIPTRIGGERPRODUCER_H
 
+//STL
+#include <set> //listing layers that have already been counted
+#include <map> //logging hits
+#include <vector> //creating track
+
 //LDMX Framework
-#include "Event/Event.h"
+#include "Event/Event.h" //getting event bus
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "DetDescr/HcalID.h" //For HcalSection enum and HcalID creation
+#include "Event/HcalHit.h" //getting hits
 
 namespace ldmx {
     
@@ -49,7 +55,7 @@ namespace ldmx {
              * @param hit HcalHit* that needs to be checked
              * @bool true if plausible MIP
              */
-            bool isPlausibleMip( HcalHit* hit ) const;
+            bool isPlausibleMip( ldmx::HcalHit* hit ) const;
 
             /**
              * Find end points that haven't been tested before.
@@ -57,7 +63,7 @@ namespace ldmx {
              * @param orientation HcalOrientation of orientation to search
              * @return true if new end points are found
              */
-            bool findEndPoints( HcalOrientation orientation );
+            bool findEndPoints( int orientation );
 
             /**
              * Remove a given raw ID value from the hit log.
@@ -65,20 +71,7 @@ namespace ldmx {
              * @param orientation HcalOrienation
              * @param rawID raw ID value to be removed
              */
-            void removeHcalID( HcalOrienation orientation , DetectorID::RawValue rawID );
-
-            /** enum for layers orientated in the same way */
-            enum HcalOrientation {
-                BACK_EVEN = 0,
-                BACK_ODD = 1,
-                TOP = 2,
-                BOTTOM = 3,
-                LEFT = 4,
-                RIGHT = 5
-            };
-            
-            /** list of orientation enum */
-            static const std::vector< HcalOrientation > HcalOrientationList_({ BACK_EVEN , BACK_ODD , TOP , BOTTOM , LEFT , RIGHT });
+            void removeHcalID( int orientation , DetectorID::RawValue rawID );
 
             /** struct to help organize hitLog */
             struct HitLogNode {
@@ -90,7 +83,7 @@ namespace ldmx {
             };
 
             /** Hits sorted by their orientations and stored as their raw IDs */
-            std::map< HcalOrientation , std::map< DetectorID::RawValue , HitLogNode > > hitLog_;
+            std::map< DetectorID::RawValue , HitLogNode > hitLog_[6];
 
             /** Current Starting Point */
             HcalID* startPt_;
@@ -98,9 +91,9 @@ namespace ldmx {
             /** Current Finish Point */
             HcalID* finishPt_;
             
-            /** map of layers in each orientation */
-            std::map< HcalOrientation , int > nLayersPerOrientation_;
-
+            /** array of layers in each orientation */
+            int nLayersPerOrientation_[6]; 
+            
             /** Name of HcalHit collection */
             std::string hitCollName_;
 
