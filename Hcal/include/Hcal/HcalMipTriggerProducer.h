@@ -32,7 +32,7 @@ namespace ldmx {
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
-            virtual void produce(const ldmx::Event& event);
+            virtual void produce(ldmx::Event& event);
 
             virtual void onFileOpen() { }
 

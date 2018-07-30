@@ -15,7 +15,6 @@
 //LDMX Framework
 #include "Event/HcalTrack.h" //for typedef of hcalhits
 #include "DetDescr/HcalID.h" //for the HcalSection enum
-#include "EventDisplay/DetectorGeometry.h" //for the HCAL Geometry constants
 
 namespace ldmx {
     
@@ -53,7 +52,7 @@ namespace ldmx {
             /**
              * Get the section.
              */
-            HcalSection getSection() const { return section_; }
+            int getSection() const { return section_; }
 
             /**
              * Get the layer.
@@ -116,7 +115,7 @@ namespace ldmx {
             void setTotalEnergy();
 
             /** Section of the Hits */
-            HcalSection section_;
+            int section_;
 
             /** Layer of the Hits */
             int layer_;
@@ -138,7 +137,7 @@ namespace ldmx {
    };
 
     /** Pointer to MipHit instance */
-    typedef MipHit * MipHitPtr
+    typedef MipHit * MipHitPtr;
 
 }
 
