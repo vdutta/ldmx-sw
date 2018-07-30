@@ -37,7 +37,7 @@ namespace ldmx {
         return;
     }
 
-    void HcalMipTriggerProducer::produce(const ldmx::Event& event) {
+    void HcalMipTriggerProducer::produce(ldmx::Event& event) {
         
         //initialize event containers
         for ( int iO = 0; iO < 6; iO++ ) {
