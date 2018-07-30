@@ -57,7 +57,7 @@ namespace ldmx {
                 
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
-                if ( csect != HcalSection::BACK or clayer % 2 == 1 ) {
+                if ( corient != HcalSection::BACK or clayer % 2 == 1 ) {
                     corient++;
                 }
                 
@@ -79,6 +79,9 @@ namespace ldmx {
             int trackcnt = 0;
             while ( findEndPoints( corient ) ) {
                 
+                //track to be constructed
+                std::vector< DetectorID::RawValue > track;
+                
                 int laycnt = 0;
                 if ( startPt_->getLayerID() != finishPt_->getLayerID() ) {
                     
@@ -91,7 +94,6 @@ namespace ldmx {
                     
                     //count hits in this orientation that are in the cylinder
                     std::set<int> countedLayers; //layers that already have been counted
-                    std::vector< DetectorID::RawValue > track;
                     for ( auto node : hitLog_[ corient ] ) {
                         
                         HcalID* chit = &( (node.second).id );
@@ -191,4 +193,4 @@ namespace ldmx {
 
 }
 
-DECLARE_PRODUCER_NS(ldmx, HcalMipTriggerProducer);
+DECLARE_PRODUCER_NS( ldmx , HcalMipTriggerProducer );
