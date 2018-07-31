@@ -40,7 +40,7 @@ namespace ldmx {
                   << " Created within " << track->GetLogicalVolumeAtVertex()->GetName() 
                   << std::endl;*/
 
-        if (track->GetParentID() != 1) return 0; 
+        if (track->GetParentID() != 2) return 0; 
 
         /*std::cout << "[ PhotoNuclearXsecBiasingOperator ]: " 
                   << "Kinetic energy: " << track->GetKineticEnergy() 
