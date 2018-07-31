@@ -59,7 +59,7 @@ namespace ldmx {
         G4Track* track = step->GetTrack();
 
         // Only process tracks whose parent is the primary particle
-        if (track->GetParentID() != 1) return; 
+        if (track->GetParentID() != 2) return; 
 
         // get the PDGID of the track.
         G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
