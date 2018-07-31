@@ -25,24 +25,29 @@ namespace ldmx {
             /**
              * Default Constructor
              */
-            HcalMipTriggerResult() : TriggerResult() { }
+            HcalMipTriggerResult(); 
 
             /**
              * Destructor
              */
-            ~HcalMipTriggerResult() {
-                Clear();
-            }
-            
-            /**
-             * Clear the HcalMipTriggerResult
-             */
-            void Clear( Option_t *opt = "" );
+            ~HcalMipTriggerResult(); 
 
             /**
-             * Copy the HcalMipTriggerResult
+             * Print a description of this object.
              */
-            void Copy( Option_t *opt = "" );
+            void Print(Option_t *option = "") const;
+
+            /**
+             * Reset the TriggerResult object.
+             */
+            void Clear(Option_t *option = "");
+
+            /**
+             * Copy this object.
+             * @param o The target object.
+             */
+            void Copy(TObject& o) const;
+            
             /**
              * Add a track to the vector of tracks.
              */
@@ -51,32 +56,32 @@ namespace ldmx {
             /**
              * Get number of tracks in this result.
              */
-            int getNumTracks() const { return trackVec_.size(); }
+            int getNumTracks() const; 
 
             /**
              * Get the whole vector of tracks.
              */
-            std::vector< std::vector< DetectorID::RawValue > > &getTrackVec() const { return trackVec_; }
+            std::vector< std::vector< DetectorID::RawValue > > &getTrackVec() const; 
             
             /**
              * Set the fraction of layers hit threshold.
              */
-            void setFracLayersHit( const float fracLayersHit ) { fracLayersHit_ = fracLayersHit; return; }
+            void setFracLayersHit( const float fracLayersHit ); 
 
             /**
              * Get the fraction of layers hit threshold.
              */
-            float getFracLayersHit() const { return fracLayersHit_; }
+            float getFracLayersHit() const; 
 
             /**
              * Set the radius of the track cylinder.
              */
-            void setTrackRadius( const int trackRadius ) { trackRadius_ = trackRadius; return; }
+            void setTrackRadius( const int trackRadius ); 
 
             /**
              * Get the radius of the track cylinder.
              */
-            int getTrackRadius() const { return trackRadius_; }
+            int getTrackRadius() const; 
 
         private:
 
