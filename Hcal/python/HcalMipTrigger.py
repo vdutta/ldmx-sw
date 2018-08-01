@@ -23,7 +23,7 @@ HcalMipTrigger.parameters["MinimumPE"] = 5.5
 HcalMipTrigger.parameters["MaximumEnergy"] = 4000.0
 
 # maximum difference (in strips) between a hit and the centerline of a track
-HcalMipTrigger.parameters["TrackRadius"] = 2.0
+HcalMipTrigger.parameters["TrackRadius"] = 4.0
 
 # Minimum fraction of layers hit in track to be considered valid track
 HcalMipTrigger.parameters["MinFractionLayersHit"] = 0.8

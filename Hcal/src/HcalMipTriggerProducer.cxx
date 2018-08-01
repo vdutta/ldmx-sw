@@ -76,8 +76,7 @@ namespace ldmx {
         for ( int corient = 0; corient < 6; corient++ ) {
             
             //while good end points are being found
-            int loopcnt = 0;
-            while ( findEndPoints( corient ) and loopcnt < 50 ) {
+            while ( findEndPoints( corient ) ) {
                 
                 //track to be constructed
                 std::vector< unsigned int > track;
@@ -105,8 +104,10 @@ namespace ldmx {
     
                         if ( stripdif < trackRadius_ ) {
                             //hit is in track cylinder
-                            if ( countedLayers.find( clayer ) != countedLayers.end() )
+                            if ( countedLayers.find( clayer ) == countedLayers.end() ) {
                                 laycnt++;
+                                countedLayers.insert( clayer );
+                            }
     
                             track.push_back( node.first ); 
                         } //check if hit is in track cylinder
@@ -117,8 +118,8 @@ namespace ldmx {
                 
                 float layfrac = static_cast<float>( laycnt ) /
                     static_cast<float>( nLayersPerOrientation_[ corient ] );
-
-                if ( layfrac > minFracLayersHit_ ) { 
+                
+                if ( layfrac > static_cast<float>(minFracLayersHit_) ) { 
                     //good track found
                     //result_.addTrack( track );
                     
@@ -133,9 +134,7 @@ namespace ldmx {
                     (startPt_->second).isGood = false;
                     (finishPt_->second).isGood = false;
                 } //what to do if track is good
-                loopcnt++;
-                for ( auto node : hitLog_[ corient ] ) { std::cout << node.second.isGood << " "; }
-                std::cout << std::endl;
+            
             } //while good end points are still being found
 
         } //for each orientation (corient)
