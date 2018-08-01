@@ -24,8 +24,12 @@ namespace ldmx {
     
     /**
      * @class HcalMipTriggerProducer
-     * @brief Constructs Trigger Result depending on Section, Layer, Strip, and 
-     *  Amplitude information of hits in the Hcal.
+     * @brief Constructs Trigger Result depending on Section, Layer, Strip, PE, and 
+     *  Energy information of hits in the Hcal.
+     *
+     * @note Right now, this producer assumes that there is no alternating orientation
+     *  in the back hcal. When alternating bar orientations are implemented in the hcal,
+     *  this can be implemented here by changing the lines containing ALT in the implementation.
      */
     class HcalMipTriggerProducer : public ldmx::Producer {
         public:

@@ -60,7 +60,7 @@ namespace ldmx {
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
                 //Since alternating orientations aren't implemented, we pretend all layers are odd
-                if ( corient != HcalSection::BACK ) { //or clayer % 2 == 1 ) {
+                if ( corient != HcalSection::BACK ) { //ALT or clayer % 2 == 1 ) {
                     corient++;
                 }
                 
