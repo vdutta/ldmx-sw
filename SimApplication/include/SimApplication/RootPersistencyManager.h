@@ -1,6 +1,7 @@
 /**
  * @file RootPersistencyManager.h
- * @brief Class providing persistency manager implementation with SimEvent output
+ * @brief Class providing persistency manager implementation with SimEvent 
+ *        output.
  * @author Jeremy McCormick, SLAC National Accelerator Laboratory
  */
 
@@ -15,6 +16,8 @@
 //------------//
 //   Geant4   //
 //------------//
+#include "G4CascadeParameters.hh"
+#include "G4CascadParticle.hh"
 #include "G4PersistencyManager.hh"
 #include "G4PersistencyCenter.hh"
 #include "G4Run.hh"
@@ -90,9 +93,7 @@ namespace ldmx {
             /**
              * Implementing this makes an "overloaded-virtual" compiler warning go away.
              */
-            G4bool Store(const G4VPhysicalVolume*) {
-                return false;
-            }
+            G4bool Store(const G4VPhysicalVolume*) { return false; }
 
             /** 
              * This is called "manually" in UserRunAction to open the ROOT writer for the run.
@@ -103,19 +104,22 @@ namespace ldmx {
              * Set the output file name.
              * @param fileName The output file name.
              */
-            void setFileName(std::string fileName) {
-                fileName_ = fileName;
-            }
+            void setFileName(std::string fileName) { fileName_ = fileName; }
+
+            /**
+             * Enable saving of auxiliary photonuclear information.  
+             *
+             * @param saveAuxPNInfo True to enable saving of auxiliary 
+             *                      photonuclear information.
+             */
+            void saveAuxPNInfo() { saveAuxPNInfo_ = true; };
 
             /**
              * Enable or disable hit contribution output for SimCalorimeterHits.
              * This is enabled by default.
              * @param enableHitContribs True to enable hit contributions.
              */
-            void setEnableHitContribs(bool enableHitContribs) {
-                // Pass this flag to the ECal IO helper.
-                ecalHitIO_->setEnableHitContribs(enableHitContribs);
-            }
+            void setEnableHitContribs(bool enableHitContribs) { ecalHitIO_->setEnableHitContribs(enableHitContribs); }
 
             /**
              * Enable or disable compression of hit contribution output by finding
@@ -123,14 +127,9 @@ namespace ldmx {
              * This is enabled by default.
              * @param compressHitContribs True to compress hit contributions.
              */
-            void setCompressHitContribs(bool compressHitContribs) {
-                // Pass this flag to the ECal IO helper.
-                ecalHitIO_->setCompressHitContribs(compressHitContribs);
-            }
+            void setCompressHitContribs(bool compressHitContribs) { ecalHitIO_->setCompressHitContribs(compressHitContribs); }
 
-            void setCompressionLevel(int compressionLevel) {
-                compressionLevel_ = compressionLevel;
-            }
+            void setCompressionLevel(int compressionLevel) { compressionLevel_ = compressionLevel; }
 
             /** 
              * Drop the hits associated with the specified collection.
@@ -138,9 +137,7 @@ namespace ldmx {
              * @param collectionName The name of the collection whose hits
              *                       should be dropped.
              */
-            void dropCollection(std::string collectionName) { 
-                dropCollectionNames_.push_back(collectionName);  
-            }  
+            void dropCollection(std::string collectionName) { dropCollectionNames_.push_back(collectionName); }  
 
         private:
 
@@ -163,6 +160,13 @@ namespace ldmx {
              * @param fileName The filename that stores temporary seeds.
              */
             std::string getEventSeeds(std::string fileName = "currentEvent.rndm");
+
+            /**
+             * Write auxiliary photonuclear information into a ROOT event. 
+             *
+             * @param outputEvent the output event.
+             */
+            void writeAuxPNInfo(Event* outputEvent); 
 
             /**
              * Write hits collections from Geant4 into a ROOT event.
@@ -255,8 +259,15 @@ namespace ldmx {
              */
             HitsCollectionMap outputHitsCollections_;
 
+            /** The output SimParticle collection. */
+            TClonesArray* pnGammaSecColl_{nullptr};
+            
+            /**
+             * Flag indicating whether photonuclear auxiliary information should
+             * be saved.
+             */
+            bool saveAuxPNInfo_{false}; 
     };
-
 }
 
 #endif

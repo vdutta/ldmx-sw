@@ -83,6 +83,10 @@ namespace ldmx {
 
         // Create map with output hits collections.
         setupHitsCollectionMap();
+
+        if (saveAuxPNInfo_) { 
+            pnGammaSecColl_ = new TClonesArray(EventConstants::SIM_PARTICLE.c_str(), 50);
+        }
     }
 
     void RootPersistencyManager::buildEvent(const G4Event* anEvent, Event* outputEvent) {
@@ -98,6 +102,11 @@ namespace ldmx {
 
         // Copy hit objects from SD hit collections into the output event.
         writeHitsCollections(anEvent, outputEvent);
+    
+        // Write auxiliary photonuclear information.
+        if (saveAuxPNInfo_) { 
+            writeAuxPNInfo(outputEvent); 
+        }
     }
 
     void RootPersistencyManager::printEvent(Event* outputEvent) {
@@ -165,6 +174,30 @@ namespace ldmx {
         t.close();
 
         return buffer.str();
+    }
+
+    void RootPersistencyManager::writeAuxPNInfo(Event* outputEvent) { 
+       
+        // Clear the output particle collection.
+        pnGammaSecColl_->Clear("C");
+        
+        std::vector<G4CascadParticle> cascadeParticles = 
+            G4CascadeParameters::getCascadeParticles();
+
+        std::cout << "[ RootPersistencyManager ]: Total cascade particles: " 
+                  << cascadeParticles.size() << std::endl;
+
+        for (G4CascadParticle particle : cascadeParticles) { 
+            SimParticle* simParticle 
+                =  static_cast<SimParticle*>(pnGammaSecColl_->ConstructedAt(pnGammaSecColl_->GetEntries()));
+
+            std::cout << "[ RootPersistencyManager ]: Particle type: " 
+                      << particle.getParticle().type() 
+                      << std::endl;
+        }
+
+        // Add the collection data to the output event.
+        outputEvent->add("PNGammaSecondaries", pnGammaSecColl_); 
     }
 
     void RootPersistencyManager::writeHitsCollections(const G4Event* anEvent, Event* outputEvent) {
