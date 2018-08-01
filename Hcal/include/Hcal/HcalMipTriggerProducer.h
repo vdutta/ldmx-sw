@@ -43,7 +43,11 @@ namespace ldmx {
 
             virtual void onProcessStart() { } 
 
-            virtual void onProcessEnd() { }
+            virtual void onProcessEnd() {
+                std::cout << "HcalMipTriggerProducer accepted ";
+                std::cout << numPass_ << " events in this run." << std::endl;    
+                return;
+            }
 
         private:
             
@@ -121,6 +125,10 @@ namespace ldmx {
             /** Trigger object to add to event */
             //HcalMipTriggerResult result_;
             TriggerResult result_;
+
+            /** Number of Events Passed */
+            int numPass_;
+
     };
 }
 

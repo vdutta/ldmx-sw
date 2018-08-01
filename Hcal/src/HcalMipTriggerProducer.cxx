@@ -34,6 +34,8 @@ namespace ldmx {
 
         triggerObjectName_ = ps.getString( "HcalMipTriggerObjectName" );
 
+        numPass_ = 0;
+
         return;
     }
 
@@ -143,6 +145,7 @@ namespace ldmx {
         bool pass = false;
         if ( trackcnt > 0 ) { //result_.getNumTracks() > 0 ) {
             pass = true;
+            numPass_++;
         }
 
         result_.set( triggerObjectName_ , pass , 4 );
