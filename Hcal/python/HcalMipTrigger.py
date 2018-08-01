@@ -23,10 +23,10 @@ HcalTracks.parameters["MinimumPE"] = 5.5
 HcalTracks.parameters["MaximumEnergy"] = 4000.0
 
 # maximum difference (in strips) between a hit and the centerline of a track
-HcalTracks.parameters["MaximumStripDifference"] = 2
+HcalTracks.parameters["TrackRadius"] = 2
 
-# Minimum number of layers hit in track to be considered valid track
-HcalTracks.parameters["MinTrackLayerHits"] = 5
+# Minimum fraction of layers hit in track to be considered valid track
+HcalTracks.parameters["MinFractionLayersHits"] = 0.8
 
 # Name of track collection to be added to event bus
 HcalTracks.parameters["HcalMipTriggerObjectName"] = "hcalMipTrigger"
