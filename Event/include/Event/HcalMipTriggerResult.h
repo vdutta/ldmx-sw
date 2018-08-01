@@ -48,11 +48,6 @@ namespace ldmx {
             void Copy(TObject& o) const;
 
             /**
-             * Set whether or not the event passed the trigger.
-             */
-            void set( bool pass );
-            
-            /**
              * Add a track to the vector of tracks.
              */
             void addTrack( const std::vector< unsigned int > &track );
@@ -67,46 +62,6 @@ namespace ldmx {
              */
             std::vector< std::vector< unsigned int > > getTrackVec() const; 
             
-            /**
-             * Set the fraction of layers hit threshold.
-             */
-            void setFracLayersHit( const float fracLayersHit ); 
-
-            /**
-             * Get the fraction of layers hit threshold.
-             */
-            float getFracLayersHit() const; 
-
-            /**
-             * Set the radius of the track cylinder.
-             */
-            void setTrackRadius( const float trackRadius ); 
-
-            /**
-             * Get the radius of the track cylinder.
-             */
-            float getTrackRadius() const; 
-
-            /**
-             * Set the maximum Energy allowed for a hit.
-             */
-            void setMaxEnergy( const float maxEnergy );
-
-            /**
-             * Get the maximum Energy allowed for a hit.
-             */
-            float getMaxEnergy() const;
-
-            /**
-             * Set the minimum PE allowed for a hit.
-             */
-            void setMinPE( const float minPE );
-
-            /**
-             * Get the minimum PE allowed for a hit.
-             */
-            float getMinPE() const;
-
         private:
 
             /** The list of tracks found (may be empty) */
