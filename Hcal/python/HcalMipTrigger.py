@@ -3,31 +3,31 @@
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
-HcalTracks = ldmxcfg.Producer( "HcalMipTrigger" , "ldmx::HcalMipTriggerProducer" )
+HcalMipTrigger = ldmxcfg.Producer( "HcalMipTrigger" , "ldmx::HcalMipTriggerProducer" )
 
 # name of collection that contains the hcal hits 
-HcalTracks.parameters["HcalHitCollectionName"] = "hcalDigis"
-HcalTracks.parameters["HcalHitPassName"] = "recon"
+HcalMipTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
+HcalMipTrigger.parameters["HcalHitPassName"] = "recon"
 
 # hcal specifications
-HcalTracks.parameters["NumLayersBackHcal"]   = 81 
-HcalTracks.parameters["NumLayersTopHcal"]    = 81 
-HcalTracks.parameters["NumLayersBottomHcal"] = 81 
-HcalTracks.parameters["NumLayersLeftHcal"]   = 81 
-HcalTracks.parameters["NumLayersRightHcal"]  = 81 
+HcalMipTrigger.parameters["NumLayersBackHcal"]   = 81 
+HcalMipTrigger.parameters["NumLayersTopHcal"]    = 81 
+HcalMipTrigger.parameters["NumLayersBottomHcal"] = 81 
+HcalMipTrigger.parameters["NumLayersLeftHcal"]   = 81 
+HcalMipTrigger.parameters["NumLayersRightHcal"]  = 81 
 
 # minimum PE for a single hit to be considered non-noise
-HcalTracks.parameters["MinimumPE"] = 5.5
+HcalMipTrigger.parameters["MinimumPE"] = 5.5
 
 # maximum Energy of a group of hits to be considered a mip
-HcalTracks.parameters["MaximumEnergy"] = 4000.0
+HcalMipTrigger.parameters["MaximumEnergy"] = 4000.0
 
 # maximum difference (in strips) between a hit and the centerline of a track
-HcalTracks.parameters["TrackRadius"] = 2
+HcalMipTrigger.parameters["TrackRadius"] = 2.0
 
 # Minimum fraction of layers hit in track to be considered valid track
-HcalTracks.parameters["MinFractionLayersHits"] = 0.8
+HcalMipTrigger.parameters["MinFractionLayersHits"] = 0.8
 
 # Name of track collection to be added to event bus
-HcalTracks.parameters["HcalMipTriggerObjectName"] = "hcalMipTrigger"
+HcalMipTrigger.parameters["HcalMipTriggerObjectName"] = "hcalMipTrigger"
  

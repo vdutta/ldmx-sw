@@ -148,11 +148,12 @@ namespace ldmx {
             numPass_++;
         }
 
-        result_.set( triggerObjectName_ , pass , 4 );
+        result_.set( triggerObjectName_ , pass , 5 );
         result_.setAlgoVar( 0 , minPE_ );
         result_.setAlgoVar( 1 , maxEnergy_ );
         result_.setAlgoVar( 2 , minFracLayersHit_ );
         result_.setAlgoVar( 3 , trackRadius_ );
+        result_.setAlgoVar( 4 , static_cast<double>( trackcnt ) );
 
         event.addToCollection( "Trigger" , result_ );
 

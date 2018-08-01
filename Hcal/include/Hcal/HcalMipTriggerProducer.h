@@ -108,16 +108,16 @@ namespace ldmx {
             std::string hitPassName_;
             
             /** Maximum Difference Between a hit and the center line of track */
-            float trackRadius_;
+            double trackRadius_;
 
             /** Minimum Fraction of Layers Hit to be considered a MIP */
-            float minFracLayersHit_;
+            double minFracLayersHit_;
 
             /** Maximum Energy of a HcalHit to be considered a MIP */
-            float maxEnergy_;
+            double maxEnergy_;
 
             /** Minimum PE of a HcalHit to be considered a real hit (not noise) */
-            float minPE_;
+            double minPE_;
 
             /** Name of this trigger object */
             std::string triggerObjectName_;
