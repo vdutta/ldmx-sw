@@ -76,19 +76,20 @@ namespace ldmx {
         for ( int corient = 0; corient < 6; corient++ ) {
             
             //while good end points are being found
-            while ( findEndPoints( corient ) ) {
+            int loopcnt = 0;
+            while ( findEndPoints( corient ) and loopcnt < 50 ) {
                 
                 //track to be constructed
                 std::vector< unsigned int > track;
                 
                 int laycnt = 0;
-                if ( startPt_->layer != finishPt_->layer ) {
+                if ( (startPt_->second).layer != (finishPt_->second).layer ) {
                     
                     //calculate slope
-                    int startLayer = startPt_->layer;
-                    int startStrip = startPt_->strip;
-                    int dstrip = ( finishPt_->strip - startStrip );
-                    int dlayer = ( finishPt_->layer - startLayer );
+                    int startLayer = (startPt_->second).layer;
+                    int startStrip = (startPt_->second).strip;
+                    int dstrip = ( (finishPt_->second).strip - startStrip );
+                    int dlayer = ( (finishPt_->second).layer - startLayer );
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
                     
                     //count hits in this orientation that are in the cylinder
@@ -129,10 +130,12 @@ namespace ldmx {
 
                 } else {
                     //mark the end points as not good end points
-                    startPt_->isGood = false;
-                    finishPt_->isGood = false;
+                    (startPt_->second).isGood = false;
+                    (finishPt_->second).isGood = false;
                 } //what to do if track is good
-
+                loopcnt++;
+                for ( auto node : hitLog_[ corient ] ) { std::cout << node.second.isGood << " "; }
+                std::cout << std::endl;
             } //while good end points are still being found
 
         } //for each orientation (corient)
@@ -161,40 +164,33 @@ namespace ldmx {
 
     bool HcalMipTriggerProducer::findEndPoints( int orientation ) {
         
-        startPt_ = nullptr;
-        finishPt_ = nullptr;
+        startPt_ = hitLog_[ orientation ].end();
+        finishPt_ = hitLog_[ orientation ].end();
 
         if ( hitLog_[ orientation ].size() > 1 ) {
             
-            for ( auto node : hitLog_[ orientation ] ) {
+            for ( std::map< unsigned int , HitLogNode >::iterator it = hitLog_[ orientation ].begin();
+                it != hitLog_[ orientation ].end(); ++it ) {
 
-                int clayer = (node.second).layer;
-
-                if ( startPt_ ) {
-                    
-                    if ( clayer < startPt_->layer and (node.second).isGood ) {
-                        startPt_ = &node.second;
-                    } //if node.second could be a good start point
-
-                } else {
-                    startPt_ = &node.second;
-                } //if startPt_ is nullptr
-
-                if ( finishPt_ ) {
-                    
-                    if ( clayer > finishPt_->layer and (node.second).isGood ) {
-                        finishPt_ = &node.second;
+                if ( (it->second).isGood ) {
+                
+                    int clayer = (it->second).layer;
+    
+                    if ( startPt_ == hitLog_[ orientation ].end() or clayer < (startPt_->second).layer ) {
+                        startPt_ = it;
+                    } //if it->second could be a good start point
+    
+                    if ( finishPt_ == hitLog_[ orientation ].end() or clayer > (finishPt_->second).layer ) {
+                        finishPt_ = it;
                     } //if node.second could be a good finish point
+                
+                } //is current hit good
 
-                } else {
-                    finishPt_ = &node.second;
-                } //if finishPt_ is nullptr
-            
             } //iterate through hits in this orientation hitlog (node)
         
         } //two ore more hits in this part of the log
 
-        return ( startPt_ and finishPt_ );
+        return ( startPt_ != hitLog_[ orientation ].end() and finishPt_ != hitLog_[ orientation ].end() );
 
     }
 

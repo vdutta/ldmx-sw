@@ -18,7 +18,7 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "DetDescr/HcalID.h" //For HcalSection enum and HcalID creation
 #include "Event/HcalHit.h" //getting hits
-#include "Event/HcalMipTriggerResult.h" //saving result in event
+#include "Event/TriggerResult.h" //storing result in event bus
 
 namespace ldmx {
     
@@ -88,10 +88,10 @@ namespace ldmx {
             std::map< unsigned int , HitLogNode > hitLog_[6];
 
             /** Current Starting Point */
-            HitLogNode* startPt_;
+            std::map< unsigned int , HitLogNode >::iterator startPt_;
 
             /** Current Finish Point */
-            HitLogNode* finishPt_;
+            std::map< unsigned int , HitLogNode >::iterator finishPt_;
             
             /** array of layers in each orientation */
             int nLayersPerOrientation_[6]; 
