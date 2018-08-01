@@ -67,6 +67,11 @@ namespace ldmx {
             /** The list of tracks found (may be empty) */
             std::vector< std::vector< unsigned int > > trackVec_;
 
+            /**
+             * ROOT Class Definition
+             */
+            //ClassDef( HcalMipTriggerResult , 1 );
+
     };
 }
 

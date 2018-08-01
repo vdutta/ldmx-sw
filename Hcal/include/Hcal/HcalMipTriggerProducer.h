@@ -18,6 +18,7 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "DetDescr/HcalID.h" //For HcalSection enum and HcalID creation
 #include "Event/HcalHit.h" //getting hits
+#include "Event/HcalMipTriggerResult.h" //saving result in event
 
 namespace ldmx {
     
@@ -116,6 +117,10 @@ namespace ldmx {
 
             /** Name of this trigger object */
             std::string triggerObjectName_;
+
+            /** Trigger object to add to event */
+            //HcalMipTriggerResult result_;
+            TriggerResult result_;
     };
 }
 

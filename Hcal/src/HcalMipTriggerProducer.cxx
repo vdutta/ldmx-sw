@@ -72,11 +72,12 @@ namespace ldmx {
                 hitLog_[ corient ][ chit->getID() ] = cNode;
             } //could be a MIP
         } //iterate through rawhits (iH)
-
+        
+        //Find (and count) tracks
+        int trackcnt = 0;
         for ( int corient = 0; corient < 6; corient++ ) {
             
             //while good end points are being found
-            int trackcnt = 0;
             while ( findEndPoints( corient ) ) {
                 
                 //track to be constructed
@@ -121,6 +122,8 @@ namespace ldmx {
 
                 if ( layfrac > minFracLayersHit_ ) { 
                     //good track found
+                    //result_.addTrack( track );
+                    
                     for ( DetectorID::RawValue rawID : track ) {
                         removeHcalID( corient , rawID );
                     } //iterate through track (rawID)
@@ -136,6 +139,19 @@ namespace ldmx {
             } //while good end points are still being found
 
         } //for each orientation (corient)
+        
+        bool pass = false;
+        if ( trackcnt > 0 ) { //result_.getNumTracks() > 0 ) {
+            pass = true;
+        }
+
+        result_.set( triggerObjectName_ , pass , 4 );
+        result_.setAlgoVar( 0 , minPE_ );
+        result_.setAlgoVar( 1 , maxEnergy_ );
+        result_.setAlgoVar( 2 , minFracLayersHit_ );
+        result_.setAlgoVar( 3 , trackRadius_ );
+
+        event.addToCollection( "Trigger" , result_ );
 
         return;
     }
