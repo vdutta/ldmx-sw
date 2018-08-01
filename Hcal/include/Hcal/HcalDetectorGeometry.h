@@ -7,7 +7,12 @@
 #ifndef HCAL_HCALDETECTORGEOMETRY_H
 #define HCAL_HCALDETECTORGEOMETRY_H
 
-//INCLUDES
+//STL
+#include <map> //storage maps
+
+//LDMX Framework
+#include "DetDescr/HcalID.h" //HcalSection enum
+#include "Event/HcalHit.h" //hit pointer
 
 namespace ldmx {
     
@@ -19,65 +24,50 @@ namespace ldmx {
         public:
             /**
              * Constructor
+             * This is where all the detector constants are set.
              */
-            HcalDetectorGeometry() { }
+            HcalDetectorGeometry()
 
             /**
              * Calculate real space coordinates from detector location.
+             *
+             * @param hit HcalHit to find real space hit for
+             * @param point vector containing real space point
+             * @param errs vector containing errors in each coordinate
              */
-            void transformDet2Real( /* Args */ );
+            void transformDet2Real( const HcalHit* hit , std::vector< float > &point ,
+                std::vector< float > &errs ) const;
 
         private:
             /** Number of layers in each section */
-            static const int nLayersVerticalBackHcal_( 40 );
-            static const int nLayersHorizontalBackHcal_( 41 );
-            static const int nLayersTopHcal_( 17 );
-            static const int nLayersBottomHcal_( 17 );
-            static const int nLayersRightHcal_( 17 );
-            static const int nLayersLeftHcal_( 17 );
+            std::map< HcalID::HcalSection , int > nLayers_;
 
             /** Number of strips per layer in each section */
-            static const int nStripsBackHcal_( 31 );
-            static const int nStripsTopHcal_( 31 );
-            static const int nStripsBottomHcal_( 31 );
-            static const int nStripsRightHcal_( 31 );
-            static const int nStripsLeftHcal_( 31 );
-
-            /** Flag to say which parity the vertical layers are */
-            static const bool isVerticalOdd_( false );
-
-            /** Uncertainty in timing position along a bar/strip [mm] */
-            static const float uncertaintyTimingPos_( 200.0 );
-
-            /** Thickness of Scintillator Strip [mm] */
-            static const float thicknessScint_( 20.0 );
-
-            /** Width of Scintillator Strip [mm] */
-            static const float widthScint_( 100.0 );
+            std::map< HcalID::HcalSection , int > nStrips_;
 
             /** Length of Scintillator Strip [mm] */
-            static const float lengthBackHcal_( 3100. );
-            static const float lengthTopHcal_( (3100.+525.)/2 );
-            static const float lengthBottomHcal_( (3100.+525.)/2 );
-            static const float lengthLeftHcal_( (3100.+525.)/2 );
-            static const float lengthRightHcal_( (3100.+525.)/2 );
- 
-            /** Thickness of a whole layer (scint+air+absorber) [mm] */
-            static const float thicknessLayer_( 50. + 20. + 2*2. );
+            std::map< HcalID::HcalSection , float > lengthScint_;
 
             /** Front of each section, the plane of the zero'th layer of each section [mm] */
-            static const float frontBackHcal_( 200. + 290.0 ); //front in z
-            static const float frontTopHcal_( 525./2 ); //bottom in y
-            static const float frontBottomHcal_( -525./2 ); //top in y
-            static const float frontLeftHcal_( 525./2 ); //rightside in x
-            static const float frontRightHcal_( -525./2 ); //leftside in x
+            std::map< HcalID::HcalSection , float > frontSection_;
             
             /** Floor of each section, the plane of the zero'th strip of each section [mm] */
-            static const float floorBackHcal_( -3100.0/2 ); //bottom in y
-            static const float floorTopHcal_( 200. ); //front in z
-            static const float floorBottomHcal_( 200. ); //front in z
-            static const float floorLeftHcal_( 200. ); //front in z
-            static const float floorRightHcal_( 200. ); //front in z
-            
+            std::map< HcalID::HcalSection , float > floorSection_;
+ 
+            /** an example layer number of a vertical layer */
+            int parityVertical_;
+
+            /** Uncertainty in timing position along a bar/strip [mm] */
+            float uncertaintyTimingPos_;
+
+            /** Thickness of Scintillator Strip [mm] */
+            float thicknessScint_;
+
+            /** Width of Scintillator Strip [mm] */
+            float widthScint_;
+ 
+            /** Thickness of a whole layer  [mm] */
+            float thicknessLayer_;
+           
     };
 }
