@@ -122,7 +122,7 @@ namespace ldmx {
                     //result_.addTrack( track );
                     
                     for ( unsigned int rawID : track ) {
-                        removeHcalID( corient , rawID );
+                        hitLog_[ corient ].erase( rawID );
                     } //iterate through track (rawID)
                     
                     trackcnt++;
@@ -196,13 +196,6 @@ namespace ldmx {
 
         return ( startPt_ and finishPt_ );
 
-    }
-
-    void HcalMipTriggerProducer::removeHcalID( int orientation , unsigned int rawID ) {
-        
-        hitLog_[ orientation ].erase( rawID );
-
-        return;
     }
 
 }

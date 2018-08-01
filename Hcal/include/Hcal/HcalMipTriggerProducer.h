@@ -72,14 +72,6 @@ namespace ldmx {
              */
             bool findEndPoints( int orientation );
 
-            /**
-             * Remove a given raw ID value from the hit log.
-             *
-             * @param orientation HcalOrienation
-             * @param rawID raw ID value to be removed
-             */
-            void removeHcalID( int orientation , DetectorID::RawValue rawID );
-
             /** struct to help organize hitLog */
             struct HitLogNode {
                 /** Layer of HcalHit */
@@ -126,7 +118,6 @@ namespace ldmx {
             std::string triggerObjectName_;
 
             /** Trigger object to add to event */
-            //HcalMipTriggerResult result_;
             TriggerResult result_;
 
             /** Number of Events Passed */
