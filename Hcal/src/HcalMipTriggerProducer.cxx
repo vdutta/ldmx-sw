@@ -59,7 +59,8 @@ namespace ldmx {
                 
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
-                if ( corient != HcalSection::BACK or clayer % 2 == 1 ) {
+                //Since alternating orientations aren't implemented, we pretend all layers are odd
+                if ( corient != HcalSection::BACK ) { //or clayer % 2 == 1 ) {
                     corient++;
                 }
                 
@@ -143,6 +144,7 @@ namespace ldmx {
         if ( trackcnt > 0 ) { //result_.getNumTracks() > 0 ) {
             pass = true;
             numPass_++;
+            setStorageHint( hint_shouldDrop );
         }
 
         result_.set( triggerObjectName_ , pass , 5 );
