@@ -48,6 +48,10 @@ namespace ldmx {
         compressContribsCmd_->SetParameter(compress);
         compressContribsCmd_->AvailableForStates(G4ApplicationState::G4State_Idle);
         compressContribsCmd_->SetGuidance("Compress hit contributions by matching SimParticle and PDG code");
+
+        saveAuxPNInfoCmd_ 
+            = new G4UIcmdWithoutParameter("/ldmx/persistency/root/saveAuxPNInfo", this);
+        saveAuxPNInfoCmd_->SetGuidance("Enable saving auxiliary PN information."); 
     
         dropCmd_ = new G4UIcmdWithAString{"/ldmx/persistency/root/dropCol", this}; 
         dropCmd_->AvailableForStates(G4ApplicationState::G4State_Idle);
@@ -60,7 +64,6 @@ namespace ldmx {
         delete enableCmd_;
         delete disableCmd_;
         delete comprCmd_;
-        //delete modeCmd_;
         delete rootDir_;
         delete dropCmd_; 
     }
@@ -85,14 +88,14 @@ namespace ldmx {
             } else if (command == comprCmd_) {
                 int compr = std::stoi(newValues);
                 rootIO_->setCompressionLevel(compr);
-            } /*else if (command == modeCmd_) {
-             rootIO_->getWriter()->setMode(newValues);
-             }*/else if (command == hitContribsCmd_) {
+            } else if (command == hitContribsCmd_) {
                 rootIO_->setEnableHitContribs(hitContribsCmd_->GetNewBoolValue(newValues.c_str()));
             } else if (command == compressContribsCmd_) {
                 rootIO_->setCompressHitContribs(compressContribsCmd_->GetNewBoolValue(newValues.c_str()));
             } else if (command == dropCmd_) { 
                 rootIO_->dropCollection(newValues); 
+            } else if (command == saveAuxPNInfoCmd_) { 
+                rootIO_->saveAuxPNInfo(); 
             }
         } else {
             // Re-enable ROOT IO.

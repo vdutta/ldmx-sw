@@ -71,6 +71,12 @@ namespace ldmx {
             /** Command used to compress the Ecal hit contributions. */
             G4UIcmdWithABool* compressContribsCmd_{nullptr};
 
+            /** 
+             * Command used to enable saving of photonuclear auxiliary
+             * information.
+             */
+            G4UIcmdWithoutParameter* saveAuxPNInfoCmd_{nullptr}; 
+
             /** Command allowing a user to specify a collection name to drop. */
             G4UIcmdWithAString* dropCmd_{nullptr}; 
 
