@@ -26,7 +26,7 @@ HcalMipTrigger.parameters["MaximumEnergy"] = 4000.0
 HcalMipTrigger.parameters["TrackRadius"] = 2.0
 
 # Minimum fraction of layers hit in track to be considered valid track
-HcalMipTrigger.parameters["MinFractionLayersHits"] = 0.8
+HcalMipTrigger.parameters["MinFractionLayersHit"] = 0.8
 
 # Name of track collection to be added to event bus
 HcalMipTrigger.parameters["HcalMipTriggerObjectName"] = "hcalMipTrigger"

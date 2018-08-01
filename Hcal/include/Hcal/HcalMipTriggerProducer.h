@@ -82,21 +82,24 @@ namespace ldmx {
 
             /** struct to help organize hitLog */
             struct HitLogNode {
-                /** ID of hit in log */
-                HcalID id;
+                /** Layer of HcalHit */
+                int layer;
+
+                /** Strip of HcalHit */
+                int strip;
 
                 /** flag if hit could be a good end point */
                 bool isGood;
             };
 
             /** Hits sorted by their orientations and stored as their raw IDs */
-            std::map< DetectorID::RawValue , HitLogNode > hitLog_[6];
+            std::map< unsigned int , HitLogNode > hitLog_[6];
 
             /** Current Starting Point */
-            HcalID* startPt_;
+            HitLogNode* startPt_;
 
             /** Current Finish Point */
-            HcalID* finishPt_;
+            HitLogNode* finishPt_;
             
             /** array of layers in each orientation */
             int nLayersPerOrientation_[6]; 

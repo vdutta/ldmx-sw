@@ -26,7 +26,7 @@ namespace ldmx {
 
         trackRadius_ = ps.getDouble( "TrackRadius" );
 
-        minFracLayersHit_ = ps.getDouble( "MinimumFractionLayersHit" );
+        minFracLayersHit_ = ps.getDouble( "MinFractionLayersHit" );
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
 
@@ -63,13 +63,9 @@ namespace ldmx {
                     corient++;
                 }
                 
-                //Each hit in hitLog_[ orientation ] has the same section number, so the standard sort
-                // will sort them correctly according to layer,strip information
-                HcalID cID;
-                cID.setRawValue( chit->getID() );
-                cID.unpack();
                 HitLogNode cNode;
-                cNode.id = cID;
+                cNode.layer = clayer;
+                cNode.strip = chit->getStrip();
                 cNode.isGood = true;
                 hitLog_[ corient ][ chit->getID() ] = cNode;
             } //could be a MIP
@@ -83,26 +79,24 @@ namespace ldmx {
             while ( findEndPoints( corient ) ) {
                 
                 //track to be constructed
-                std::vector< DetectorID::RawValue > track;
+                std::vector< unsigned int > track;
                 
                 int laycnt = 0;
-                if ( startPt_->getLayerID() != finishPt_->getLayerID() ) {
+                if ( startPt_->layer != finishPt_->layer ) {
                     
                     //calculate slope
-                    int startLayer = startPt_->getLayerID();
-                    int startStrip = startPt_->getStrip();
-                    int dstrip = ( finishPt_->getStrip() - startStrip );
-                    int dlayer = ( finishPt_->getLayerID() - startLayer );
+                    int startLayer = startPt_->layer;
+                    int startStrip = startPt_->strip;
+                    int dstrip = ( finishPt_->strip - startStrip );
+                    int dlayer = ( finishPt_->layer - startLayer );
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
                     
                     //count hits in this orientation that are in the cylinder
                     std::set<int> countedLayers; //layers that already have been counted
                     for ( auto node : hitLog_[ corient ] ) {
                         
-                        HcalID* chit = &( (node.second).id );
-    
-                        int cstrip = chit->getStrip();
-                        int clayer = chit->getLayerID();
+                        int cstrip = (node.second).strip;
+                        int clayer = (node.second).layer;
     
                         float trackstrip = slope*( clayer - startLayer ) + startStrip;
     
@@ -113,20 +107,21 @@ namespace ldmx {
                             if ( countedLayers.find( clayer ) != countedLayers.end() )
                                 laycnt++;
     
-                            track.push_back( chit->getRawValue() );
+                            track.push_back( node.first ); 
                         } //check if hit is in track cylinder
     
                     } //iterate through hitLog of current orientation (chit)
                 
                 } //startPt and finishPt are not on the same layer
                 
-                float layfrac = static_cast<float>( laycnt ) / static_cast<float>( nLayersPerOrientation_[ corient ] );
+                float layfrac = static_cast<float>( laycnt ) /
+                    static_cast<float>( nLayersPerOrientation_[ corient ] );
 
                 if ( layfrac > minFracLayersHit_ ) { 
                     //good track found
                     //result_.addTrack( track );
                     
-                    for ( DetectorID::RawValue rawID : track ) {
+                    for ( unsigned int rawID : track ) {
                         removeHcalID( corient , rawID );
                     } //iterate through track (rawID)
                     
@@ -134,8 +129,8 @@ namespace ldmx {
 
                 } else {
                     //mark the end points as not good end points
-                    hitLog_[ corient ][ startPt_->getRawValue() ].isGood = false;
-                    hitLog_[ corient ][ finishPt_->getRawValue() ].isGood = false;
+                    startPt_->isGood = false;
+                    finishPt_->isGood = false;
                 } //what to do if track is good
 
             } //while good end points are still being found
@@ -173,27 +168,26 @@ namespace ldmx {
             
             for ( auto node : hitLog_[ orientation ] ) {
 
-                HcalID *chit = &( (node.second).id );
-                int clayer = chit->getLayerID();
+                int clayer = (node.second).layer;
 
                 if ( startPt_ ) {
                     
-                    if ( clayer < startPt_->getLayerID() and (node.second).isGood ) {
-                        startPt_ = chit;
-                    } //if chit could be a good start point
+                    if ( clayer < startPt_->layer and (node.second).isGood ) {
+                        startPt_ = &node.second;
+                    } //if node.second could be a good start point
 
                 } else {
-                    startPt_ = chit;
+                    startPt_ = &node.second;
                 } //if startPt_ is nullptr
 
                 if ( finishPt_ ) {
                     
-                    if ( clayer > finishPt_->getLayerID() and (node.second).isGood ) {
-                        finishPt_ = chit;
-                    } //if chit could be a good finish point
+                    if ( clayer > finishPt_->layer and (node.second).isGood ) {
+                        finishPt_ = &node.second;
+                    } //if node.second could be a good finish point
 
                 } else {
-                    finishPt_ = chit;
+                    finishPt_ = &node.second;
                 } //if finishPt_ is nullptr
             
             } //iterate through hits in this orientation hitlog (node)
@@ -204,7 +198,7 @@ namespace ldmx {
 
     }
 
-    void HcalMipTriggerProducer::removeHcalID( int orientation , DetectorID::RawValue rawID ) {
+    void HcalMipTriggerProducer::removeHcalID( int orientation , unsigned int rawID ) {
         
         hitLog_[ orientation ].erase( rawID );
 
