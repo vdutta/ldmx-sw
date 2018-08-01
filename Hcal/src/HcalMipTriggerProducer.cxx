@@ -24,7 +24,7 @@ namespace ldmx {
         nLayersPerOrientation_[ 4 ] = ps.getInteger( "NumLayersLeftHcal" );
         nLayersPerOrientation_[ 5 ] = ps.getInteger( "NumLayersRightHcal" );
 
-        maxStripDif_ = ps.getDouble( "MaximumStripDifference" );
+        trackRadius_ = ps.getDouble( "TrackRadius" );
 
         minFracLayersHit_ = ps.getDouble( "MinimumFractionLayersHit" );
 
@@ -105,7 +105,7 @@ namespace ldmx {
     
                         float stripdif = std::abs( trackstrip - cstrip );
     
-                        if ( stripdif < maxStripDif_ ) {
+                        if ( stripdif < trackRadius_ ) {
                             //hit is in track cylinder
                             if ( countedLayers.find( clayer ) != countedLayers.end() )
                                 laycnt++;

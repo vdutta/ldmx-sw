@@ -80,12 +80,32 @@ namespace ldmx {
             /**
              * Set the radius of the track cylinder.
              */
-            void setTrackRadius( const int trackRadius ); 
+            void setTrackRadius( const float trackRadius ); 
 
             /**
              * Get the radius of the track cylinder.
              */
-            int getTrackRadius() const; 
+            float getTrackRadius() const; 
+
+            /**
+             * Set the maximum Energy allowed for a hit.
+             */
+            void setMaxEnergy( const float maxEnergy );
+
+            /**
+             * Get the maximum Energy allowed for a hit.
+             */
+            float getMaxEnergy() const;
+
+            /**
+             * Set the minimum PE allowed for a hit.
+             */
+            void setMinPE( const float minPE );
+
+            /**
+             * Get the minimum PE allowed for a hit.
+             */
+            float getMinPE() const;
 
         private:
 

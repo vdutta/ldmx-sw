@@ -23,12 +23,14 @@ namespace ldmx {
     
     /**
      * @class HcalMipTriggerProducer
-     * @brief Constructs Trigger Result depending on Section, Layer, Strip, and Amplitude information of hits in the Hcal.
+     * @brief Constructs Trigger Result depending on Section, Layer, Strip, and 
+     *  Amplitude information of hits in the Hcal.
      */
     class HcalMipTriggerProducer : public ldmx::Producer {
         public:
 
-            HcalMipTriggerProducer(const std::string& name, ldmx::Process& process) : ldmx::Producer(name, process) {}
+            HcalMipTriggerProducer(const std::string& name, ldmx::Process& process) 
+                : ldmx::Producer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
@@ -101,7 +103,7 @@ namespace ldmx {
             std::string hitPassName_;
             
             /** Maximum Difference Between a hit and the center line of track */
-            float maxStripDif_;
+            float trackRadius_;
 
             /** Minimum Fraction of Layers Hit to be considered a MIP */
             float minFracLayersHit_;

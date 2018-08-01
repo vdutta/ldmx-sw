@@ -41,7 +41,7 @@ namespace ldmx {
     }
 
     void HcalMipTriggerResult::set( bool pass ) {
-        TriggerResult::set( "HcalMipTrigger" , pass , 2 );
+        TriggerResult::set( "HcalMipTrigger" , pass , 4 );
         return;
     }
     
@@ -59,21 +59,38 @@ namespace ldmx {
     }
     
     void HcalMipTriggerResult::setFracLayersHit( const float fracLayersHit ) {
-        TriggerResult::setAlgoVar( 0 , fracLayersHit );
+        TriggerResult::setAlgoVar( 0 , static_cast<double>(fracLayersHit) );
         return;
     }
 
     float HcalMipTriggerResult::getFracLayersHit() const {
-        return TriggerResult::getAlgoVar0();
+        return static_cast<float>( TriggerResult::getAlgoVar0() );
     }
 
-    void HcalMipTriggerResult::setTrackRadius( const int trackRadius ) {
+    void HcalMipTriggerResult::setTrackRadius( const float trackRadius ) {
         TriggerResult::setAlgoVar( 1 , static_cast<double>( trackRadius ) );
         return;
     }
 
-    int HcalMipTriggerResult::getTrackRadius() const {
-        return static_cast<int>( TriggerResult::getAlgoVar1() );
+    float HcalMipTriggerResult::getTrackRadius() const {
+        return static_cast<float>( TriggerResult::getAlgoVar1() );
     }
 
+    void HcalMipTriggerResult::setMaxEnergy( const float maxEnergy ) {
+        TriggerResult::setAlgoVar( 2 , static_cast<double>( maxEnergy ) );
+        return;
+    }
+
+    float HcalMipTriggerResult::getMaxEnergy() const {
+        return static_cast<float>( TriggerResult::getAlgoVar2() );
+    }
+
+    void HcalMipTriggerResult::setMinPE( const float maxEnergy ) {
+        TriggerResult::setAlgoVar( 3 , static_cast<double>( minPE ) );
+        return;
+    }
+
+    float HcalMipTriggerResult::getMinPE() const {
+        return static_cast<float>( TriggerResult::getAlgoVar3() );
+    }
 }
