@@ -11,7 +11,6 @@
 #include <vector> //storage of vectors
 
 //LDMX Framework
-#include "DetDescr/HcalID.h" //RawValue typedef
 #include "Event/TriggerResult.h" //Base class
 
 namespace ldmx {
@@ -47,11 +46,16 @@ namespace ldmx {
              * @param o The target object.
              */
             void Copy(TObject& o) const;
+
+            /**
+             * Set whether or not the event passed the trigger.
+             */
+            void set( bool pass );
             
             /**
              * Add a track to the vector of tracks.
              */
-            void addTrack( const std::vector< DetectorID::RawValue > &track );
+            void addTrack( const std::vector< unsigned int > &track );
 
             /**
              * Get number of tracks in this result.
@@ -61,7 +65,7 @@ namespace ldmx {
             /**
              * Get the whole vector of tracks.
              */
-            std::vector< std::vector< DetectorID::RawValue > > &getTrackVec() const; 
+            std::vector< std::vector< unsigned int > > getTrackVec() const; 
             
             /**
              * Set the fraction of layers hit threshold.
@@ -86,7 +90,7 @@ namespace ldmx {
         private:
 
             /** The list of tracks found (may be empty) */
-            std::vector< std::vector< DetectorID::RawValue > > trackVec_;
+            std::vector< std::vector< unsigned int > > trackVec_;
 
     };
 }
