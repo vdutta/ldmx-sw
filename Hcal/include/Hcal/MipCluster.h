@@ -56,11 +56,12 @@ namespace ldmx {
             void setTotalEnergy();
             
             /** The total energy of the MipCluster */
-            float totalEnergy_;
+            float totalEnergy_(0.0);
  
             /** Storage vector of pointers to HcalHits */
             std::vector< ldmx::HcalHit* > hcalHits_;
-   };
+
+    };
 
 }
 

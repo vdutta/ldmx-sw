@@ -8,7 +8,7 @@
 
 namespace ldmx {
 
-    MipCluster::MipHit() : totalEnergy_(0.0) { }
+    MipCluster::MipHit() { }
 
     void MipCluster::addHit( ldmx::HcalHit* hit ) {
         hcalHits_.push_back( hit );
