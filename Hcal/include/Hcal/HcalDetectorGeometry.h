@@ -10,6 +10,7 @@
 //STL
 #include <map> //storage maps
 #include <cmath> //sqrt
+#include <iostream> //cerr
 
 //LDMX Framework
 #include "DetDescr/HcalID.h" //HcalSection enum
@@ -27,7 +28,7 @@ namespace ldmx {
              * Constructor
              * This is where all the detector constants are set.
              */
-            HcalDetectorGeometry()
+            HcalDetectorGeometry();
 
             /**
              * Calculate real space coordinates from detector location.
@@ -53,19 +54,19 @@ namespace ldmx {
         
         private:
             /** Number of layers in each section */
-            std::map< HcalID::HcalSection , int > nLayers_;
+            std::map< HcalSection , int > nLayers_;
 
             /** Number of strips per layer in each section */
-            std::map< HcalID::HcalSection , int > nStrips_;
+            std::map< HcalSection , int > nStrips_;
 
             /** Length of Scintillator Strip [mm] */
-            std::map< HcalID::HcalSection , float > lengthScint_;
+            std::map< HcalSection , float > lengthScint_;
 
             /** The plane of the zero'th layer of each section [mm] */
-            std::map< HcalID::HcalSection , float > zeroLayer_;
+            std::map< HcalSection , float > zeroLayer_;
             
             /** The plane of the zero'th strip of each section [mm] */
-            std::map< HcalID::HcalSection , float > zeroStrip_;
+            std::map< HcalSection , float > zeroStrip_;
  
             /** an example layer number of a vertical layer */
             int parityVertical_;
@@ -84,3 +85,5 @@ namespace ldmx {
            
     };
 }
+
+#endif /* HCAL_HCALDETECTORGEOMETRY_H */

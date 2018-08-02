@@ -14,6 +14,7 @@
 
 //LDMX Framework
 #include "DetDescr/HcalID.h" //for the HcalSection enum
+#include "Hcal/HcalDetectorGeometry.h" //to calculate real space coordinates
 
 namespace ldmx {
     
@@ -31,7 +32,18 @@ namespace ldmx {
             /**
              * Add an HcalHit to the MipCluster
              */
-            void addHit( ldmx::HcalHit* hit );
+            void addHit( const HcalHit* hit );
+            
+            /**
+             * Merges the input cluster into this cluster
+             */
+            void mergeCluster( const MipCluster &cluster );
+
+            /**
+             * Re-calculate member variables that depend on the hits.
+             * This should be called whenever the hcalHits vector changes.
+             */
+            void set();
             
             /**
              * Get the total energy of the MipCluster
@@ -46,7 +58,7 @@ namespace ldmx {
             /**
              * Get vector of HcalHits in this MipCluster
              */
-            const std::vector< ldmx::HcalHit* > &getHcalHits() const { return hcalHits_; }
+            const std::vector< const HcalHit* > &getHcalHits() const { return hcalHits_; }
 
         private:
             
@@ -54,12 +66,26 @@ namespace ldmx {
              * Calculate the total energy of the MipCluster.
              */
             void setTotalEnergy();
+
+            /**
+             * Calculate the real space point and errors of the MipCluster.
+             */
+            void setRealPoint();
             
+            /** Class instance to help calculate real space coordinates */
+            static HcalDetectorGeometry hdg_;
+
             /** The total energy of the MipCluster */
-            float totalEnergy_(0.0);
+            float totalEnergy_;
  
             /** Storage vector of pointers to HcalHits */
-            std::vector< ldmx::HcalHit* > hcalHits_;
+            std::vector< const HcalHit* > hcalHits_;
+
+            /** Real Space point representing cluster */
+            std::vector< float > point_;
+
+            /** "Error" (more like uncertainty) in each coordinate of the point */
+            std::vector< float > errs_;
 
     };
 
