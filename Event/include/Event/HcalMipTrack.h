@@ -98,10 +98,10 @@ namespace ldmx {
             TRefArray *hcalHits_; 
             
             /** Graph relating z and x coordinates */
-            TGraphErrors *zxGr_;
+            TGraphErrors zxGr_;
 
             /** Graph relating z and y coordinates */
-            TGraphErrors *zyGr_;
+            TGraphErrors zyGr_;
             
             /**
              * ROOT Class Definition
