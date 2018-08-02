@@ -17,10 +17,8 @@ namespace ldmx {
 
     void MipCluster::mergeCluster( const MipCluster &cluster ) {
         
-        const std::vector< const HcalHit* > hcalHitsnew = cluster.getHcalHits();
-
-        for ( const HcalHit* hit : hcalHitsnew ) {
-            this->addHit( hit );
+        for ( unsigned int iH = 0; iH < cluster.getNumHits(); iH++ ) {
+            this->addHit( cluster.getHcalHit( iH ) );
         }
 
         return;

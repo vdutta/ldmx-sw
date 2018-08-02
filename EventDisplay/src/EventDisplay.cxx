@@ -150,7 +150,7 @@ namespace ldmx {
         hcalDigiHits_ = new TClonesArray("ldmx::HcalHit");
         recoilHits_ = new TClonesArray("ldmx::SimTrackerHit");
         ecalClusters_ = new TClonesArray("ldmx::EcalCluster");
-        hcalTracks_ = new TClonesArray("ldmx::HcalTrack");
+        hcalTracks_ = new TClonesArray("ldmx::HcalMipTrack");
         ecalSimParticles_ = new TClonesArray("ldmx::SimTrackerHit");
 
         foundECALDigis_ = GetECALDigisColl(ecalDigisCollName_);

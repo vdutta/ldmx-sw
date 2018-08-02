@@ -338,16 +338,14 @@ namespace ldmx {
         
         //iterate through tracks
         int iT = 0;
-        ldmx::HcalTrack* track;
-        for (TIter next(tracks); track = (ldmx::HcalTrack*)next();) {
+        ldmx::HcalMipTrack* track;
+        for (TIter next(tracks); track = (ldmx::HcalMipTrack*)next();) {
             
             if ( track == nullptr ) {
                 //empty tracks list
                 break;
             }
             
-            std::cout << "Seed: " << track->getSeedLayer() << " " << track->getSeedStrip() << std::endl;
-
             //construct track, drawing hcal hits
             TString trackname;
             trackname.Form("Hcal Track %d", iT);
@@ -355,7 +353,7 @@ namespace ldmx {
             int nhits = track->getNHits();
             for (int iH = 0; iH < nhits; iH++) {
                 
-                ldmx::HcalHit* chit = track->getHit( iH );
+                const HcalHit* chit = track->getHit( iH );
                 
                 bool isNoise = (chit->getZ() == 0);
                 

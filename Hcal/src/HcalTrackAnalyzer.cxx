@@ -23,9 +23,7 @@ namespace ldmx {
         int ntracks = tracks->GetEntriesFast();
         h_tracksperevent_->Fill( ntracks );
         for( int iT = 0; iT < ntracks; iT++ ) {
-            HcalTrack *curr_track = (HcalTrack *)( tracks->At(iT) );
             if (iT < 3 ) {
-                h_layhitspertrack_[iT]->Fill( curr_track->getNLayHits() );
             } else {
                 std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
             }

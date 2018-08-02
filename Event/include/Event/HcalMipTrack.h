@@ -13,8 +13,8 @@
 //ROOT
 #include "TRefArray.h" //store pointers to hits
 #include "TObject.h" //inherit from TObject
-#include "TF1.h" //fit function
-#include "TGraph.h" //store points for fit
+#include "TGraphErrors.h" //store points for fit
+#include "TF1.h" //fitting graphs
 
 //LDMX Framework
 #include "Event/HcalHit.h" //Get Hcal Specific information from hit
@@ -54,11 +54,15 @@ namespace ldmx {
             void Clear(Option_t *opt = ""); 
 
             /**
-             * Add a MipCluster to the track.
-             * This function takes the clusters points and errors for fitting,
-             *  and puts the hit in the TRefArray.
+             * Add a hit to the track.
              */
-            void addCluster( const MipCluster &cluster );
+            void addHit( HcalHit* hit );
+
+            /**
+             * Add point to graphs for fitting.
+             */
+            void addPoint( const float x , const float y , const float z,
+                           const float ex, const float ey, const float ez );
             
             /**
              * Get number of hits in track
@@ -68,7 +72,7 @@ namespace ldmx {
             /**
              * Get hit at a certain index in track.
              */
-            const HcalHit* getHit( int i ) const; 
+            HcalHit* getHit( int i ) const; 
 
             /**
              * Fit the graphs linearly and assign their values

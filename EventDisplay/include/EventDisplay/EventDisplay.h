@@ -100,7 +100,7 @@ namespace ldmx {
             int eventNumMax_;
 
             TString clustersCollName_ = "ecalClusters_recon";
-            TString hcalTracksCollName_ = "HcalTracks_recon";
+            TString hcalTracksCollName_ = "HcalMipTracks_recon";
             TString ecalDigisCollName_ = "ecalDigis_recon";
             TString hcalDigisCollName_ = "hcalDigis_recon";
             TString trackerHitsCollName_ = "RecoilSimHits_sim";

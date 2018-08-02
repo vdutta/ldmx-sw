@@ -20,17 +20,13 @@
 #include "Framework/EventProcessor.h" //Needed to declare analyzer
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/Event.h" //Study event by event
-#include "Event/HcalTrack.h" //Study hcal tracks
+#include "Event/HcalMipTrack.h" //Study hcal tracks
 
 namespace ldmx {
     
     /**
      * @class HcalTrackAnalyzer
      * @brief ldmx::Analyzer that constructs histograms studying how tracks in the Hcal behave differently.
-     *
-     * @note Currently, the Hcal strip orientation is not specified (x or y), and simulation is only split
-     *  along y (as of June 18, 2018). This means any orientation-related studies in this analyzer will be
-     *  making external assumptions that SHOULD BE REMOVED if strip orientation is specifed in the future.
      */
     class HcalTrackAnalyzer : public ldmx::Analyzer {
         public:
