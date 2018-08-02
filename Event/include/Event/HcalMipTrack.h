@@ -54,10 +54,11 @@ namespace ldmx {
             void Clear(Option_t *opt = ""); 
 
             /**
-             * Add a hit to the track.
-             * This function also adds the layer,strip information to the TGraphs for fitting
+             * Add a MipCluster to the track.
+             * This function takes the clusters points and errors for fitting,
+             *  and puts the hit in the TRefArray.
              */
-            void addHit( HcalHit* hit );
+            void addCluster( const MipCluster &cluster );
             
             /**
              * Get number of hits in track
@@ -65,24 +66,19 @@ namespace ldmx {
             int getNHits() const; 
 
             /**
-             * Get number of layers hit in track
-             */
-            int getNLayHits() const; 
-            
-            /**
-             * Get seed layer information
-             */
-            int getSeedLayer() const;
-            
-            /**
-             * Get seed strip information
-             */
-            int getSeedStrip() const; 
-
-            /**
              * Get hit at a certain index in track.
              */
-            HcalHit* getHit( int i ) const; 
+            const HcalHit* getHit( int i ) const; 
+
+            /**
+             * Fit the graphs linearly and assign their values
+             *  to the corresponding inputs.
+             *
+             * @param z z coordinate to evaluate at
+             * @param x x coordinate to find
+             * @param y y coordinate to find
+             */
+            void evalFit( const float z , float &x , float &y );
             
             /**
              * Check to see if HcalMipTrack is empty.
@@ -98,7 +94,14 @@ namespace ldmx {
 
         private:
             
-            TRefArray *hcalHits_; //* references to hits in the track
+            /** references to hits in the track */
+            TRefArray *hcalHits_; 
+            
+            /** Graph relating z and x coordinates */
+            TGraphErrors *zxGr_;
+
+            /** Graph relating z and y coordinates */
+            TGraphErrors *zyGr_;
             
             /**
              * ROOT Class Definition
