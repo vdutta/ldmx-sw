@@ -168,7 +168,7 @@ namespace ldmx {
         //calculate final weighted mean
         for ( unsigned int iC = 0; iC < 3; iC++ ) {
             point[iC] = ptSum[iC]/weightSum[iC];
-            errs[iC] = std::sqrt( 1.0 / weightSum[iC] );
+            errs[iC] = sqrt( 1.0 / weightSum[iC] );
         }
 
         return;
