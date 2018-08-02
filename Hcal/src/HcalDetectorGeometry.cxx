@@ -49,18 +49,16 @@ namespace ldmx {
 
         thicknessLayer_ = 50. + 20. + 2*2.;
     }
-    void HcalDetectorGeometry::transformDet2Real( const HcalHit* hit , std::vector< float > &point ,
-        std::vector< float &errs ) const {
+
+    void HcalDetectorGeometry::transformDet2Real( const HcalHit* hit ,
+        std::vector< float > &point , std::vector< float > &errs ) const {
         
         point.clear();
         errs.clear();
         for ( int i = 0; i < 3; i++ ) {
             point.push_back( 0.0 );
             errs.push_back( 0.0 );
-        }
-
-        float x,y,z; //point coordinates
-        float ex,ey,ez; //errors in coordinates
+        }    
         
         HcalSection section = (HcalSection)( hit->getSection() );
         int layer = hit->getLayer();
@@ -76,57 +74,57 @@ namespace ldmx {
 
         if ( section == HcalSection::BACK ) {
             
-            z = zeroLayer_[ section ] + layercenter;
-            ez = elayer
+            point[2] = zeroLayer_[ section ] + layercenter;
+            errs[2] = elayer;
             
             if ( ( (layer ^ parityVertical_) & 1) == 0 ) { //checks for same parity
                 //Vertical Layers
                 
-                x = zeroStrip_[ section ] + stripcenter;
-                ex = estrip;
+                point[0] = zeroStrip_[ section ] + stripcenter;
+                errs[0] = estrip;
 
-                y = hit->getY();
-                ey = uncertaintyTimingPos_;
+                point[1] = hit->getY();
+                errs[1] = uncertaintyTimingPos_;
 
             } else {
                 //Horizontal Layers
                 
-                x = hit->getX();
-                ex = uncertaintyTimingPos_;
+                point[0] = hit->getX();
+                errs[0] = uncertaintyTimingPos_;
 
-                y = zeroStrip_[ section ] + stripcenter;
-                ey = estrip;
+                point[1] = zeroStrip_[ section ] + stripcenter;
+                errs[1] = estrip;
 
             } //calculate depending on layer
 
         } else {
             
-            z = zeroStrip_[ section ] + stripcenter;
-            ez = estrip;
+            point[2] = zeroStrip_[ section ] + stripcenter;
+            errs[2] = estrip;
 
             if ( section == HcalSection::TOP or section == HcalSection::BOTTOM ) {
                 
-                x = hit->getX();
-                ex = uncertaintyTimingPos_;
+                point[0] = hit->getX();
+                errs[0] = uncertaintyTimingPos_;
                 
                 if ( section == HcalSection::TOP ) {
-                    y = zeroLayer_[ section ] + layercenter;
+                    point[1] = zeroLayer_[ section ] + layercenter;
                 } else {
-                    y = zeroLayer_[ section ] - layercenter;
+                    point[1] = zeroLayer_[ section ] - layercenter;
                 } //top or bottom hcal
-                ey = elayer;
+                errs[1] = elayer;
                 
             } else if ( section == HcalSection::LEFT or section == HcalSection::RIGHT ) {
                 
-                y = hit->getY();
-                ey = uncertaintyTimingPos_;
+                point[1] = hit->getY();
+                errs[1] = uncertaintyTimingPos_;
 
                 if ( section == HcalSection::LEFT ) {
-                    x = zeroLayer_[ section ] + layercenter;
+                    point[0] = zeroLayer_[ section ] + layercenter;
                 } else {
-                    x = zeroLayer_[ section ] - layercenter;
+                    point[0] = zeroLayer_[ section ] - layercenter;
                 } //left or right hcal
-                ex = elayer;
+                errs[0] = elayer;
     
             } else {
                 std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknow Hcal Section!" << std::endl;
@@ -135,13 +133,43 @@ namespace ldmx {
         
         } //calculate depending on section
 
-        point[0] = x;
-        point[1] = y;
-        point[3] = z;
+        return;
+    }
+    
+    void HcalDetectorGeometry::transformDet2Real( const std::vector<const HcalHit*>  &hitVec ,
+        std::vector< float > &point , std::vector< float > &errs ) const {
+        
+        point.clear();
+        errs.clear();
+        for ( int i = 0; i < 3; i++ ) {
+            point.push_back( 0.0 );
+            errs.push_back( 0.0 );
+        }
+        
+        std::vector<float> ptSum( 3 , 0.0 ); //sums of weighted coordinates
+        std::vector<float> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
+        
+        //calculate real space point for each hit
+        for ( const HcalHit* hit : hitVec ) {
+            
+            std::vector<float> cpt, cer;
 
-        errs[0] = ex;
-        errs[1] = ey;
-        errs[2] = ez;
+            transformDet2Real( hit , cpt , cer );
+            
+            //Add weighted values to sums
+            float weight;
+            for ( unsigned int iC = 0; iC < 3; iC++ ) {
+                weight = 1.0 / ( cer[iC]*cer[iC] );
+                weightSum[ iC ] += weight;
+                pointSum[ iC ] += weight*cpt[iC];
+            }
+        } //go through hitVec
+        
+        //calculate final weighted mean
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            point[iC] = ptSum[iC]/weightSum[iC];
+            errs[iC] = std::sqrt( 1.0 / weightSum[iC] );
+        }
 
         return;
     }

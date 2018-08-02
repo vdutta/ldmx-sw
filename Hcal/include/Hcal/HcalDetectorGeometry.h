@@ -9,6 +9,7 @@
 
 //STL
 #include <map> //storage maps
+#include <cmath> //sqrt
 
 //LDMX Framework
 #include "DetDescr/HcalID.h" //HcalSection enum
@@ -32,12 +33,24 @@ namespace ldmx {
              * Calculate real space coordinates from detector location.
              *
              * @param hit HcalHit to find real space hit for
-             * @param point vector containing real space point
-             * @param errs vector containing errors in each coordinate
+             * @param point vector that will contain real space point
+             * @param errs vector that will contain errors in each coordinate
              */
-            void transformDet2Real( const HcalHit* hit , std::vector< float > &point ,
-                std::vector< float > &errs ) const;
-
+            void transformDet2Real( const HcalHit* hit ,
+                std::vector< float > &point , std::vector< float > &errs ) const;
+            
+            /**
+             * Calculate real space coordinates of a cluster of hits.
+             *
+             * Determines cluster's coordinates by a weighted mean of the individuals.
+             * 
+             * @param hitVec vector of HcalHits to find a "center" for
+             * @param point vector that will contain real space point
+             * @param errs vector that will contain errors in each coordinate
+             */
+            void transformDet2Real( const std::vector< const HcalHit* > &hitVec ,
+                std::vector< float > &point , std::vector< float > &errs ) const;
+        
         private:
             /** Number of layers in each section */
             std::map< HcalID::HcalSection , int > nLayers_;
@@ -48,11 +61,11 @@ namespace ldmx {
             /** Length of Scintillator Strip [mm] */
             std::map< HcalID::HcalSection , float > lengthScint_;
 
-            /** Front of each section, the plane of the zero'th layer of each section [mm] */
-            std::map< HcalID::HcalSection , float > frontSection_;
+            /** The plane of the zero'th layer of each section [mm] */
+            std::map< HcalID::HcalSection , float > zeroLayer_;
             
-            /** Floor of each section, the plane of the zero'th strip of each section [mm] */
-            std::map< HcalID::HcalSection , float > floorSection_;
+            /** The plane of the zero'th strip of each section [mm] */
+            std::map< HcalID::HcalSection , float > zeroStrip_;
  
             /** an example layer number of a vertical layer */
             int parityVertical_;
