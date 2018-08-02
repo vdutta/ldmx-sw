@@ -12,6 +12,11 @@
 #include "G4Decay.hh"
 #include "G4hMultipleScattering.hh"
 #include "G4ProcessManager.hh"
+#include "G4Electron.hh"
+#include "G4eDarkBremsstrahlung.h"
+
+// Sim Application
+#include "SimApplication/G4APrime.h"
 
 namespace ldmx {
 
