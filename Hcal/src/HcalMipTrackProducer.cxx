@@ -18,26 +18,6 @@ namespace ldmx {
         return;
     }
     
-    void HcalMipTrackProducer::onFileOpen() {
-
-        return;
-    }
-
-    void HcalMipTrackProducer::onFileClose() {
-
-        return;
-    }
-
-    void HcalMipTrackProducer::onProcessStart() {
-
-        return;
-    }
-
-    void HcalMipTrackProducer::onProcessEnd() {
-
-        return;
-    }
-
 }
 
 DECLARE_PRODUCER_NS(ldmx, HcalMipTrackProducer);

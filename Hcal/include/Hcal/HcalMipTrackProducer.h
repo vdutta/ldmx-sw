@@ -27,13 +27,13 @@ namespace ldmx {
 
             virtual void produce(ldmx::Event& event);
 
-            virtual void onFileOpen();
+            virtual void onFileOpen() { }
 
-            virtual void onFileClose();
+            virtual void onFileClose() { }
 
-            virtual void onProcessStart(); 
+            virtual void onProcessStart() { } 
 
-            virtual void onProcessEnd();
+            virtual void onProcessEnd() { }
 
         private:
 
