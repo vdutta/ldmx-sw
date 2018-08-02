@@ -319,10 +319,10 @@ void G4eDarkBremsstrahlungModel::SampleSecondaries(std::vector<G4DynamicParticle
 //Simulates the emission of a dark photon + electron. Gets an energy fraction and Pt from madgraph files. Scales the energy so that the fraction of kinectic energy is constant, keeps the Pt constant. If the Pt is larger than the new energy, that event is skipped, and a new one is taken from the file.
 {
    //Deactivate the process after one dark brem. Needs to be reactivated in the end of event action. If this is in the stepping action instead, more than one brem can occur within each step.
-   G4bool active = false;
+   G4bool state = false;
    G4String pname = "eDBrem";
    G4ProcessTable* ptable = G4ProcessTable::GetProcessTable();
-   ptable->SetProcessActivation(pname,active);
+   ptable->SetProcessActivation(pname,state);
 
    if(lhe_loaded==false)
    {
