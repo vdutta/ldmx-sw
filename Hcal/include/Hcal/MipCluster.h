@@ -56,9 +56,15 @@ namespace ldmx {
             int getNumHits() const { return hcalHits_.size(); }
 
             /**
-             * Get vector of HcalHits in this MipCluster
+             * Get a hit in this MipCluster
              */
-            const std::vector< const HcalHit* > &getHcalHits() const { return hcalHits_; }
+            const HcalHit* getHcalHit( const int i ) const { return hcalHits_.at( i ); }
+
+            /**
+             * Get the real space point and errors in each coordinate.
+             */
+            void getPoint( float &x , float &y , float &z ,
+                           float &ex , float &ey , float &ez ) const;
 
         private:
             

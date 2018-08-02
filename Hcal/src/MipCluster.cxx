@@ -34,6 +34,19 @@ namespace ldmx {
 
     }
 
+    void MipCluster::getPoint( float &x , float &y , float &z ,
+                               float &ex , float &ey , float &ez ) const {
+        x = point_.at(0);
+        y = point_.at(1);
+        z = point_.at(2);
+
+        ex = errs_.at(0);
+        ey = errs_.at(1);
+        ez = errs_.at(2);
+        
+        return;
+    }
+
     void MipCluster::setTotalEnergy() {
         totalEnergy_ = 0.0;
         for ( unsigned int i = 0; i < hcalHits_.size(); i++ ) {
