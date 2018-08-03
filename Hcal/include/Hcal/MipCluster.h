@@ -32,7 +32,7 @@ namespace ldmx {
             /**
              * Add an HcalHit to the MipCluster
              */
-            void addHit( const HcalHit* hit );
+            void addHit( HcalHit* hit );
             
             /**
              * Merges the input cluster into this cluster
@@ -58,13 +58,12 @@ namespace ldmx {
             /**
              * Get a hit in this MipCluster
              */
-            const HcalHit* getHcalHit( const int i ) const { return hcalHits_.at( i ); }
+            HcalHit* getHcalHit( const int i ) const { return hcalHits_.at( i ); }
 
             /**
              * Get the real space point and errors in each coordinate.
              */
-            void getPoint( float &x , float &y , float &z ,
-                           float &ex , float &ey , float &ez ) const;
+            void getPoint( std::vector<double> &point , std::vector<double> &errors ) const;
 
             /**
              * Set the uniqe event id.
@@ -98,13 +97,13 @@ namespace ldmx {
             unsigned int uID_;
  
             /** Storage vector of pointers to HcalHits */
-            std::vector< const HcalHit* > hcalHits_;
+            std::vector< HcalHit* > hcalHits_;
 
             /** Real Space point representing cluster */
-            std::vector< float > point_;
+            std::vector< double > point_;
 
             /** "Error" (more like uncertainty) in each coordinate of the point */
-            std::vector< float > errs_;
+            std::vector< double > errs_;
 
     };
 

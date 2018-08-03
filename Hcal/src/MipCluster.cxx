@@ -10,7 +10,7 @@ namespace ldmx {
 
     MipCluster::MipCluster() { }
 
-    void MipCluster::addHit( const HcalHit* hit ) {
+    void MipCluster::addHit( HcalHit* hit ) {
         hcalHits_.push_back( hit );
         return;
     }
@@ -32,16 +32,11 @@ namespace ldmx {
 
     }
 
-    void MipCluster::getPoint( float &x , float &y , float &z ,
-                               float &ex , float &ey , float &ez ) const {
-        x = point_.at(0);
-        y = point_.at(1);
-        z = point_.at(2);
-
-        ex = errs_.at(0);
-        ey = errs_.at(1);
-        ez = errs_.at(2);
+    void MipCluster::getPoint( std::vector< double > &point , std::vector< double > &errors ) const {
         
+        point = point_;
+        errors = errs_;
+
         return;
     }
 
