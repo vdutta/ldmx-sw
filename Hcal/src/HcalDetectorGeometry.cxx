@@ -51,7 +51,7 @@ namespace ldmx {
     }
 
     void HcalDetectorGeometry::transformDet2Real( const HcalHit* hit ,
-        std::vector< float > &point , std::vector< float > &errs ) const {
+        std::vector< double > &point , std::vector< double > &errs ) const {
         
         point.clear();
         errs.clear();
@@ -65,12 +65,12 @@ namespace ldmx {
         int strip = hit->getStrip();
 
         //calculate center of layer,strip with respect to detector section
-        float layercenter = (layer + 0.5)*thicknessLayer_;
-        float stripcenter = (strip + 0.5)*thicknessScint_;
+        double layercenter = (layer + 0.5)*thicknessLayer_;
+        double stripcenter = (strip + 0.5)*thicknessScint_;
 
         //calculate error in layer,strip position
-        float elayer = 0.5*thicknessLayer_;
-        float estrip = 0.5*thicknessScint_;
+        double elayer = 0.5*thicknessLayer_;
+        double estrip = 0.5*thicknessScint_;
 
         if ( section == HcalSection::BACK ) {
             
@@ -137,7 +137,7 @@ namespace ldmx {
     }
     
     void HcalDetectorGeometry::transformDet2Real( const std::vector<const HcalHit*>  &hitVec ,
-        std::vector< float > &point , std::vector< float > &errs ) const {
+        std::vector< double > &point , std::vector< double > &errs ) const {
         
         point.clear();
         errs.clear();
@@ -146,18 +146,18 @@ namespace ldmx {
             errs.push_back( 0.0 );
         }
         
-        std::vector<float> pointSum( 3 , 0.0 ); //sums of weighted coordinates
-        std::vector<float> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
+        std::vector<double> pointSum( 3 , 0.0 ); //sums of weighted coordinates
+        std::vector<double> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
         
         //calculate real space point for each hit
         for ( const HcalHit* hit : hitVec ) {
             
-            std::vector<float> cpt, cer;
+            std::vector<double> cpt, cer;
 
             transformDet2Real( hit , cpt , cer );
             
             //Add weighted values to sums
-            float weight;
+            double weight;
             for ( unsigned int iC = 0; iC < 3; iC++ ) {
                 weight = 1.0 / ( cer[iC]*cer[iC] );
                 weightSum[ iC ] += weight;

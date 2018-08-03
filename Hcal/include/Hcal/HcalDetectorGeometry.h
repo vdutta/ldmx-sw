@@ -38,7 +38,7 @@ namespace ldmx {
              * @param errs vector that will contain errors in each coordinate
              */
             void transformDet2Real( const HcalHit* hit ,
-                std::vector< float > &point , std::vector< float > &errs ) const;
+                std::vector< double > &point , std::vector< double > &errs ) const;
             
             /**
              * Calculate real space coordinates of a cluster of hits.
@@ -50,7 +50,7 @@ namespace ldmx {
              * @param errs vector that will contain errors in each coordinate
              */
             void transformDet2Real( const std::vector< const HcalHit* > &hitVec ,
-                std::vector< float > &point , std::vector< float > &errs ) const;
+                std::vector< double > &point , std::vector< double > &errs ) const;
         
         private:
             /** Number of layers in each section */
@@ -60,28 +60,28 @@ namespace ldmx {
             std::map< HcalSection , int > nStrips_;
 
             /** Length of Scintillator Strip [mm] */
-            std::map< HcalSection , float > lengthScint_;
+            std::map< HcalSection , double > lengthScint_;
 
             /** The plane of the zero'th layer of each section [mm] */
-            std::map< HcalSection , float > zeroLayer_;
+            std::map< HcalSection , double > zeroLayer_;
             
             /** The plane of the zero'th strip of each section [mm] */
-            std::map< HcalSection , float > zeroStrip_;
+            std::map< HcalSection , double > zeroStrip_;
  
             /** an example layer number of a vertical layer */
             int parityVertical_;
 
             /** Uncertainty in timing position along a bar/strip [mm] */
-            float uncertaintyTimingPos_;
+            double uncertaintyTimingPos_;
 
             /** Thickness of Scintillator Strip [mm] */
-            float thicknessScint_;
+            double thicknessScint_;
 
             /** Width of Scintillator Strip [mm] */
-            float widthScint_;
+            double widthScint_;
  
             /** Thickness of a whole layer  [mm] */
-            float thicknessLayer_;
+            double thicknessLayer_;
            
     };
 }
