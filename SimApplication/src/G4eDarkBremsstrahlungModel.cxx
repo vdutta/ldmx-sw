@@ -341,8 +341,17 @@ void G4eDarkBremsstrahlungModel::SampleSecondaries(std::vector<G4DynamicParticle
 
    if(lhe_loaded==false)
    {
-      std::string fname = "mg_events.lhe";
-      ParseLHE(fname); //Parse LHE files into the data vectors.
+      DIR *dir;
+      dir = opendir("Resources/");
+      struct dirent *directory;
+      if(dir)
+      {
+         while((directory = readdir(dir)) != NULL)
+	 {
+	    std::string fname = "Resources/" + std::string(directory->d_name);
+	    ParseLHE(fname); //Parse LHE files into the data vectors.
+	 }
+      }
       MakePlaceholders(); //Setup the placeholder offsets for getting data.
       lhe_loaded=true;
    }

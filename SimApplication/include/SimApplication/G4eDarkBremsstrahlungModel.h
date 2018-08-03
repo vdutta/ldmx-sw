@@ -35,6 +35,8 @@
 // STL
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
+#include <dirent.h>
 
 struct ParamsForChi {double AA; double ZZ; double MMA; double EE0;};
 
