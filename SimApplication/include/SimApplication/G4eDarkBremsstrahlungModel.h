@@ -69,7 +69,9 @@ class G4eDarkBremsstrahlungModel : public G4VEmModel
                                     G4double tmin,
                                     G4double maxEnergy);
 
-     void ParseLHE(std::string fname, double ebeam);
+     void ParseLHE(std::string fname);
+     
+     void MakePlaceholders();
 
      std::pair < double, double > GetMadgraphData(double E0);
 

@@ -19,7 +19,7 @@ G4eDarkBremsstrahlungModel::G4eDarkBremsstrahlungModel(const G4ParticleDefinitio
    lowKinEnergy = LowEnergyLimit();
    fParticleChange = 0;
 //   std::string fname = "mg_events.lhe";
- //  ParseLHE(fname, 5.0); //Parse LHE files into the data vectors.
+ //  ParseLHE(fname); //Parse LHE files into the data vectors.
 
    //Sort the energies list after parsing all LHE files. Necessary for GetMadgraphData() to function correctly.
    std::sort(energies.begin(), energies.end());
@@ -96,7 +96,7 @@ void G4eDarkBremsstrahlungModel::Initialise(const G4ParticleDefinition* p,
    isInitialised = true;
 }
 
-void G4eDarkBremsstrahlungModel::ParseLHE (std::string fname, double ebeam)
+void G4eDarkBremsstrahlungModel::ParseLHE (std::string fname)
 //Parses an LHE file to extract the kinetic energy fraction and pt of the outgoing electron in each event. Loads the two numbers from every event into a map of vectors of pairs (mgdata). Map is keyed by energy, vector pairs are energy fraction + pt. Also creates an list of energies and placeholders (energies), so that different energies can be looped separately. 
 {
    std::cout << "Parsing LHE file " << fname << "\n";
@@ -108,7 +108,6 @@ void G4eDarkBremsstrahlungModel::ParseLHE (std::string fname, double ebeam)
       exit(1);
    }
    std::string line;
-   mgdata[ebeam];
    while(std::getline(ifile,line))
    {
       std::istringstream iss(line);
@@ -116,18 +115,34 @@ void G4eDarkBremsstrahlungModel::ParseLHE (std::string fname, double ebeam)
       double skip, px, py, pz, E, pt, efrac, M;
       if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >> pz >> E >> M )
       {
-         if((ptype==11)&&(state==1)) //Find a final state electron.
-         {
-            pt=sqrt(px*px+py*py);
-            efrac = (E-M)/(ebeam-M-MA);
-            mgdata[ebeam].push_back(std::make_pair(efrac,pt));
-         }
+         if((ptype==11)&&(state==-1))
+	 {
+	    double ebeam = E;
+	    if (mgdata.count(ebeam) == 0) {mgdata[ebeam];}
+	    for(int i=0;i<2;i++) {std::getline(ifile,line);}
+	    std::istringstream jss(line);
+	    jss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >> pz >> E >> M; 
+            if((ptype==11)&&(state==1)) //Find a final state electron.
+            {
+               pt=sqrt(px*px+py*py);
+               efrac = (E-M)/(ebeam-M-MA);
+               mgdata[ebeam].push_back(std::make_pair(efrac,pt));
+            }
+	 }   
       }
    }
    //Add the energy to the list, with a random offset between 0 and the total number of entries.
-   energies.push_back(std::make_pair(ebeam,int(G4UniformRand()*mgdata[ebeam].size())));
    ifile.close();
    std::cout << "LHE File " << fname << " parsed.\n";
+}
+
+void G4eDarkBremsstrahlungModel::MakePlaceholders()
+{
+   for ( const auto &iter : mgdata )
+   {
+      energies.push_back(std::make_pair(iter.first,iter.second.size()));
+   }
+
 }
 
 std::pair < double, double > G4eDarkBremsstrahlungModel::GetMadgraphData(double E0)
@@ -327,7 +342,8 @@ void G4eDarkBremsstrahlungModel::SampleSecondaries(std::vector<G4DynamicParticle
    if(lhe_loaded==false)
    {
       std::string fname = "mg_events.lhe";
-      ParseLHE(fname, 5.0); //Parse LHE files into the data vectors.
+      ParseLHE(fname); //Parse LHE files into the data vectors.
+      MakePlaceholders(); //Setup the placeholder offsets for getting data.
       lhe_loaded=true;
    }
    G4double E0 = dp->GetTotalEnergy();
