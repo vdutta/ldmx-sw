@@ -7,10 +7,15 @@
 #ifndef HCAL_HCALMIPTRACKPRODUCER_H
 #define HCAL_HCALMIPTRACKPRODUCER_H
 
+//STL
+#include <string> //names of collections
+
 //LDMX Framework
 #include "Event/Event.h"
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
+#include "Event/EventConstants.h" //for HcalMipTrack string
+#include "Event/HcalMipTrack.h" //mip track container
 
 namespace ldmx {
     
@@ -21,7 +26,7 @@ namespace ldmx {
     class HcalMipTrackProducer : public ldmx::Producer {
         public:
 
-            HcalMipTrackProducer(const std::string& name, ldmx::Process& process) : ldmx::Producer(name, process) {}
+            HcalMipTrackProducer(const std::string& name, ldmx::Process& process) : ldmx::Producer(name, process) { }
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
@@ -36,7 +41,32 @@ namespace ldmx {
             virtual void onProcessEnd() { }
 
         private:
+            
+            /** Name of collection of HcalHits */
+            std::string hcalHitCollName_;
 
+            /** Name of pass to get HcalHits collection from */
+            std::string hcalHitPassName_;
+
+            /** Container for reconstructed tracks */
+            TClonesArray *hcalMipTracks_;
+
+            /** Collection name for event bus */
+            std::string hcalMipTracksCollName_;
+
+            /** Radius of cylinder around track [mm] */
+            double trackRadius_;
+
+            /** Minimum number of PE to be considered not noise */
+            double minPE_;
+
+            /** Maximum energy of a cluster to be considered a mip */
+            double maxEnergy_;
+
+            /** Minimum number of clusters in track to be considered for ranking */
+            int minNumClusters_;
+
+            
     };
 }
 

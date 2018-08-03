@@ -106,7 +106,7 @@ namespace ldmx {
 
             /** Graph relating z and y coordinates */
             TGraphErrors zyGr_;
-            
+
             /**
              * ROOT Class Definition
              */

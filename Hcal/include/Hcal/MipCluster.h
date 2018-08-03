@@ -66,6 +66,16 @@ namespace ldmx {
             void getPoint( float &x , float &y , float &z ,
                            float &ex , float &ey , float &ez ) const;
 
+            /**
+             * Set the uniqe event id.
+             */
+            void setUID( const unsigned int id ) { uID_ = id; return; }
+
+            /**
+             * Get the unique event id.
+             */
+            unsigned int getUID() const { return uID_; }
+
         private:
             
             /**
@@ -83,6 +93,9 @@ namespace ldmx {
 
             /** The total energy of the MipCluster */
             float totalEnergy_;
+
+            /** ID that is unique in a single event */
+            unsigned int uID_;
  
             /** Storage vector of pointers to HcalHits */
             std::vector< const HcalHit* > hcalHits_;
