@@ -63,6 +63,7 @@ namespace ldmx {
         int trackcnt = 0;
         while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
             //store best in collection and delete used mips from log
+            std::cout << trackcnt << std::endl;
             HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
             for ( unsigned int mipid : track_mipids ) {
@@ -83,7 +84,7 @@ namespace ldmx {
                 clusterLog_.erase( mipid );
 
             } //add clusters with mipids to track
-
+            
             trackcnt++;
 
         } //repeat track construction until no more pairs of clusters
