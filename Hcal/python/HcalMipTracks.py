@@ -6,8 +6,8 @@ from LDMX.Framework import ldmxcfg
 HcalMipTracks = ldmxcfg.Producer( "HcalMipTracks" , "ldmx::HcalMipTrackProducer" )
 
 # name of collection that contains the hcal hits 
-HcalMipTracks.parameters["HitCollectionName"] = "hcalDigis"
-HcalMipTracks.parameters["HitPassName"] = "recon"
+HcalMipTracks.parameters["HcalHitCollectionName"] = "hcalDigis"
+HcalMipTracks.parameters["HcalHitPassName"] = "recon"
 
 # Name of track collection to be added to event bus
 HcalMipTracks.parameters["HcalMipTrackCollectionName"] = "hcalMipTracks"

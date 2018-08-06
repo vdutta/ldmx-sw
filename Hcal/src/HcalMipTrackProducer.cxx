@@ -14,7 +14,9 @@ namespace ldmx {
 
         hcalHitPassName_ = ps.getString( "HcalHitPassName" );
 
-        TClonesArray *hcalMipTracks_ = new TClonesArray( EventConstants::HCAL_MIP_TRACK.c_str() , 10000 );
+        maxTrackCount_ = 100;
+
+        TClonesArray *hcalMipTracks_ = new TClonesArray( EventConstants::HCAL_MIP_TRACK.c_str() ); //, maxTrackCount_ );
 
         hcalMipTracksCollName_ = ps.getString( "HcalMipTrackCollectionName" );
 
@@ -59,9 +61,9 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        while ( buildTrack( track_mipids ) and trackcnt < 100 ) {
+        while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
             //store best in collection and delete used mips from log
-            HcalMipTrack *track = dynamic_cast<HcalMipTrack*>(hcalMipTracks_->ConstructedAt( trackcnt ));
+            HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
             for ( unsigned int mipid : track_mipids ) {
                 

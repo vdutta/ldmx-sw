@@ -124,6 +124,9 @@ namespace ldmx {
 
             /** Collection name for event bus */
             std::string hcalMipTracksCollName_;
+            
+            /** Maximum number of tracks to be allowed, prevents infinite looping */
+            int maxTrackCount_;
 
             /** Minimum number of PE to be considered not noise */
             double minPE_;
