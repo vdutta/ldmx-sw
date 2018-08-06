@@ -48,14 +48,13 @@ namespace ldmx {
         return;
     }
 
-    void HcalMipTrack::addPoint( const float x , const float y , const float z,
-                   const float ex, const float ey, const float ez ) {
+    void HcalMipTrack::addPoint( const std::vector<double> &point , const std::vector<double> &errors ) {
         
-        zxGr_.SetPoint( zxGr_.GetN() , z , x );
-        zxGr_.SetPointError( zxGr_.GetN()-1 , ez , ex );
+        zxGr_.SetPoint( zxGr_.GetN() , point[2] , point[0] );
+        zxGr_.SetPointError( zxGr_.GetN()-1 , errors[2] , errors[0] );
 
-        zyGr_.SetPoint( zyGr_.GetN() , z , y );
-        zyGr_.SetPointError( zyGr_.GetN()-1 , ez , ey );
+        zyGr_.SetPoint( zyGr_.GetN() , point[2] , point[1] );
+        zyGr_.SetPointError( zyGr_.GetN()-1 , errors[2] , errors[1] );
 
         return;       
     }

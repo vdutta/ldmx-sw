@@ -61,8 +61,7 @@ namespace ldmx {
             /**
              * Add point to graphs for fitting.
              */
-            void addPoint( const float x , const float y , const float z,
-                           const float ex, const float ey, const float ez );
+            void addPoint( const std::vector<double> &point , const std::vector<double> &errors );
             
             /**
              * Get number of hits in track
