@@ -18,8 +18,6 @@ namespace ldmx {
 
         hcalMipTracksCollName_ = ps.getString( "HcalMipTrackCollectionName" );
 
-        trackRadius_ = ps.getDouble( "MipTrackRadius" );
-
         minPE_ = ps.getDouble( "MinimumPE" );
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
@@ -100,25 +98,22 @@ namespace ldmx {
 
             current_cluster->addHit( itH->second );
 
-            itH++;
-            prev_itH = std::prev( itH );
+            prev_itH = itH;
 
         }//iterate through sorted hcalHitLog (itH)
 
         //clean up at end of hit log
-        if ( current_cluster->getNumHits() > 0 ) {
+        if ( current_cluster ) {
             current_cluster->setUID( prev_itH->first );
             current_cluster->set();
-            clusterLog_[ current_cluster->getUID() ] = *current_cluster;
-        }
-
-        if ( current_cluster ) {
+            if ( isMip( current_cluster ) ) {
+                clusterLog_[ current_cluster->getUID() ] = *current_cluster;
+            }
             delete current_cluster;
             current_cluster = nullptr;
         }
 
-        // cluster across layers (if overlap)
-     
+        return; 
     }
     
     bool lineHitBox( const std::vector<double> origin , const std::vector<double> dir , 

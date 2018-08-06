@@ -116,9 +116,6 @@ namespace ldmx {
             /** Collection name for event bus */
             std::string hcalMipTracksCollName_;
 
-            /** Radius of cylinder around track [mm] */
-            double trackRadius_;
-
             /** Minimum number of PE to be considered not noise */
             double minPE_;
 
