@@ -71,15 +71,21 @@ namespace ldmx {
             void clusterHits();
 
             /**
-             * Calculate distance from Q to line defined by P1 and P2.
+             * Determine if line (defined by origin and direction) hits the box defined by minimum and maximum corners.
+             * Assumes all inputs are formatted correctly.
+             * This algorithm is the Fast Ray-Box Intersection Algorithm developed by Andrew Woo
+             *  from "Graphics Gems", Academic Press, 1990.
+             * This algorithm returns false if ray points away from box (even if the extended line would intersect it),
+             *  so it is suggested to project the ray back to a plane one one side of all boxes and then use an origin there.
              *
-             * Assumes that all MipClusters already have their real space points calculated.
-             * @param P1 first cluster defining line
-             * @param P2 second cluster defining line
-             * @param Q cluster to determine distance to line
-             * @return double distance from Q to line
+             * @param origin originating point of ray
+             * @param dir direction vector of ray
+             * @param minBox minimum corner of box
+             * @param maxBox maximum corner of box
+             * @return true if ray hits box
              */
-            double distToLine( const MipCluster *P1 , const MipCluster *P2 , const MipCluster *Q ) const;
+            bool lineHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+                             const std::vector<double> minBox , const std::vector<double> maxBox ) const;
             
             /**
              * Compares two mip tracks.
@@ -93,9 +99,10 @@ namespace ldmx {
             /**
              * Finds best track out of the clusters that are left.
              * 
+             * @param track_mipids vector of cluster ids in track that is found
              * @return true if track was found
              */
-            bool buildTrack( );
+            bool buildTrack( std::vector< unsigned int > &track_mipids );
 
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;

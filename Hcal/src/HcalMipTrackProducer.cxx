@@ -121,18 +121,72 @@ namespace ldmx {
      
     }
     
-    double HcalMipTrackProducer::distToLine( const std::vector<double> &P1 , const std::vector<double> &P2 ,
-        const std::vector<double> &Q ) const {
+    bool lineHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+                     const std::vector<double> minBox , const std::vector<double> maxBox ) const {
+        
+        bool originInside = true;
+        bool originBetween[3];
 
-        //calculate determinant of matrix with the three points as rows
-        double det = P1[0]*P2[1]*Q[2] + P2[0]*Q[1]*P1[2] + Q[0]*P1[1]*P2[2] + P1[0]*P2[1]*Q[2]
-            - Q[0]*P2[1]*P1[2] - P2[0]*P1[1]*Q[2] - P1[0]*Q[1]*P2[2] - Q[0]*P2[1]*P1[2];
+        //Determine planes that are on the "front" of the box w.r.t. the origin of the ray
+        std::vector<double> candidatePlane( 3 , 0.0 );
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( origin.at(iC) < minBox.at(iC) ) {
+                originBetween[iC] = false;
+                candidatePlane[iC] = minBox.at(iC);
+                originInside = false;
+            } else if ( origin.at(iC) > maxBox.at(iC) ) {
+                originBetween[iC] = false;
+                candidatePlane[iC] = maxBox.at(iC) );
+                originInside = false;
+            } else {
+                originBetween[iC] = true;
+            } //where origin is w.r.t. box
+                
+        } //iterate through coordinates (iC)
+        
+        //Origin Inside Box ==> Ray Intersects Box
+        if ( originInside ) {
+            return true;
+        }
 
-        //distance between P1 and P2
-        double dist = sqrt( (P2[0]-P1[0])*(P2[0]-P1[0]) + (P2[1]-P1[1])*(P2[1]-P1[1]) + (P2[2]-P1[2])*(P2[2]-P1[2]) );
+        //Calculate maximum T distances to candidatePlanes
+        std::vector<double> maxT( 3 , 0.0 );
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( !originBetween[iC] and dir.at(iC) != 0.0 ) {
+                maxT[ iC ] = ( candidatePlane[iC] - origin.at(iC) ) / dir.at(iC);        
+            } else {
+                maxT[ iC ] = -1.0;
+            }
 
-        return ( std::abs(det)/dist );
+        } //iterate through coordinates (iC)
 
+        //Get largest of maxTs for the final choice of intersection
+        unsigned int iMax = 0;
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            if ( maxT[ iMax ] < maxT[ iC ] ) {
+                iMax = iC;
+            }
+        } //iterate through coordinates (iC)
+        
+        //Check if final candidate is inside box
+        if ( maxT[ iMax ] < 0.0 ) {
+            return false;
+        }
+
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( iMax != iC ) {
+                double coordinate = origin.at(iC) + maxT[iC]*dir.at(iC);
+                if ( coordinate < minBox.at(iC) or coordinate > maxBox.at(iC) ) {
+                    //coordinate outside box
+                    return false;
+                }
+            } //if coordinate is not maximum T plane
+        } //iterate through coordinates (iC)
+
+        return true;
     }
 
     bool HcalMipTrackProducer::compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const {
@@ -148,11 +202,10 @@ namespace ldmx {
         return better;
     }
 
-    bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > track_mipids ) {
+    bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
         //for clusters:
         //  no suffix means that it isn't an endpoint
         //  suffice {1,2} means that it is one of the endpoints
-        bool success = false;
         track_mipids.clear();
         //iterate through all pairs of points
         HcalMipTrack best_track;
@@ -161,21 +214,55 @@ namespace ldmx {
             for ( itC2 = itC1+1; itC2 != clusterLog_.end(); ++itC2 ) {
                 //construct track in cylinder
                 
-                std::vector< unsigned int > ctrack_mipids;
-
                 std::vector< double > point1, point2 , errors1 , errors2;
                 (itC1->second).getPoint( point1 , errors1 );
                 (itC2->second).getPoint( point2 , errors2 );
 
+                std::vector< double > origin( 3 , 0.0 ), direction( 3 , 0.0 ), linesmudge( errors1 );
+                for ( unsigned int iC = 0; iC < 3; iC++ ) {
+                    direction[ iC ] = point2[iC] - point1[iC];
+                }
+
+                //project origin back to plane of maximum direction change
+                // e.g. if direction has largest value in z then the origin will
+                //  be put on xy-plane (z = 0)
+                unsigned int iMax = 0;
+                for ( unsigned int iC = 1; iC < 3; iC++ ) {
+                    if ( std::abs(direction[iMax]) < std::abs(direction[iC]) ) {
+                        iMax = iC;
+                    }
+                }
+
+                //calculate origin and recalculate direction
+                double originT = ( -point1[iMax] ) / direction[iMax];
+                for ( unsigned int iC = 0; iC < 3; iC++ ) {
+                    //calculate origin
+                    origin[ iC ] = point1[ iC ] + originT*direction[ iC ];
+                    //re-calculate direction
+                    direction[ iC ] = point2[ iC ] - origin[ iC ];
+                    //calculate smudge of line
+                    if ( errors2[iC] < errors1[iC] ) {
+                        linesmudge[iC] = errors2[iC];
+                    }
+                }
+                
+                std::vector< unsigned int > ctrack_mipids; //ids of mip clusters in track
                 //iterate through all clusters to see if they are in track
                 for ( itC = clusterLog_.begin(); itC != clusterLog_.end(); ++itC ) {
                     
                     std::vector< double> point, errors;
                     (itC->second).getPoint( point , errors );
                     
-                    double dist = distToLine( point1 , point2 , point );
-
-                    if ( dist < trackRadius_ ) {
+                    //construct hit box
+                    // could add a fudge factor controlled by user
+                    std::vector< double > maxBox( 3 , 0.0 ), minBox( 3 , 0.0 );
+                    for ( unsigned int iC = 0; iC < 3; iC++ ) {
+                        maxBox[iC] = point[iC] + errors[iC] + linesmudge[iC];
+                        minBox[iC] = point[iC] - errors[iC] - linesmudge[iC];
+                    }
+                    
+                    //see if ray hits box
+                    if ( lineHitBox( origin , direction , minBox , maxBox ) ) {
                         ctrack_mipids.push_back( itC->first );
                     }
 
@@ -198,7 +285,6 @@ namespace ldmx {
                     if ( compMipTracks( best_track , ctrack ) ) {
                         best_track = ctrack;
                         track_mipids = ctrack_mipids;
-                        success = true;
                     }//ctrack is better than best_track
 
                 }//ctrack is a plausible track
@@ -206,7 +292,7 @@ namespace ldmx {
             } //go through remaining hits as second end point (itC2)
         } //go through all hits as first end point (itC1)
         
-        return success;
+        return (!track_mipids.empty());
     }
 }
 
