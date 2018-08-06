@@ -17,7 +17,9 @@ namespace ldmx {
 
     HcalMipTrack::~HcalMipTrack() {
         Clear();
-        hcalHits_->Delete();
+        
+        if ( hcalHits_ )
+            hcalHits_->Delete();
         
         if ( zxGr_ )
             delete zxGr_;
@@ -49,8 +51,9 @@ namespace ldmx {
     void HcalMipTrack::Clear( Option_t *opt ) {
 
         TObject::Clear(opt);
-
-        hcalHits_->Clear(opt);
+        
+        if ( hcalHits_ )
+            hcalHits_->Clear(opt);
 
         if ( zxGr_ )
             delete zxGr_;
