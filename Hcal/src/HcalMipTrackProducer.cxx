@@ -57,10 +57,33 @@ namespace ldmx {
 
         clusterHits();
         
-        std::vector< unsigned int > track;
-        while ( buildTrack( track ) ) {
-            //store best in collection
-            //delete best from cluster log
+        std::vector< unsigned int > track_mipids;
+        int trackcnt = 0;
+        while ( buildTrack( track_mipids ) ) {
+            //store best in collection and delete used mips from log
+            HcalMipTrack *track = dynamic_cast<HcalMipTrack*>(hcalMipTracks_->ConstructedAt( trackcnt ));
+            
+            for ( unsigned int mipid : track_mipids ) {
+                
+                MipCluster* cmip = &clusterLog_[ mipid ];
+
+                //add HcalHits to track
+                for ( int i = 0; i < cmip->getNumHits(); i++ ) {
+                    track->addHit( cmip->getHcalHit( i ) );
+                }//iterate through hits in cluster
+                
+                //add real point to track
+                std::vector<double> point, errors;
+                cmip->getPoint( point , errors );
+                track->addPoint( point , errors );
+                
+                //erase mipid from log
+                clusterLog_.erase( mipid );
+
+            } //add clusters with mipids to track
+
+            trackcnt++;
+
         } //repeat track construction until no more pairs of clusters
         
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
@@ -184,6 +207,10 @@ namespace ldmx {
                         for ( int i = 0; i < cmip->getNumHits(); i++ ) {
                             ctrack.addHit( cmip->getHcalHit( i ) );
                         }//iterate through hits in cluster
+
+                        std::vector<double> point,errors;
+                        cmip->getPoint( point , errors );
+                        ctrack.addPoint( point , errors );
 
                     } //add clusters with mipids to ctrack
                     
