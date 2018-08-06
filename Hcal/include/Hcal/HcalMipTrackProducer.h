@@ -84,7 +84,7 @@ namespace ldmx {
              * @param maxBox maximum corner of box
              * @return true if ray hits box
              */
-            bool lineHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+            bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
                              const std::vector<double> minBox , const std::vector<double> maxBox ) const;
             
             /**

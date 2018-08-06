@@ -56,11 +56,14 @@ namespace ldmx {
         } //iterate through rawhits (iH)
 
         clusterHits();
-       
-                //store best in collection
-        //delete best from cluster log
-
-        //repeat track construction until no more pairs of clusters
+        
+        std::vector< unsigned int > track;
+        while ( buildTrack( track ) ) {
+            //store best in collection
+            //delete best from cluster log
+        } //repeat track construction until no more pairs of clusters
+        
+        event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
 
         return;
     }
@@ -116,7 +119,7 @@ namespace ldmx {
         return; 
     }
     
-    bool lineHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+    bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
                      const std::vector<double> minBox , const std::vector<double> maxBox ) const {
         
         bool originInside = true;
@@ -202,6 +205,7 @@ namespace ldmx {
         //  no suffix means that it isn't an endpoint
         //  suffice {1,2} means that it is one of the endpoints
         track_mipids.clear();
+
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itC1, itC2, itC; //iterators for map
@@ -212,34 +216,20 @@ namespace ldmx {
                 std::vector< double > point1, point2 , errors1 , errors2;
                 (itC1->second).getPoint( point1 , errors1 );
                 (itC2->second).getPoint( point2 , errors2 );
-
-                std::vector< double > origin( 3 , 0.0 ), direction( 3 , 0.0 ), linesmudge( errors1 );
+                
+                //calculate line properties 
+                //  (origin, direction, negative direction, smudging factor)
+                std::vector< double > origin( point1 ), direction( 3 , 0.0 );
+                std::vector< double > negdirection( 3 , 0.0 ), linesmudge( errors1 );
                 for ( unsigned int iC = 0; iC < 3; iC++ ) {
                     direction[ iC ] = point2[iC] - point1[iC];
-                }
+                    negdirection[ iC ] = -1*direction[iC];
 
-                //project origin back to plane of maximum direction change
-                // e.g. if direction has largest value in z then the origin will
-                //  be put on xy-plane (z = 0)
-                unsigned int iMax = 0;
-                for ( unsigned int iC = 1; iC < 3; iC++ ) {
-                    if ( std::abs(direction[iMax]) < std::abs(direction[iC]) ) {
-                        iMax = iC;
-                    }
-                }
-
-                //calculate origin and recalculate direction
-                double originT = ( -point1[iMax] ) / direction[iMax];
-                for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                    //calculate origin
-                    origin[ iC ] = point1[ iC ] + originT*direction[ iC ];
-                    //re-calculate direction
-                    direction[ iC ] = point2[ iC ] - origin[ iC ];
-                    //calculate smudge of line
-                    if ( errors2[iC] < errors1[iC] ) {
+                    //determine line smudging
+                    if ( errors2[iC] < linesmudge[iC] ) {
                         linesmudge[iC] = errors2[iC];
                     }
-                }
+                } //space coordinates (iC)
                 
                 std::vector< unsigned int > ctrack_mipids; //ids of mip clusters in track
                 //iterate through all clusters to see if they are in track
@@ -256,10 +246,11 @@ namespace ldmx {
                         minBox[iC] = point[iC] - errors[iC] - linesmudge[iC];
                     }
                     
-                    //see if ray hits box
-                    if ( lineHitBox( origin , direction , minBox , maxBox ) ) {
+                    //see if ray hits box on either side of origin along line
+                    if ( rayHitBox( origin , direction , minBox , maxBox ) or
+                         rayHitBox( origin , negdirection , minBox , maxBox ) {
                         ctrack_mipids.push_back( itC->first );
-                    }
+                    } 
 
                 } //iterate through all clusters to see if they are in track (itC)
                 
