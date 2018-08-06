@@ -16,7 +16,7 @@ namespace ldmx {
 
         maxTrackCount_ = 100;
 
-        TClonesArray *hcalMipTracks_ = new TClonesArray( "ldmx::HcalMipTrack" , maxTrackCount_ );
+        hcalMipTracks_ = new TClonesArray( "ldmx::HcalMipTrack" , maxTrackCount_ );
 
         hcalMipTracksCollName_ = ps.getString( "HcalMipTrackCollectionName" );
 
@@ -63,7 +63,6 @@ namespace ldmx {
         int trackcnt = 0;
         while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
             //store best in collection and delete used mips from log
-            std::cout << trackcnt << std::endl;
             HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
             for ( unsigned int mipid : track_mipids ) {
@@ -89,6 +88,7 @@ namespace ldmx {
 
         } //repeat track construction until no more pairs of clusters
         
+        //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
         numTracksPerEvent_[ trackcnt ] ++;

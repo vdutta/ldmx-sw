@@ -35,7 +35,6 @@ namespace ldmx {
             /**
              * Destructor
              * Clears the TRefArray and Frees the memory
-             * Deltes the TGraphs
              */
             ~HcalMipTrack(); 
             
@@ -49,7 +48,6 @@ namespace ldmx {
             /**
              * Clear the track
              * Sets member variables to zero and empties the TRefArray (does NOT free the memory).
-             * Deletes the TGraphs and creates new (empty) ones.
              */
             void Clear(Option_t *opt = ""); 
 
