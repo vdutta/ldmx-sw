@@ -98,13 +98,13 @@ namespace ldmx {
         private:
             
             /** references to hits in the track */
-            TRefArray *hcalHits_; 
+            TRefArray hcalHits_; 
             
             /** Graph relating z and x coordinates */
-            TGraphErrors *zxGr_;
+            TGraphErrors zxGr_;
 
             /** Graph relating z and y coordinates */
-            TGraphErrors *zyGr_;
+            TGraphErrors zyGr_;
 
             /**
              * ROOT Class Definition
