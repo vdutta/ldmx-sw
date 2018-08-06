@@ -11,21 +11,36 @@ ClassImp( ldmx::HcalMipTrack );
 namespace ldmx {
     
     HcalMipTrack::HcalMipTrack() 
-        : TObject(), hcalHits_(new TRefArray()), zxGr_(), zyGr_()
+        : TObject(), hcalHits_(new TRefArray()),
+          zxGr_(new TGraphErrors()), zyGr_(new TGraphErrors())
           { } 
 
     HcalMipTrack::~HcalMipTrack() {
         Clear();
         hcalHits_->Delete();
+        
+        if ( zxGr_ )
+            delete zxGr_;
+        
+        if ( zyGr_ )
+            delete zyGr_;
     }
     
     HcalMipTrack& HcalMipTrack::operator= ( const HcalMipTrack &track ) {
         
         if ( this != &track ) { //self-assignment guard
             
+            //delete existing objects
+            if ( this->hcalHits_ )
+                delete hcalHits_;
+            if ( this->zxGr_ )
+                delete this->zxGr_;
+            if ( this->zyGr_ )
+                delete this->zyGr_;
+            
             this->hcalHits_ = new TRefArray( *track.hcalHits_ );
-            this->zxGr_ = track.zxGr_;
-            this->zyGr_ = track.zyGr_;
+            this->zxGr_ = new TGraphErrors( *track.zxGr_ );
+            this->zyGr_ = new TGraphErrors( *track.zyGr_ );
         }
 
         return *this;
@@ -33,13 +48,19 @@ namespace ldmx {
              
     void HcalMipTrack::Clear( Option_t *opt ) {
 
-        TObject::Clear();
+        TObject::Clear(opt);
 
-        hcalHits_->Clear();
+        hcalHits_->Clear(opt);
 
-        zxGr_.Set( 0 );
-        zyGr_.Set( 0 );
+        if ( zxGr_ )
+            delete zxGr_;
         
+        if ( zyGr_ )
+            delete zyGr_;
+
+        zxGr_ = new TGraphErrors();
+        zyGr_ = new TGraphErrors();
+
         return;
     }
  
@@ -50,11 +71,11 @@ namespace ldmx {
 
     void HcalMipTrack::addPoint( const std::vector<double> &point , const std::vector<double> &errors ) {
         
-        zxGr_.SetPoint( zxGr_.GetN() , point[2] , point[0] );
-        zxGr_.SetPointError( zxGr_.GetN()-1 , errors[2] , errors[0] );
+        zxGr_->SetPoint( zxGr_->GetN() , point[2] , point[0] );
+        zxGr_->SetPointError( zxGr_->GetN()-1 , errors[2] , errors[0] );
 
-        zyGr_.SetPoint( zyGr_.GetN() , point[2] , point[1] );
-        zyGr_.SetPointError( zyGr_.GetN()-1 , errors[2] , errors[1] );
+        zyGr_->SetPoint( zyGr_->GetN() , point[2] , point[1] );
+        zyGr_->SetPointError( zyGr_->GetN()-1 , errors[2] , errors[1] );
 
         return;       
     }
@@ -69,13 +90,13 @@ namespace ldmx {
 
     void HcalMipTrack::evalFit( const float z , float &x , float &y ) {
         
-        zxGr_.Fit( "pol1" , "Q" );
-        zyGr_.Fit( "pol1" , "Q" );
+        zxGr_->Fit( "pol1" , "Q" );
+        zyGr_->Fit( "pol1" , "Q" );
         
         TF1 *fitresult;
-        fitresult = zxGr_.GetFunction( "pol1" );
+        fitresult = zxGr_->GetFunction( "pol1" );
         x = fitresult->Eval( z );
-        fitresult = zyGr_.GetFunction( "pol1" );
+        fitresult = zyGr_->GetFunction( "pol1" );
         y = fitresult->Eval( z );
         
         return;
