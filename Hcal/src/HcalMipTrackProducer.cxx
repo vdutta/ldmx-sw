@@ -38,10 +38,10 @@ namespace ldmx {
         const TClonesArray *rawhits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
         //go through raw hits and ignore noise hits
-        int nhits = rawhits.GetEntriesFast();
+        int nhits = rawhits->GetEntriesFast();
         for ( int iH = 0; iH < nhits; iH++ ) {
             
-            HcalHit* chit = dynamic_cast<HcalHit*>((rawhits->At( iH ));
+            HcalHit* chit = dynamic_cast<HcalHit*>(rawhits->At( iH ));
 
             if ( isNotNoise( chit ) ) {
                 int section = chit->getSection();
@@ -68,8 +68,8 @@ namespace ldmx {
         return;
     }
 
-    bool HcalMipTrackProducer::isNotNoise( const HcalHit* hit ) const {
-        return ( !chit->getNoise() and chit->getPE() > minPE_ );
+    bool HcalMipTrackProducer::isNotNoise( HcalHit* hit ) const {
+        return ( !hit->getNoise() and hit->getPE() > minPE_ );
     }
 
     bool HcalMipTrackProducer::isMip( const MipCluster* cluster ) const {
@@ -80,7 +80,7 @@ namespace ldmx {
         
         // cluster hits in same layer
         std::map< unsigned int , HcalHit* >::iterator itH;
-        std::map< unsigned int , HCalHit* >::iterator prev_itH = hcalHitLog_.begin();
+        std::map< unsigned int , HcalHit* >::iterator prev_itH = hcalHitLog_.begin();
         MipCluster *current_cluster = new MipCluster();
         for ( itH = hcalHitLog_.begin(); itH != hcalHitLog_.end(); ++itH ) {
             
@@ -119,8 +119,8 @@ namespace ldmx {
         return; 
     }
     
-    bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
-                     const std::vector<double> minBox , const std::vector<double> maxBox ) const {
+    bool HcalMipTrackProducer::rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+                    const std::vector<double> minBox , const std::vector<double> maxBox ) const {
         
         bool originInside = true;
         bool originBetween[3];
@@ -135,7 +135,7 @@ namespace ldmx {
                 originInside = false;
             } else if ( origin.at(iC) > maxBox.at(iC) ) {
                 originBetween[iC] = false;
-                candidatePlane[iC] = maxBox.at(iC) );
+                candidatePlane[iC] = maxBox.at(iC);
                 originInside = false;
             } else {
                 originBetween[iC] = true;
@@ -194,7 +194,7 @@ namespace ldmx {
             better = true;
         } else {
             //TEMPORARY
-            better = ( track1.getEnergy() < track2.getEnergy() );
+            better = ( track1.getNHits() < track2.getNHits() );
         } //if track1 is empty
 
         return better;
@@ -209,8 +209,8 @@ namespace ldmx {
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itC1, itC2, itC; //iterators for map
-        for ( itC1 = clusterLog_.begin(); itC1 != clusterLog.end(); ++itC1 ) {
-            for ( itC2 = itC1+1; itC2 != clusterLog_.end(); ++itC2 ) {
+        for ( itC1 = clusterLog_.begin(); itC1 != clusterLog_.end(); ++itC1 ) {
+            for ( itC2 = std::next(itC1); itC2 != clusterLog_.end(); ++itC2 ) {
                 //construct track in cylinder
                 
                 std::vector< double > point1, point2 , errors1 , errors2;
@@ -247,8 +247,8 @@ namespace ldmx {
                     }
                     
                     //see if ray hits box on either side of origin along line
-                    if ( rayHitBox( origin , direction , minBox , maxBox ) or
-                         rayHitBox( origin , negdirection , minBox , maxBox ) {
+                    if ( rayHitBox( origin , direction    , minBox , maxBox ) or
+                         rayHitBox( origin , negdirection , minBox , maxBox ) ) {
                         ctrack_mipids.push_back( itC->first );
                     } 
 
@@ -263,7 +263,7 @@ namespace ldmx {
                         
                         MipCluster* cmip = &clusterLog_[ *it ];
                         for ( int i = 0; i < cmip->getNumHits(); i++ ) {
-                            ctrack->addHit( cmip->getHit( iH ) );
+                            ctrack.addHit( cmip->getHcalHit( i ) );
                         }//iterate through hits in cluster
 
                     } //add clusters with mipids to ctrack

@@ -50,7 +50,7 @@ namespace ldmx {
         thicknessLayer_ = 50. + 20. + 2*2.;
     }
 
-    void HcalDetectorGeometry::transformDet2Real( const HcalHit* hit ,
+    void HcalDetectorGeometry::transformDet2Real( HcalHit* hit ,
         std::vector< double > &point , std::vector< double > &errs ) const {
         
         point.clear();
@@ -136,7 +136,7 @@ namespace ldmx {
         return;
     }
     
-    void HcalDetectorGeometry::transformDet2Real( const std::vector<const HcalHit*>  &hitVec ,
+    void HcalDetectorGeometry::transformDet2Real( const std::vector<HcalHit*>  &hitVec ,
         std::vector< double > &point , std::vector< double > &errs ) const {
         
         point.clear();
@@ -150,7 +150,7 @@ namespace ldmx {
         std::vector<double> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
         
         //calculate real space point for each hit
-        for ( const HcalHit* hit : hitVec ) {
+        for ( HcalHit* hit : hitVec ) {
             
             std::vector<double> cpt, cer;
 

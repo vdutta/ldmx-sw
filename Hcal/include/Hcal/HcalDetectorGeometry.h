@@ -37,7 +37,7 @@ namespace ldmx {
              * @param point vector that will contain real space point
              * @param errs vector that will contain errors in each coordinate
              */
-            void transformDet2Real( const HcalHit* hit ,
+            void transformDet2Real( HcalHit* hit ,
                 std::vector< double > &point , std::vector< double > &errs ) const;
             
             /**
@@ -49,7 +49,7 @@ namespace ldmx {
              * @param point vector that will contain real space point
              * @param errs vector that will contain errors in each coordinate
              */
-            void transformDet2Real( const std::vector< const HcalHit* > &hitVec ,
+            void transformDet2Real( const std::vector< HcalHit* > &hitVec ,
                 std::vector< double > &point , std::vector< double > &errs ) const;
         
         private:

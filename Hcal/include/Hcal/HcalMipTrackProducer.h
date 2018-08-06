@@ -20,6 +20,7 @@
 #include "Event/EventConstants.h" //for HcalMipTrack string
 #include "Event/HcalMipTrack.h" //mip track container
 #include "Hcal/HcalDetectorGeometry.h" //calculating real space coordinates
+#include "Hcal/MipCluster.h" //cluster object
 
 namespace ldmx {
     
@@ -52,7 +53,7 @@ namespace ldmx {
              * @param hit HcalHit to check
              * @return true if not noise
              */
-            bool isNotNoise( const HcalHit* hit ) const;
+            bool isNotNoise( HcalHit* hit ) const;
 
             /**
              * Check if cluster is a mip.
