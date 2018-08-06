@@ -63,7 +63,7 @@ namespace ldmx {
         int trackcnt = 0;
         while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
             //store best in collection and delete used mips from log
-            //HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
+            HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
             for ( unsigned int mipid : track_mipids ) {
                 
@@ -71,13 +71,13 @@ namespace ldmx {
 
                 //add HcalHits to track
                 for ( int i = 0; i < cmip->getNumHits(); i++ ) {
-             //       track->addHit( cmip->getHcalHit( i ) );
+                    track->addHit( cmip->getHcalHit( i ) );
                 }//iterate through hits in cluster
                 
                 //add real point to track
                 std::vector<double> point, errors;
                 cmip->getPoint( point , errors );
-             //   track->addPoint( point , errors );
+                track->addPoint( point , errors );
                 
                 //erase mipid from log
                 clusterLog_.erase( mipid );
@@ -88,7 +88,7 @@ namespace ldmx {
 
         } //repeat track construction until no more pairs of clusters
         
-        //event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
+        event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
         numTracksPerEvent_[ trackcnt ] ++;
 
