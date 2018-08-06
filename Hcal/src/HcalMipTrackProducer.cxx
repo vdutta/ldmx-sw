@@ -87,6 +87,8 @@ namespace ldmx {
         } //repeat track construction until no more pairs of clusters
         
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
+        
+        numTracksPerEvent_[ trackcnt ] ++;
 
         return;
     }

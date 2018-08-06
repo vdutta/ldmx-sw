@@ -43,7 +43,15 @@ namespace ldmx {
 
             virtual void onProcessStart() { } 
 
-            virtual void onProcessEnd() { }
+            virtual void onProcessEnd() {
+                
+                std::cout << "N Tracks : N Events" << std::endl;
+                for ( auto keyvalpair : numTracksPerEvent_ ) {
+                    std::cout << keyvalpair.first << " : " << keyvalpair.second << std::endl;
+                }
+
+                return;
+            }
 
         private:
             
@@ -135,7 +143,8 @@ namespace ldmx {
             /** Log of clusters still being considered for track */
             std::map< unsigned int , MipCluster > clusterLog_;
 
-            
+            /** Record the number of events that have a certain number of tracks */
+            std::map< int , int > numTracksPerEvent_;
     };
 }
 
