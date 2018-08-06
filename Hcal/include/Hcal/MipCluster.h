@@ -10,8 +10,6 @@
 //Standard Libraries
 #include <vector> //for storage vector of HcalHit pointers
 
-//ROOT Libs
-
 //LDMX Framework
 #include "DetDescr/HcalID.h" //for the HcalSection enum
 #include "Hcal/HcalDetectorGeometry.h" //to calculate real space coordinates
@@ -88,7 +86,7 @@ namespace ldmx {
             void setRealPoint();
             
             /** Class instance to help calculate real space coordinates */
-            static HcalDetectorGeometry hdg_;
+            HcalDetectorGeometry hdg_;
 
             /** The total energy of the MipCluster */
             float totalEnergy_;

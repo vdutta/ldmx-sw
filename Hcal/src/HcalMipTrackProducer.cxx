@@ -59,7 +59,7 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        while ( buildTrack( track_mipids ) ) {
+        while ( buildTrack( track_mipids ) and trackcnt < 100 ) {
             //store best in collection and delete used mips from log
             HcalMipTrack *track = dynamic_cast<HcalMipTrack*>(hcalMipTracks_->ConstructedAt( trackcnt ));
             
@@ -311,4 +311,4 @@ namespace ldmx {
     }
 }
 
-DECLARE_PRODUCER_NS(ldmx, HcalMipTrackProducer);
+DECLARE_PRODUCER_NS( ldmx , HcalMipTrackProducer );
