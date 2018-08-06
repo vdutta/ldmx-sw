@@ -32,15 +32,17 @@ namespace ldmx {
             minNumClusters_ = 2;
         } //minNumClusters_ validation check
         
-        meanTime_ = 0.0;
+        meanTime_produce_ = 0.0;
+        meanTime_buildTrack_ = 0.0;
+        meanTime_anaendpts_ = 0.0;
 
         return;
     }
 
     void HcalMipTrackProducer::produce(ldmx::Event& event) {
         
-        std::clock_t start;
-        start = std::clock();
+        std::clock_t start_produce;
+        start_produce = std::clock();
 
         const TClonesArray *rawhits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
@@ -66,7 +68,11 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
+        std::clock_t start_buildTrack;
+        start_buildTrack = std::clock();
         while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
+            double time_buildTrack = (std::clock() - start_buildTrack)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
+            meanTime_buildTrack_ = (trackcnt/(double)(trackcnt+1))*meanTime_buildTrack_ + time_buildTrack/(trackcnt+1);
             //store best in collection and delete used mips from log
             HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
@@ -99,8 +105,8 @@ namespace ldmx {
         numTracksPerEvent_[ trackcnt ] ++;
         
         int ievent = event.getEventHeader()->getEventNumber();
-        double time = (std::clock() - start)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
-        meanTime_ = ((double)(ievent)/(double)(ievent+1))*meanTime_ + time/(double)(ievent+1);
+        double time_produce = (std::clock() - start_produce)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
+        meanTime_produce_ = ((double)(ievent)/(double)(ievent+1))*meanTime_produce_ + time_produce/(double)(ievent+1);
 
         return;
     }
@@ -165,10 +171,13 @@ namespace ldmx {
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itC1, itC2, itC; //iterators for map
+        int loopcnt = 0;
         for ( itC1 = clusterLog_.begin(); itC1 != clusterLog_.end(); ++itC1 ) {
             for ( itC2 = std::next(itC1); itC2 != clusterLog_.end(); ++itC2 ) {
                 //construct track in cylinder
-                
+                std::clock_t start_anaendpts;
+                start_anaendpts = std::clock();
+
                 std::vector< double > point1, point2 , errors1 , errors2;
                 (itC1->second).getPoint( point1 , errors1 );
                 (itC2->second).getPoint( point2 , errors2 );
@@ -234,7 +243,10 @@ namespace ldmx {
                     }//ctrack is better than best_track
 
                 }//ctrack is a plausible track
-
+                
+                double time_anaendpts = (std::clock() - start_anaendpts)/(double)( CLOCKS_PER_SEC / 1000 ); //ms
+                meanTime_anaendpts_ = (loopcnt/(double)(loopcnt+1))*meanTime_anaendpts_ + time_anaendpts/(loopcnt+1);
+                loopcnt++;
             } //go through remaining hits as second end point (itC2)
         } //go through all hits as first end point (itC1)
         

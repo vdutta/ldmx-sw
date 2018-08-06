@@ -29,6 +29,9 @@ namespace ldmx {
     /**
      * @class HcalMipTrackProducer
      * @brief Producer that reconstructs MIP tracks through the hcal.
+     *
+     * @note VERY SLOW. Optimization still under way, currently takes
+     *  ~2s PER EVENT to produce the tracks.
      */
     class HcalMipTrackProducer : public ldmx::Producer {
         public:
@@ -47,7 +50,9 @@ namespace ldmx {
 
             virtual void onProcessEnd() {
                 
-                printf( "Mean Time [s]: %f \n", meanTime_/1000 );
+                printf( "Mean Time produce    [s]: %f \n", meanTime_produce_/1000 );
+                printf( "Mean Time buildTrack [s]: %f \n" , meanTime_buildTrack_/1000 );
+                printf( "Mean Time anaendpts  [s]: %f \n" , meanTime_anaendpts_/1000 );
 
                 printf( "N Tracks : N Events \n" );
                 for ( auto keyvalpair : numTracksPerEvent_ ) {
@@ -154,7 +159,13 @@ namespace ldmx {
             std::map< int , int > numTracksPerEvent_;
 
             /** Record the mean time it takes to produce the tracks */
-            double meanTime_;
+            double meanTime_produce_;
+
+            /** buildTrack time */
+            double meanTime_buildTrack_;
+
+            /** analyze end ponts time */
+            double meanTime_anaendpts_;
     };
 }
 
