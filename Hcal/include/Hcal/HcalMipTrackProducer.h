@@ -72,6 +72,14 @@ namespace ldmx {
             void clusterHits();
 
             /**
+             * Finds best track out of the clusters that are left.
+             * 
+             * @param track_mipids vector of cluster ids in track that is found
+             * @return true if track was found
+             */
+            bool buildTrack( std::vector< unsigned int > &track_mipids );
+
+            /**
              * Determine if line (defined by origin and direction) hits the box defined by minimum and maximum corners.
              * Assumes all inputs are formatted correctly.
              * This algorithm is the Fast Ray-Box Intersection Algorithm developed by Andrew Woo
@@ -96,15 +104,7 @@ namespace ldmx {
              * @return true if track1 is "worse" than track2
              */
             bool compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const;
-
-            /**
-             * Finds best track out of the clusters that are left.
-             * 
-             * @param track_mipids vector of cluster ids in track that is found
-             * @return true if track was found
-             */
-            bool buildTrack( std::vector< unsigned int > &track_mipids );
-
+            
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
 

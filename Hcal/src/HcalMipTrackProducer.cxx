@@ -118,88 +118,7 @@ namespace ldmx {
 
         return; 
     }
-    
-    bool HcalMipTrackProducer::rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
-                    const std::vector<double> minBox , const std::vector<double> maxBox ) const {
-        
-        bool originInside = true;
-        bool originBetween[3];
-
-        //Determine planes that are on the "front" of the box w.r.t. the origin of the ray
-        std::vector<double> candidatePlane( 3 , 0.0 );
-        for ( unsigned int iC = 0; iC < 3; iC++ ) {
-            
-            if ( origin.at(iC) < minBox.at(iC) ) {
-                originBetween[iC] = false;
-                candidatePlane[iC] = minBox.at(iC);
-                originInside = false;
-            } else if ( origin.at(iC) > maxBox.at(iC) ) {
-                originBetween[iC] = false;
-                candidatePlane[iC] = maxBox.at(iC);
-                originInside = false;
-            } else {
-                originBetween[iC] = true;
-            } //where origin is w.r.t. box
-                
-        } //iterate through coordinates (iC)
-        
-        //Origin Inside Box ==> Ray Intersects Box
-        if ( originInside ) {
-            return true;
-        }
-
-        //Calculate maximum T distances to candidatePlanes
-        std::vector<double> maxT( 3 , 0.0 );
-        for ( unsigned int iC = 0; iC < 3; iC++ ) {
-            
-            if ( !originBetween[iC] and dir.at(iC) != 0.0 ) {
-                maxT[ iC ] = ( candidatePlane[iC] - origin.at(iC) ) / dir.at(iC);        
-            } else {
-                maxT[ iC ] = -1.0;
-            }
-
-        } //iterate through coordinates (iC)
-
-        //Get largest of maxTs for the final choice of intersection
-        unsigned int iMax = 0;
-        for ( unsigned int iC = 0; iC < 3; iC++ ) {
-            if ( maxT[ iMax ] < maxT[ iC ] ) {
-                iMax = iC;
-            }
-        } //iterate through coordinates (iC)
-        
-        //Check if final candidate is inside box
-        if ( maxT[ iMax ] < 0.0 ) {
-            return false;
-        }
-
-        for ( unsigned int iC = 0; iC < 3; iC++ ) {
-            
-            if ( iMax != iC ) {
-                double coordinate = origin.at(iC) + maxT[iC]*dir.at(iC);
-                if ( coordinate < minBox.at(iC) or coordinate > maxBox.at(iC) ) {
-                    //coordinate outside box
-                    return false;
-                }
-            } //if coordinate is not maximum T plane
-        } //iterate through coordinates (iC)
-
-        return true;
-    }
-
-    bool HcalMipTrackProducer::compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const {
-        
-        bool better = false;
-        if ( track1.isEmpty() ) {
-            better = true;
-        } else {
-            //TEMPORARY
-            better = ( track1.getNHits() < track2.getNHits() );
-        } //if track1 is empty
-
-        return better;
-    }
-
+ 
     bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
         //for clusters:
         //  no suffix means that it isn't an endpoint
@@ -279,6 +198,87 @@ namespace ldmx {
         } //go through all hits as first end point (itC1)
         
         return (!track_mipids.empty());
+    }
+   
+    bool HcalMipTrackProducer::rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
+                    const std::vector<double> minBox , const std::vector<double> maxBox ) const {
+        
+        bool originInside = true;
+        bool originBetween[3];
+
+        //Determine planes that are on the "front" of the box w.r.t. the origin of the ray
+        std::vector<double> candidatePlane( 3 , 0.0 );
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( origin.at(iC) < minBox.at(iC) ) {
+                originBetween[iC] = false;
+                candidatePlane[iC] = minBox.at(iC);
+                originInside = false;
+            } else if ( origin.at(iC) > maxBox.at(iC) ) {
+                originBetween[iC] = false;
+                candidatePlane[iC] = maxBox.at(iC);
+                originInside = false;
+            } else {
+                originBetween[iC] = true;
+            } //where origin is w.r.t. box
+                
+        } //iterate through coordinates (iC)
+        
+        //Origin Inside Box ==> Ray Intersects Box
+        if ( originInside ) {
+            return true;
+        }
+
+        //Calculate maximum T distances to candidatePlanes
+        std::vector<double> maxT( 3 , 0.0 );
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( !originBetween[iC] and dir.at(iC) != 0.0 ) {
+                maxT[ iC ] = ( candidatePlane[iC] - origin.at(iC) ) / dir.at(iC);        
+            } else {
+                maxT[ iC ] = -1.0;
+            }
+
+        } //iterate through coordinates (iC)
+
+        //Get largest of maxTs for the final choice of intersection
+        unsigned int iMax = 0;
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            if ( maxT[ iMax ] < maxT[ iC ] ) {
+                iMax = iC;
+            }
+        } //iterate through coordinates (iC)
+        
+        //Check if final candidate is inside box
+        if ( maxT[ iMax ] < 0.0 ) {
+            return false;
+        }
+
+        for ( unsigned int iC = 0; iC < 3; iC++ ) {
+            
+            if ( iMax != iC ) {
+                double coordinate = origin.at(iC) + maxT[iC]*dir.at(iC);
+                if ( coordinate < minBox.at(iC) or coordinate > maxBox.at(iC) ) {
+                    //coordinate outside box
+                    return false;
+                }
+            } //if coordinate is not maximum T plane
+        } //iterate through coordinates (iC)
+
+        return true;
+    }
+
+    bool HcalMipTrackProducer::compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const {
+        
+        bool better = false;
+        if ( track1.isEmpty() ) {
+            better = true;
+        } else {
+            //TEMPORARY
+            better = ( track1.getNHits() < track2.getNHits() );
+        } //if track1 is empty
+
+        return better;
     }
 }
 
