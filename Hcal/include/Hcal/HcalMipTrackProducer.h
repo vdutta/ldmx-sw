@@ -12,6 +12,8 @@
 #include <map> //cluster and hit logs
 #include <iterator> //std::prev
 #include <cmath> //sqrt and abs
+#include <iostream> //cerr and cout
+#include <ctime> //timing produce function
 
 //LDMX Framework
 #include "Event/Event.h"
@@ -45,9 +47,11 @@ namespace ldmx {
 
             virtual void onProcessEnd() {
                 
-                std::cout << "N Tracks : N Events" << std::endl;
+                printf( "Mean Time [s]: %f \n", meanTime_/1000 );
+
+                printf( "N Tracks : N Events \n" );
                 for ( auto keyvalpair : numTracksPerEvent_ ) {
-                    std::cout << keyvalpair.first << " : " << keyvalpair.second << std::endl;
+                    printf( "%-8d : %d \n" , keyvalpair.first , keyvalpair.second );
                 }
 
                 return;
@@ -148,6 +152,9 @@ namespace ldmx {
 
             /** Record the number of events that have a certain number of tracks */
             std::map< int , int > numTracksPerEvent_;
+
+            /** Record the mean time it takes to produce the tracks */
+            double meanTime_;
     };
 }
 

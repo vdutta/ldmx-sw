@@ -32,11 +32,16 @@ namespace ldmx {
             minNumClusters_ = 2;
         } //minNumClusters_ validation check
         
+        meanTime_ = 0.0;
+
         return;
     }
 
     void HcalMipTrackProducer::produce(ldmx::Event& event) {
         
+        std::clock_t start;
+        start = std::clock();
+
         const TClonesArray *rawhits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
         //go through raw hits and ignore noise hits
@@ -92,6 +97,10 @@ namespace ldmx {
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
         numTracksPerEvent_[ trackcnt ] ++;
+        
+        int ievent = event.getEventHeader()->getEventNumber();
+        double time = (std::clock() - start)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
+        meanTime_ = ((double)(ievent)/(double)(ievent+1))*meanTime_ + time/(double)(ievent+1);
 
         return;
     }
