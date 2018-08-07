@@ -68,7 +68,7 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        while ( findSeed() and trackcnt < maxTrackCount_ ) {
+        while ( findSeed_MedianZPos() and trackcnt < maxTrackCount_ ) {
             
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
@@ -167,9 +167,8 @@ namespace ldmx {
         return; 
     }
 
-    bool HcalMipTrackProducer::findSeed(  ) {
+    bool HcalMipTrackProducer::findSeed_LowZPos( ) {
         
-        MipCluster *seedMip = nullptr;
         seedPoint_.clear();
         seedErrors_.clear();
         seedID_ = 0;
@@ -183,7 +182,6 @@ namespace ldmx {
                 numTouchLogs_++;
                 (keyclust.second).getPoint( point , errors );
                 if ( isGoodSeed_[keyclust.first] and point[2] < seed_z ) {
-                    seedMip = &(keyclust.second);
                     seedPoint_ = point;
                     seedErrors_ = errors;
                     seed_z = point[2];
@@ -191,6 +189,41 @@ namespace ldmx {
                 } //if lower z coordinate
             } //go through clusterLog_
             
+        } //enough clusters in log
+
+        return (!seedPoint_.empty());
+    }
+
+    bool HcalMipTrackProducer::findSeed_MedianZPos() {
+        
+        seedPoint_.clear();
+        seedErrors_.clear();
+        seedID_ = 0;
+        
+        if ( clusterLog_.size() > minNumClusters_ ) {
+            
+            //map from zpos to mip id (bad seeds excluded)
+            std::map< const double , unsigned int > zpos_id;
+
+            std::vector< double > point , errors;
+            for ( auto keyclust : clusterLog_ ) {
+                numTouchLogs_++;
+                if ( isGoodSeed_[keyclust.first] ) {
+                    (keyclust.second).getPoint( point , errors );
+                    zpos_id[ point[2] ] = keyclust.first;
+                } //store zpos if good seed
+            
+            } //go through clusterLog_
+            
+            std::map< const double , unsigned int >::iterator seed_it = zpos_id.begin();
+
+            //rough median
+            for ( int i = 0; i < zpos_id.size()/2; i++)
+                ++seed_it;
+            
+            seedID_ = seed_it->second;
+            clusterLog_.at( seedID_ ).getPoint( seedPoint_ , seedErrors_ );
+
         } //enough clusters in log
 
         return (!seedPoint_.empty());

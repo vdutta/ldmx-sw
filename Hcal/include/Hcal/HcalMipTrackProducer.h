@@ -93,10 +93,19 @@ namespace ldmx {
             
             /**
              * Finds a seed to construct a track from.
+             * Choose a good seed cluster that has the lowest z coordinate.
              *
              * @return true if successfully found a seed
              */
-            bool findSeed(  );
+            bool findSeed_LowZPos();
+
+            /**
+             * Finds a seed to construct a track from.
+             * Choose a good seed cluster that has the median z coordinate.
+             *
+             * @return true if successfully found a seed
+             */
+            bool findSeed_MedianZPos();
 
             /**
              * Finds best track out of the clusters that are left.
