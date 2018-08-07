@@ -10,6 +10,7 @@
 //STL
 #include <string> //names of collections
 #include <map> //cluster and hit logs
+#include <set> //set of bad seed ids
 #include <iterator> //std::prev
 #include <cmath> //sqrt and abs
 #include <iostream> //cerr and cout
@@ -94,18 +95,11 @@ namespace ldmx {
             /**
              * Finds a seed to construct a track from.
              * Choose a good seed cluster that has the lowest z coordinate.
+             * Unless using the median is specified.
              *
              * @return true if successfully found a seed
              */
-            bool findSeed_LowZPos();
-
-            /**
-             * Finds a seed to construct a track from.
-             * Choose a good seed cluster that has the median z coordinate.
-             *
-             * @return true if successfully found a seed
-             */
-            bool findSeed_MedianZPos();
+            bool findSeed( const bool useMedian );
 
             /**
              * Finds best track out of the clusters that are left.
@@ -174,8 +168,8 @@ namespace ldmx {
             /** Seed Mip ID */
             unsigned int seedID_;
 
-            /** Map of MipCluster IDs that are good/bad seeds */
-            std::map< unsigned int , bool > isGoodSeed_;
+            /** Set of bad seed ids */
+            std::set< unsigned int > badSeeds_;
 
             // PERFORMANCE TRACKERS
 

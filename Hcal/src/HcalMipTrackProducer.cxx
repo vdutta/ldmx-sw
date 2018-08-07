@@ -44,6 +44,11 @@ namespace ldmx {
         std::clock_t start_produce;
         start_produce = std::clock();
 
+        //Clear event containers
+        hcalHitLog_.clear();
+        clusterLog_.clear();
+        badSeeds_.clear();
+
         const TClonesArray *rawhits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
         //go through raw hits and ignore noise hits
@@ -63,12 +68,12 @@ namespace ldmx {
             } //if not noise hit
 
         } //iterate through rawhits (iH)
-       
+        std::cout << hcalHitLog_.size() << " ";
         clusterHits();
-        
+        std::cout << clusterLog_.size() << std::endl;
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        while ( findSeed_MedianZPos() and trackcnt < maxTrackCount_ ) {
+        while ( findSeed( false ) and trackcnt < maxTrackCount_ ) {
             
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
@@ -96,11 +101,12 @@ namespace ldmx {
 
             } else {
                 //Unable to build a track, mark as bad seed
-                isGoodSeed_[ seedID_ ] = false;
+                badSeeds_.insert( seedID_ );
             }//build or not build a track
-
+            //Functional Check
+            std::cout << badSeeds_.size() << " ";
         } //repeat track construction until no more viable seeds
-        
+        std::cout << std::endl;
         //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
@@ -140,7 +146,6 @@ namespace ldmx {
                 current_cluster->set(); //calculate real space point
                 if ( isMip( current_cluster ) ) {
                     clusterLog_[ current_cluster->getUID() ] = *current_cluster;
-                    isGoodSeed_[ current_cluster->getUID() ] = true;
                 }//check if mip
                 delete current_cluster;
                 current_cluster = new MipCluster();
@@ -158,7 +163,6 @@ namespace ldmx {
             current_cluster->set();
             if ( isMip( current_cluster ) ) {
                 clusterLog_[ current_cluster->getUID() ] = *current_cluster;
-                isGoodSeed_[ current_cluster->getUID() ] = true;
             }
             delete current_cluster;
             current_cluster = nullptr;
@@ -167,7 +171,7 @@ namespace ldmx {
         return; 
     }
 
-    bool HcalMipTrackProducer::findSeed_LowZPos( ) {
+    bool HcalMipTrackProducer::findSeed( const bool useMedian ) {
         
         seedPoint_.clear();
         seedErrors_.clear();
@@ -175,57 +179,30 @@ namespace ldmx {
 
         if ( clusterLog_.size() > minNumClusters_ ) {
 
-            double seed_z = 100000.0;
+            std::map< const double , unsigned int > zpos_id;
             
             std::vector< double > point , errors;
             for ( auto keyclust : clusterLog_ ) {
                 numTouchLogs_++;
-                (keyclust.second).getPoint( point , errors );
-                if ( isGoodSeed_[keyclust.first] and point[2] < seed_z ) {
-                    seedPoint_ = point;
-                    seedErrors_ = errors;
-                    seed_z = point[2];
-                    seedID_ = keyclust.first;
+                if ( badSeeds_.find(keyclust.first) == badSeeds_.end() ) {
+                    (keyclust.second).getPoint( point , errors );
+                    zpos_id[ point[2] ] = keyclust.first;
                 } //if lower z coordinate
             } //go through clusterLog_
             
-        } //enough clusters in log
-
-        return (!seedPoint_.empty());
-    }
-
-    bool HcalMipTrackProducer::findSeed_MedianZPos() {
-        
-        seedPoint_.clear();
-        seedErrors_.clear();
-        seedID_ = 0;
-        
-        if ( clusterLog_.size() > minNumClusters_ ) {
-            
-            //map from zpos to mip id (bad seeds excluded)
-            std::map< const double , unsigned int > zpos_id;
-
-            std::vector< double > point , errors;
-            for ( auto keyclust : clusterLog_ ) {
-                numTouchLogs_++;
-                if ( isGoodSeed_[keyclust.first] ) {
-                    (keyclust.second).getPoint( point , errors );
-                    zpos_id[ point[2] ] = keyclust.first;
-                } //store zpos if good seed
-            
-            } //go through clusterLog_
-            
             std::map< const double , unsigned int >::iterator seed_it = zpos_id.begin();
-
-            //rough median
-            for ( int i = 0; i < zpos_id.size()/2; i++)
-                ++seed_it;
             
+            if ( useMedian ) {
+                //move seed_it to rough media
+                for ( int i = 0; i < zpos_id.size()/2; i++ )
+                    ++seed_it;
+            }
+
             seedID_ = seed_it->second;
             clusterLog_.at( seedID_ ).getPoint( seedPoint_ , seedErrors_ );
-
+            numTouchLogs_++;
         } //enough clusters in log
-
+        std::cout << seedID_ << " ";
         return (!seedPoint_.empty());
     }
  
