@@ -31,8 +31,8 @@ namespace ldmx {
      * @class HcalMipTrackProducer
      * @brief Producer that reconstructs MIP tracks through the hcal.
      *
-     * @note VERY SLOW. Optimization still under way, currently takes
-     *  ~3s PER EVENT to produce the tracks.
+     * @note Currently, some event cause an infinity loop. Investigating
+     *  for logical error in code.
      */
     class HcalMipTrackProducer : public ldmx::Producer {
         public:
@@ -167,9 +167,6 @@ namespace ldmx {
 
             /** Seed Mip ID */
             unsigned int seedID_;
-
-            /** Set of bad seed ids */
-            std::set< unsigned int > badSeeds_;
 
             // PERFORMANCE TRACKERS
 

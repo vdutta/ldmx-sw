@@ -47,7 +47,6 @@ namespace ldmx {
         //Clear event containers
         hcalHitLog_.clear();
         clusterLog_.clear();
-        badSeeds_.clear();
 
         const TClonesArray *rawhits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
@@ -68,20 +67,20 @@ namespace ldmx {
             } //if not noise hit
 
         } //iterate through rawhits (iH)
-        std::cout << hcalHitLog_.size() << " ";
+        
         clusterHits();
-        std::cout << clusterLog_.size() << std::endl;
+        
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
         while ( findSeed( false ) and trackcnt < maxTrackCount_ ) {
-            
+            std::cout << "FOUND SEED" << std::endl;
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
                 HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
                 for ( unsigned int mipid : track_mipids ) {
                     numTouchLogs_++;
                     MipCluster* cmip = &clusterLog_[ mipid ];
-    
+                     
                     //add HcalHits to track
                     for ( int i = 0; i < cmip->getNumHits(); i++ ) {
                         track->addHit( cmip->getHcalHit( i ) );
@@ -94,17 +93,18 @@ namespace ldmx {
                     
                     //erase mipid from log
                     clusterLog_.erase( mipid );
-    
+                    
+                    std::cout << mipid << " ";
                 } //add clusters with mipids to track
-                
+                std::cout << std::endl;
                 trackcnt++;
 
             } else {
-                //Unable to build a track, mark as bad seed
-                badSeeds_.insert( seedID_ );
-            }//build or not build a track
-            //Functional Check
-            std::cout << badSeeds_.size() << " ";
+                
+                clusterLog_.at( seedID_ ).hasBeenSeed( true );
+
+            } //if able to build track
+
         } //repeat track construction until no more viable seeds
         std::cout << std::endl;
         //store collection in event bus
@@ -184,10 +184,10 @@ namespace ldmx {
             std::vector< double > point , errors;
             for ( auto keyclust : clusterLog_ ) {
                 numTouchLogs_++;
-                if ( badSeeds_.find(keyclust.first) == badSeeds_.end() ) {
+                if ( !( (keyclust.second).wasSeed() ) ) {
                     (keyclust.second).getPoint( point , errors );
                     zpos_id[ point[2] ] = keyclust.first;
-                } //if lower z coordinate
+                } //if not been a seed before
             } //go through clusterLog_
             
             std::map< const double , unsigned int >::iterator seed_it = zpos_id.begin();
