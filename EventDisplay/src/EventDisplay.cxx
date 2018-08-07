@@ -27,15 +27,10 @@ namespace ldmx {
         TGHorizontalFrame* commandFrame9 = new TGHorizontalFrame(contents, 100,0);
         TGHorizontalFrame* commandFrame10 = new TGHorizontalFrame(contents, 100,0);
         TGHorizontalFrame* commandFrame11 = new TGHorizontalFrame(contents, 100,0);
-        TGHorizontalFrame* commandFramecolorhtracks = new TGHorizontalFrame(contents, 100,0);
 
         TGButton* buttonColor = new TGTextButton(commandFrame3, "Color Clusters");
         commandFrame3->AddFrame(buttonColor, new TGLayoutHints(kLHintsExpandX));
         buttonColor->Connect("Pressed()", "ldmx::EventDisplay", this, "ColorClusters()");
-
-        TGButton* buttonColorHcalTracks = new TGTextButton( commandFramecolorhtracks , "Color Hcal Tracks" );
-        commandFramecolorhtracks->AddFrame(buttonColorHcalTracks, new TGLayoutHints(kLHintsExpandX));
-        buttonColorHcalTracks->Connect("Pressed()","ldmx::EventDisplay",this,"ColorHcalTracks()");
 
         TGButton* buttonPrevious = new TGTextButton(commandFrame2, "<<< Previous Event");
         commandFrame2->AddFrame(buttonPrevious, new TGLayoutHints(kLHintsExpandX));
@@ -111,7 +106,6 @@ namespace ldmx {
         contents->AddFrame(commandFrame2, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame3, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->AddFrame(commandFrame6, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
-        contents->AddFrame(commandFramecolorhtracks , new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
         contents->Resize(800, 1200);
 
         AddFrame(contents, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY));
@@ -150,13 +144,13 @@ namespace ldmx {
         hcalDigiHits_ = new TClonesArray("ldmx::HcalHit");
         recoilHits_ = new TClonesArray("ldmx::SimTrackerHit");
         ecalClusters_ = new TClonesArray("ldmx::EcalCluster");
-        hcalTracks_ = new TClonesArray("ldmx::HcalMipTrack");
+        hcalMipTracks_ = new TClonesArray("ldmx::HcalMipTrack");
         ecalSimParticles_ = new TClonesArray("ldmx::SimTrackerHit");
 
         foundECALDigis_ = GetECALDigisColl(ecalDigisCollName_);
         foundHCALDigis_ = GetHCALDigisColl(hcalDigisCollName_);
         foundClusters_ = GetClustersColl(clustersCollName_);
-        foundHcalTracks_ = GetHCALTracksColl(hcalTracksCollName_);
+        foundHcalMipTracks_ = GetHcalMipTracksColl(hcalMipTracksCollName_);
         foundTrackerHits_ = GetTrackerHitsColl(trackerHitsCollName_);
         foundEcalSPHits_ = GetEcalSimParticlesColl(ecalSimParticlesCollName_);
 
@@ -278,13 +272,13 @@ namespace ldmx {
         }
     }
 
-    bool EventDisplay::GetHCALTracksColl(const TString hcalTracksCollName) {
-        if (tree_->GetListOfBranches()->FindObject(hcalTracksCollName)) {
-            tree_->ResetBranchAddress(tree_->GetBranch(hcalTracksCollName_));
-            tree_->SetBranchAddress(hcalTracksCollName, &hcalTracks_);
+    bool EventDisplay::GetHcalMipTracksColl(const TString hcalMipTracksCollName) {
+        if (tree_->GetListOfBranches()->FindObject(hcalMipTracksCollName)) {
+            tree_->ResetBranchAddress(tree_->GetBranch(hcalMipTracksCollName_));
+            tree_->SetBranchAddress(hcalMipTracksCollName, &hcalMipTracks_);
             return true;
         } else {
-            std::cout << "No branch with name \"" << hcalTracksCollName << "\"" << std::endl;
+            std::cout << "No branch with name \"" << hcalMipTracksCollName << "\"" << std::endl;
             return false;
         }
     }
@@ -340,8 +334,8 @@ namespace ldmx {
             eventObjects_->drawECALClusters(ecalClusters_);
         }
 
-        if (foundHcalTracks_) {
-            eventObjects_->drawHCALTracks(hcalTracks_);
+        if (foundHcalMipTracks_) {
+            eventObjects_->drawHCALMipTracks(hcalMipTracks_);
         }
 
         if (foundTrackerHits_) {
@@ -386,7 +380,7 @@ namespace ldmx {
         foundECALDigis_ = GetECALDigisColl(ecalDigisCollName_);
         foundHCALDigis_ = GetHCALDigisColl(hcalDigisCollName_);
         foundClusters_ = GetClustersColl(clustersCollName_);
-        foundHcalTracks_ = GetHCALTracksColl(hcalTracksCollName_);
+        foundHcalMipTracks_ = GetHcalMipTracksColl(hcalMipTracksCollName_);
         foundTrackerHits_ = GetTrackerHitsColl(trackerHitsCollName_);
         foundEcalSPHits_ = GetEcalSimParticlesColl(ecalSimParticlesCollName_);
 
@@ -413,14 +407,6 @@ namespace ldmx {
     void EventDisplay::ColorClusters() {
 
         eventObjects_->ColorClusters();
-
-        manager_->RegisterRedraw3D();
-        manager_->FullRedraw3D(kFALSE, kTRUE);
-    }
-
-    void EventDisplay::ColorHcalTracks() {
-        
-        eventObjects_->ColorHcalTracks();
 
         manager_->RegisterRedraw3D();
         manager_->FullRedraw3D(kFALSE, kTRUE);

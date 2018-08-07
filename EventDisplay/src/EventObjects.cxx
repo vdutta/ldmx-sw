@@ -16,7 +16,7 @@ namespace ldmx {
         hcalHits_ = new TEveElementList("HCAL RecHits");
         recoilTrackerHits_ = new TEveElementList("Recoil Sim Hits");
         ecalClusters_ = new TEveElementList("ECAL Clusters");
-        hcalTracks_ = new TEveElementList("HCAL Tracks");
+        hcalMipTracks_ = new TEveElementList("HCAL MIP Tracks");
         ecalSimParticles_ = new TEveElementList("ECAL SP Sim Particles");
         hits_ = new TEveElementList("Reco Hits");
         recoObjs_ = new TEveElementList("Reco Objects");
@@ -102,38 +102,6 @@ namespace ldmx {
             }
         }
     }
-
-    void EventObjects::ColorHcalTracks() {
-        
-        TEveElement* tracks = recoObjs_->FindChild("HCAL Tracks");
-        if ( tracks == 0 ) {
-            std::cout << "No hcal tracks to color!" << std::endl;
-            return;
-        }
-
-        int color_i = 0;
-        TEveElement::List_i track;
-        for ( track = tracks->BeginChildren(); track != tracks->EndChildren(); track++ ) {
-            
-            //choose color
-            Int_t color = 0;
-            if ( color_i < hcaltrackcolors_.size() ) {
-                color = hcaltrackcolors_[color_i];
-                color_i++;
-            } else {
-                color = kBlack;
-            }
-
-            //go through hits in track, change color and set transparency to zero
-            TEveElement::List_i hit;
-            for (hit = (*track)->BeginChildren(); hit != (*track)->EndChildren(); hit++) {
-                TEveElement* trackChild = *hit;
-                trackChild->SetMainColor(color);
-                trackChild->SetMainTransparency(0);
-            } //iterate through hits in track (hit)
-
-        } //iterate through tracks (track)
-}
 
     void EventObjects::drawECALHits(TClonesArray* hits) {
 
@@ -334,68 +302,48 @@ namespace ldmx {
         recoObjs_->AddElement(ecalClusters_);
     }
 
-    void EventObjects::drawHCALTracks(TClonesArray* tracks) {
+    void EventObjects::drawHCALMipTracks(TClonesArray* tracks) {
         
         //iterate through tracks
-        int iT = 0;
-        ldmx::HcalMipTrack* track;
+        int iT = 0; //current track index
+        ldmx::HcalMipTrack* track; //current track pointer
+        double start_x,start_y,start_z,end_x,end_y,end_z; //current track end points
         for (TIter next(tracks); track = (ldmx::HcalMipTrack*)next();) {
             
-            if ( track == nullptr ) {
+            if ( !track or track->isEmpty() ) {
                 //empty tracks list
                 break;
             }
             
             //construct track, drawing hcal hits
             TString trackname;
-            trackname.Form("Hcal Track %d", iT);
-            TEveElement *trackray = new TEveElementList(trackname);
-            int nhits = track->getNHits();
-            for (int iH = 0; iH < nhits; iH++) {
-                
-                const HcalHit* chit = track->getHit( iH );
-                
-                bool isNoise = (chit->getZ() == 0);
-                
-                int pe = chit->getPE();
-                int bar = chit->getStrip();
-                int layer = chit->getLayer();
-                int section = chit->getSection();
-                TString digiName;
-                digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, chit->getZ());
-    
-                //draw transparent hit (color and transparency will be set in ColorHcalTracks() )
-                TEveBox* hcalDigiHit = 0;
-                if (section == 0) {
-                    if (layer % 2 == 0) {
-                        //horizontal
-                        hcalDigiHit = drawer_->drawBox(chit->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, 0, kTRUE, digiName);
-                    } else {
-                        //vertical, once alternating bar orientation in the back is implemented, uncomment
-                        //hcalDigiHit = drawer_->drawBox((bar_width*(0.5-bar)-hcal_y_width/2), chit->getY(), (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, bar_width, 150, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, 0, kTRUE, digiName);
-                        hcalDigiHit = drawer_->drawBox(chit->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, 0, kTRUE, digiName);
-                    }
-                } else if (section == 1) {hcalDigiHit = drawer_->drawBox(chit->getX(), hcal_ecal_xy/2+hcal_layer_thick*layer, ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, 0, kTRUE, digiName);
-                } else if (section == 3) {hcalDigiHit = drawer_->drawBox((hcal_ecal_xy/2+hcal_layer_thick*layer), chit->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, 0, kTRUE, digiName);
-                } else if (section == 2) {hcalDigiHit = drawer_->drawBox(chit->getX(), -(hcal_ecal_xy/2+hcal_layer_thick*layer), ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, 0, kTRUE, digiName);
-                } else if (section == 4) {hcalDigiHit = drawer_->drawBox(-(hcal_ecal_xy/2+hcal_layer_thick*layer), chit->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, 0, kTRUE, digiName);
-                }
-    
-                if (hcalDigiHit != 0) {
-                    if (isNoise) { hcalDigiHit->SetRnrSelf(0); }
-                    trackray->AddElement(hcalDigiHit);
-                }
-
-            } //iterate through hit list
+            trackname.Form("Hcal MIP Track %d", iT);
             
-            hcalTracks_->SetPickableRecursively(kTRUE);
-            hcalTracks_->AddElement(trackray);
+            start_z = 0.0;
+            end_z = 7000.0;
+            track->evalFit( start_z , start_x , start_y );
+            track->evalFit( end_z   , end_x   , end_y   );
+            
+            double r = pow(pow(end_x-start_x,2) + pow(end_y-start_y,2) + pow(end_z-start_z,2),0.5);
+            
+            TEveArrow *trackray = new TEveArrow( end_x - start_x , end_y - start_y , end_z - start_z ,
+                                                 start_x , start_y , start_z );
+            trackray->SetTubeR(60*0.02/r);
+            trackray->SetConeL(100*0.02/r);
+            trackray->SetConeR(150*0.02/r);
+            if ( iT < hcaltrackcolors_.size() )
+                trackray->SetMainColor( hcaltrackcolors_.at(iT) );
+            else
+                trackray->SetMainColor( kBlack );
+            
+            hcalMipTracks_->SetPickableRecursively(kTRUE);
+            hcalMipTracks_->AddElement(trackray);
             iT++;
         
         } //iterate through tracks in collection (track, iT)
 
         //hcalTracks_->SetPickableRecursively(kTRUE);
-        recoObjs_->AddElement(hcalTracks_);
+        recoObjs_->AddElement(hcalMipTracks_);
         
     }
     

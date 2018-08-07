@@ -57,7 +57,7 @@ namespace ldmx {
 
             void GetEcalSimParticlesCollInput();
 
-            bool GetHCALTracksColl(const TString hcalTracksCollName);
+            bool GetHcalMipTracksColl(const TString hcalTracksCollName);
 
             bool GetHCALDigisColl(const TString hcalDigisCollName);
 
@@ -86,13 +86,13 @@ namespace ldmx {
             TClonesArray* hcalDigiHits_;
             TClonesArray* recoilHits_;
             TClonesArray* ecalClusters_;
-            TClonesArray* hcalTracks_;
+            TClonesArray* hcalMipTracks_;
             TClonesArray* ecalSimParticles_;
 
             bool foundECALDigis_ = false;
             bool foundHCALDigis_ = false;
             bool foundClusters_ = false;
-            bool foundHcalTracks_ = false;
+            bool foundHcalMipTracks_ = false;
             bool foundTrackerHits_ = false;
             bool foundEcalSPHits_ = false;
 
@@ -100,7 +100,7 @@ namespace ldmx {
             int eventNumMax_;
 
             TString clustersCollName_ = "ecalClusters_recon";
-            TString hcalTracksCollName_ = "HcalMipTracks_recon";
+            TString hcalMipTracksCollName_ = "hcalMipTracks_recon";
             TString ecalDigisCollName_ = "ecalDigis_recon";
             TString hcalDigisCollName_ = "hcalDigis_recon";
             TString trackerHitsCollName_ = "RecoilSimHits_sim";

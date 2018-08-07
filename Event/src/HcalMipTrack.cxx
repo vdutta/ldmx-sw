@@ -69,7 +69,7 @@ namespace ldmx {
         return ( dynamic_cast<HcalHit*>(hcalHits_.At(i)) );
     }
 
-    void HcalMipTrack::evalFit( const float z , float &x , float &y ) {
+    void HcalMipTrack::evalFit( const double z , double &x , double &y ) {
         
         zxGr_.Fit( "pol1" , "Q" );
         zyGr_.Fit( "pol1" , "Q" );

@@ -42,15 +42,13 @@ namespace ldmx {
 
             void drawECALClusters(TClonesArray* clusters);
             
-            void drawHCALTracks(TClonesArray* tracks);
+            void drawHCALMipTracks(TClonesArray* tracks);
 
             void drawECALSimParticles(TClonesArray* ecalSimParticles);
 
             void SetSimThresh(double simThresh);
 
             void ColorClusters();
-
-            void ColorHcalTracks();
 
             TEveElement* getECALHits() { return ecalHits_; }
 
@@ -60,7 +58,7 @@ namespace ldmx {
 
             TEveElement* getECALClusters() { return ecalClusters_; }
             
-            TEveElement* getHCALTracks() { return hcalTracks_; }
+            TEveElement* getHCALMipTracks() { return hcalMipTracks_; }
 
             TEveElement* getECALSimParticles() { return ecalSimParticles_; }
 
@@ -74,7 +72,7 @@ namespace ldmx {
             TEveElement* hcalHits_{nullptr};
             TEveElement* recoilTrackerHits_{nullptr};
             TEveElement* ecalClusters_{nullptr};
-            TEveElement* hcalTracks_{nullptr};
+            TEveElement* hcalMipTracks_{nullptr};
             TEveElement* ecalSimParticles_{nullptr};
 
             TEveElement* hits_{nullptr};

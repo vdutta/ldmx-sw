@@ -79,7 +79,7 @@ namespace ldmx {
              * @param x x coordinate to find
              * @param y y coordinate to find
              */
-            void evalFit( const float z , float &x , float &y );
+            void evalFit( const double z , double &x , double &y );
             
             /**
              * Check to see if HcalMipTrack is empty.
