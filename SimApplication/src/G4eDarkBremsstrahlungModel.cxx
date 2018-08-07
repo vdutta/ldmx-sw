@@ -341,8 +341,9 @@ void G4eDarkBremsstrahlungModel::SampleSecondaries(std::vector<G4DynamicParticle
 
    if(lhe_loaded==false)
    {
+      //Read all of the lhe files in the Resources/ directory. Assumes that they are of the correct mass, need to implement method of separating masses (either filenames, or skipping events with incorrect masses).
       DIR *dir;
-      dir = opendir("Resources/");
+      dir = opendir("Resources/"); 
       struct dirent *directory;
       if(dir)
       {
