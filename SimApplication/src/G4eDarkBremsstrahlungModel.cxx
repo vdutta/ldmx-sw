@@ -349,8 +349,9 @@ void G4eDarkBremsstrahlungModel::SampleSecondaries(std::vector<G4DynamicParticle
       {
          while((directory = readdir(dir)) != NULL)
 	 {
-	    std::string fname = "Resources/" + std::string(directory->d_name);
-	    ParseLHE(fname); //Parse LHE files into the data vectors.
+            std::string fname = "Resources/" + std::string(directory->d_name);
+	    //Parse files that end in ".lhe"
+	    if(fname.substr(fname.find_last_of(".")+1) == "lhe") {ParseLHE(fname);}   
 	 }
       }
       MakePlaceholders(); //Setup the placeholder offsets for getting data.
