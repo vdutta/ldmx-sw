@@ -73,6 +73,16 @@ namespace ldmx {
              */
             unsigned int getUID() const { return uID_; }
 
+            /**
+             * Set whether this cluster has been used as a seed
+             */
+            void hasBeenSeed( const bool wasSeed = true ) { wasSeed_ = wasSeed; return; }
+
+            /**
+             * Get whether this cluster has been used as a seed
+             */
+            bool wasSeed() const { return wasSeed_; }
+
         private:
             
             /**
@@ -93,6 +103,9 @@ namespace ldmx {
 
             /** ID that is unique in a single event */
             unsigned int uID_;
+
+            /** Flag to say it has been checked as a seed */
+            bool wasSeed_;
  
             /** Storage vector of pointers to HcalHits */
             std::vector< HcalHit* > hcalHits_;

@@ -30,6 +30,9 @@ namespace ldmx {
 
         setTotalEnergy();
 
+        hasBeenSeed( false );
+
+        return;
     }
 
     void MipCluster::getPoint( std::vector< double > &point , std::vector< double > &errors ) const {
