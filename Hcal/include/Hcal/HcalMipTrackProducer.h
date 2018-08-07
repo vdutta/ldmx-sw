@@ -156,8 +156,11 @@ namespace ldmx {
             /** Log of clusters still being considered for track */
             std::map< unsigned int , MipCluster > clusterLog_;
 
-            /** Pointer to MipCluster to be used as seed for current track building */
-            MipCluster *seedMip_;
+            /** Seed point */
+            std::vector<double> seedPoint_;
+
+            /** Errors aroudn seed point */
+            std::vector<double> seedErrors_;
 
             /** Seed Mip ID */
             unsigned int seedID_;

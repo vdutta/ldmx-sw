@@ -63,17 +63,17 @@ namespace ldmx {
             } //if not noise hit
 
         } //iterate through rawhits (iH)
-
+        std::cout << "Filtered Out Noise Hits" << std::endl;
         clusterHits();
-        
+        std::cout << "Clustered Hits into Mips" << std::endl;
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
         while ( findSeed() and trackcnt < maxTrackCount_ ) {
-            
+            std::cout << "Found seed" << std::endl;
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
                 HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
-                
+                std::cout << "Good Seed" << std::endl;
                 for ( unsigned int mipid : track_mipids ) {
                     numTouchLogs_++;
                     MipCluster* cmip = &clusterLog_[ mipid ];
@@ -97,6 +97,7 @@ namespace ldmx {
 
             } else {
                 //Unable to build a track, mark as bad seed
+                std::cout << "Bad Seed" << std::endl;
                 isGoodSeed_[ seedID_ ] = false;
             }//build or not build a track
 
@@ -141,6 +142,7 @@ namespace ldmx {
                 current_cluster->set(); //calculate real space point
                 if ( isMip( current_cluster ) ) {
                     clusterLog_[ current_cluster->getUID() ] = *current_cluster;
+                    isGoodSeed_[ current_cluster->getUID() ] = true;
                 }//check if mip
                 delete current_cluster;
                 current_cluster = new MipCluster();
@@ -158,6 +160,7 @@ namespace ldmx {
             current_cluster->set();
             if ( isMip( current_cluster ) ) {
                 clusterLog_[ current_cluster->getUID() ] = *current_cluster;
+                isGoodSeed_[ current_cluster->getUID() ] = true;
             }
             delete current_cluster;
             current_cluster = nullptr;
@@ -168,7 +171,8 @@ namespace ldmx {
 
     bool HcalMipTrackProducer::findSeed(  ) {
         
-        seedMip_ = nullptr;
+        seedPoint_.clear();
+        seedErrors_.clear();
         seedID_ = 0;
 
         if ( clusterLog_.size() > minNumClusters_ ) {
@@ -180,14 +184,17 @@ namespace ldmx {
                 numTouchLogs_++;
                 (keyclust.second).getPoint( point , errors );
                 if ( isGoodSeed_[keyclust.first] and point[2] < seed_z ) {
-                    seedMip_ = &(keyclust.second);
+                    std::cout << "Plausible good seed" << std::endl;
+                    seedPoint_ = point;
+                    seedErrors_ = errors;
+                    seed_z = point[2];
                     seedID_ = keyclust.first;
                 } //if lower z coordinate
             } //go through clusterLog_
             
         } //enough clusters in log
 
-        return (seedMip_ != nullptr);
+        return (!seedPoint_.empty());
     }
  
     bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
@@ -195,11 +202,8 @@ namespace ldmx {
         //  no suffix means that it isn't an endpoint
         //  suffice {1,2} means that it is one of the endpoints
         track_mipids.clear();
+        std::cout << "Cleared track" << std::endl;
         
-        //Get seed information
-        std::vector<double> origin, seederrors;
-        seedMip_->getPoint( origin , seederrors );
-
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itEnd, itC; //iterators for map
@@ -214,9 +218,9 @@ namespace ldmx {
                 //calculate line properties 
                 //  (direction, negative direction, smudging factor)
                 std::vector< double > direction( 3 , 0.0 ), negdirection( 3 , 0.0 );
-                std::vector< double > linesmudge( seederrors );
+                std::vector< double > linesmudge( seedErrors_ );
                 for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                    direction[ iC ] = endpoint[iC] - origin[iC];
+                    direction[ iC ] = endpoint[iC] - seedPoint_[iC];
                     negdirection[ iC ] = -1*direction[iC];
     
                     //determine line smudging
@@ -241,16 +245,17 @@ namespace ldmx {
                     }
                     
                     //see if ray hits box on either side of origin along line
-                    if ( rayHitBox( origin , direction    , minBox , maxBox ) or
-                         rayHitBox( origin , negdirection , minBox , maxBox ) ) {
+                    if ( rayHitBox( seedPoint_ , direction    , minBox , maxBox ) or
+                         rayHitBox( seedPoint_ , negdirection , minBox , maxBox ) ) {
                         ctrack_mipids.push_back( itC->first );
                     } 
     
                 } //iterate through all clusters to see if they are in track (itC)
-                
+                std::cout << ctrack_mipids.size() << std::endl;
                 //check if current track is an improvement
                 if ( ctrack_mipids.size() > minNumClusters_ and 
                      ctrack_mipids.size() > track_mipids.size() ) {
+                    std::cout << "Found a good track" << std::endl;
                     track_mipids = ctrack_mipids;
                 }//ctrack is a plausible track and includes more clusters than other track
             
