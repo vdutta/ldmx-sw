@@ -63,17 +63,16 @@ namespace ldmx {
             } //if not noise hit
 
         } //iterate through rawhits (iH)
-        std::cout << "Filtered Out Noise Hits" << std::endl;
+       
         clusterHits();
-        std::cout << "Clustered Hits into Mips" << std::endl;
+        
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
         while ( findSeed() and trackcnt < maxTrackCount_ ) {
-            std::cout << "Found seed" << std::endl;
+            
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
                 HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
-                std::cout << "Good Seed" << std::endl;
                 for ( unsigned int mipid : track_mipids ) {
                     numTouchLogs_++;
                     MipCluster* cmip = &clusterLog_[ mipid ];
@@ -97,7 +96,6 @@ namespace ldmx {
 
             } else {
                 //Unable to build a track, mark as bad seed
-                std::cout << "Bad Seed" << std::endl;
                 isGoodSeed_[ seedID_ ] = false;
             }//build or not build a track
 
@@ -171,6 +169,7 @@ namespace ldmx {
 
     bool HcalMipTrackProducer::findSeed(  ) {
         
+        MipCluster *seedMip = nullptr;
         seedPoint_.clear();
         seedErrors_.clear();
         seedID_ = 0;
@@ -184,7 +183,7 @@ namespace ldmx {
                 numTouchLogs_++;
                 (keyclust.second).getPoint( point , errors );
                 if ( isGoodSeed_[keyclust.first] and point[2] < seed_z ) {
-                    std::cout << "Plausible good seed" << std::endl;
+                    seedMip = &(keyclust.second);
                     seedPoint_ = point;
                     seedErrors_ = errors;
                     seed_z = point[2];
@@ -198,11 +197,8 @@ namespace ldmx {
     }
  
     bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
-        //for clusters:
-        //  no suffix means that it isn't an endpoint
-        //  suffice {1,2} means that it is one of the endpoints
+
         track_mipids.clear();
-        std::cout << "Cleared track" << std::endl;
         
         //iterate through all pairs of points
         HcalMipTrack best_track;
@@ -251,11 +247,10 @@ namespace ldmx {
                     } 
     
                 } //iterate through all clusters to see if they are in track (itC)
-                std::cout << ctrack_mipids.size() << std::endl;
+                
                 //check if current track is an improvement
                 if ( ctrack_mipids.size() > minNumClusters_ and 
                      ctrack_mipids.size() > track_mipids.size() ) {
-                    std::cout << "Found a good track" << std::endl;
                     track_mipids = ctrack_mipids;
                 }//ctrack is a plausible track and includes more clusters than other track
             
