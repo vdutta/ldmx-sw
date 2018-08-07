@@ -31,7 +31,7 @@ namespace ldmx {
      * @brief Producer that reconstructs MIP tracks through the hcal.
      *
      * @note VERY SLOW. Optimization still under way, currently takes
-     *  ~2s PER EVENT to produce the tracks.
+     *  ~3s PER EVENT to produce the tracks.
      */
     class HcalMipTrackProducer : public ldmx::Producer {
         public:
@@ -51,8 +51,7 @@ namespace ldmx {
             virtual void onProcessEnd() {
                 
                 printf( "Mean Time produce    [s]: %f \n", meanTime_produce_/1000 );
-                printf( "Mean Time buildTrack [s]: %f \n" , meanTime_buildTrack_/1000 );
-                printf( "Mean Time anaendpts  [s]: %f \n" , meanTime_anaendpts_/1000 );
+                printf( "Mean Log Touches        : %f \n" , meanNumTouchLogs_ );
 
                 printf( "N Tracks : N Events \n" );
                 for ( auto keyvalpair : numTracksPerEvent_ ) {
@@ -113,15 +112,6 @@ namespace ldmx {
             bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
                              const std::vector<double> minBox , const std::vector<double> maxBox ) const;
             
-            /**
-             * Compares two mip tracks.
-             *
-             * @param track1 considered on the "less than" side
-             * @param track2 considered on the "greather than" side
-             * @return true if track1 is "worse" than track2
-             */
-            bool compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const;
-            
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
 
@@ -160,12 +150,12 @@ namespace ldmx {
 
             /** Record the mean time it takes to produce the tracks */
             double meanTime_produce_;
+            
+            /** Number of accesses to both logs in current event */
+            unsigned long int numTouchLogs_;
 
-            /** buildTrack time */
-            double meanTime_buildTrack_;
-
-            /** analyze end ponts time */
-            double meanTime_anaendpts_;
+            /** Number of accesses to both logs */
+            double meanNumTouchLogs_;
     };
 }
 

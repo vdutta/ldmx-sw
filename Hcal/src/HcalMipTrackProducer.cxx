@@ -33,14 +33,14 @@ namespace ldmx {
         } //minNumClusters_ validation check
         
         meanTime_produce_ = 0.0;
-        meanTime_buildTrack_ = 0.0;
-        meanTime_anaendpts_ = 0.0;
+        meanNumTouchLogs_ = 0.0;
 
         return;
     }
 
     void HcalMipTrackProducer::produce(ldmx::Event& event) {
         
+        numTouchLogs_ = 0;
         std::clock_t start_produce;
         start_produce = std::clock();
 
@@ -49,7 +49,7 @@ namespace ldmx {
         //go through raw hits and ignore noise hits
         int nhits = rawhits->GetEntriesFast();
         for ( int iH = 0; iH < nhits; iH++ ) {
-            
+            numTouchLogs_++;
             HcalHit* chit = dynamic_cast<HcalHit*>(rawhits->At( iH ));
 
             if ( isNotNoise( chit ) ) {
@@ -68,16 +68,12 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        std::clock_t start_buildTrack;
-        start_buildTrack = std::clock();
         while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
-            double time_buildTrack = (std::clock() - start_buildTrack)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
-            meanTime_buildTrack_ = (trackcnt/(double)(trackcnt+1))*meanTime_buildTrack_ + time_buildTrack/(trackcnt+1);
             //store best in collection and delete used mips from log
             HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
             
             for ( unsigned int mipid : track_mipids ) {
-                
+                numTouchLogs_++;
                 MipCluster* cmip = &clusterLog_[ mipid ];
 
                 //add HcalHits to track
@@ -107,6 +103,7 @@ namespace ldmx {
         int ievent = event.getEventHeader()->getEventNumber();
         double time_produce = (std::clock() - start_produce)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
         meanTime_produce_ = ((double)(ievent)/(double)(ievent+1))*meanTime_produce_ + time_produce/(double)(ievent+1);
+        meanNumTouchLogs_ = ((double)(ievent)/(double)(ievent+1))*meanNumTouchLogs_ + numTouchLogs_/(double)(ievent+1);
 
         return;
     }
@@ -126,7 +123,7 @@ namespace ldmx {
         std::map< unsigned int , HcalHit* >::iterator prev_itH = hcalHitLog_.begin();
         MipCluster *current_cluster = new MipCluster();
         for ( itH = hcalHitLog_.begin(); itH != hcalHitLog_.end(); ++itH ) {
-            
+            numTouchLogs_++;
             //itH and prev_itH will both point to hcalHitLog_.begin() on first loop
             unsigned int keydif = itH->first - prev_itH->first;
 
@@ -171,13 +168,10 @@ namespace ldmx {
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itC1, itC2, itC; //iterators for map
-        int loopcnt = 0;
         for ( itC1 = clusterLog_.begin(); itC1 != clusterLog_.end(); ++itC1 ) {
             for ( itC2 = std::next(itC1); itC2 != clusterLog_.end(); ++itC2 ) {
                 //construct track in cylinder
-                std::clock_t start_anaendpts;
-                start_anaendpts = std::clock();
-
+                
                 std::vector< double > point1, point2 , errors1 , errors2;
                 (itC1->second).getPoint( point1 , errors1 );
                 (itC2->second).getPoint( point2 , errors2 );
@@ -199,7 +193,7 @@ namespace ldmx {
                 std::vector< unsigned int > ctrack_mipids; //ids of mip clusters in track
                 //iterate through all clusters to see if they are in track
                 for ( itC = clusterLog_.begin(); itC != clusterLog_.end(); ++itC ) {
-                    
+                    numTouchLogs_++;
                     std::vector< double> point, errors;
                     (itC->second).getPoint( point , errors );
                     
@@ -219,34 +213,11 @@ namespace ldmx {
 
                 } //iterate through all clusters to see if they are in track (itC)
                 
-                //check if plausible track
-                if ( ctrack_mipids.size() > minNumClusters_ ) {
-                    //create fit for ctrack
-                    HcalMipTrack ctrack;
-                    for ( std::vector< unsigned int >::iterator it = ctrack_mipids.begin();
-                        it != ctrack_mipids.end(); ++it ) {
-                        
-                        MipCluster* cmip = &clusterLog_[ *it ];
-                        for ( int i = 0; i < cmip->getNumHits(); i++ ) {
-                            ctrack.addHit( cmip->getHcalHit( i ) );
-                        }//iterate through hits in cluster
-
-                        std::vector<double> point,errors;
-                        cmip->getPoint( point , errors );
-                        ctrack.addPoint( point , errors );
-
-                    } //add clusters with mipids to ctrack
-                    
-                    if ( compMipTracks( best_track , ctrack ) ) {
-                        best_track = ctrack;
-                        track_mipids = ctrack_mipids;
-                    }//ctrack is better than best_track
-
-                }//ctrack is a plausible track
+                //check if current track is an improvement
+                if ( ctrack_mipids.size() > minNumClusters_ and ctrack_mipids.size() > track_mipids.size() ) {
+                    track_mipids = ctrack_mipids;
+                }//ctrack is a plausible track and includes more clusters than other track
                 
-                double time_anaendpts = (std::clock() - start_anaendpts)/(double)( CLOCKS_PER_SEC / 1000 ); //ms
-                meanTime_anaendpts_ = (loopcnt/(double)(loopcnt+1))*meanTime_anaendpts_ + time_anaendpts/(loopcnt+1);
-                loopcnt++;
             } //go through remaining hits as second end point (itC2)
         } //go through all hits as first end point (itC1)
         
@@ -319,19 +290,6 @@ namespace ldmx {
         } //iterate through coordinates (iC)
 
         return true;
-    }
-
-    bool HcalMipTrackProducer::compMipTracks( const HcalMipTrack &track1 , const HcalMipTrack &track2 ) const {
-        
-        bool better = false;
-        if ( track1.isEmpty() ) {
-            better = true;
-        } else {
-            //TEMPORARY
-            better = ( track1.getNHits() < track2.getNHits() );
-        } //if track1 is empty
-
-        return better;
     }
 }
 
