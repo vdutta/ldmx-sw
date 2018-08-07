@@ -53,7 +53,7 @@ namespace ldmx {
                 printf( "\n==========================================\n" );
                 printf( "|HcalMipTrackProducer - Performance Stats|\n");
                 printf( "|========================================|\n");
-                printf( "|Mean Time produce [s]: %-10.8f       |\n", meanTime_produce_/1000 );
+                printf( "|Mean Time produce    : %-10.8fs      |\n", meanTime_produce_/1000 );
                 printf( "|Mean Log Touches     : %-10.2f       |\n" , meanNumTouchLogs_ );
                 printf( "|========================================|\n" );
                 printf( "|          N Tracks : N Events           |\n" );
@@ -90,6 +90,13 @@ namespace ldmx {
              *  to cluster across layers.
              */
             void clusterHits();
+            
+            /**
+             * Finds a seed to construct a track from.
+             *
+             * @return true if successfully found a seed
+             */
+            bool findSeed(  );
 
             /**
              * Finds best track out of the clusters that are left.
@@ -148,6 +155,17 @@ namespace ldmx {
 
             /** Log of clusters still being considered for track */
             std::map< unsigned int , MipCluster > clusterLog_;
+
+            /** Pointer to MipCluster to be used as seed for current track building */
+            MipCluster *seedMip_;
+
+            /** Seed Mip ID */
+            unsigned int seedID_;
+
+            /** Map of MipCluster IDs that are good/bad seeds */
+            std::map< unsigned int , bool > isGoodSeed_;
+
+            // PERFORMANCE TRACKERS
 
             /** Record the number of events that have a certain number of tracks */
             std::map< int , int > numTracksPerEvent_;

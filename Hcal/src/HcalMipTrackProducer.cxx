@@ -68,32 +68,39 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
-        while ( buildTrack( track_mipids ) and trackcnt < maxTrackCount_ ) {
-            //store best in collection and delete used mips from log
-            HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
+        while ( findSeed() and trackcnt < maxTrackCount_ ) {
             
-            for ( unsigned int mipid : track_mipids ) {
-                numTouchLogs_++;
-                MipCluster* cmip = &clusterLog_[ mipid ];
-
-                //add HcalHits to track
-                for ( int i = 0; i < cmip->getNumHits(); i++ ) {
-                    track->addHit( cmip->getHcalHit( i ) );
-                }//iterate through hits in cluster
+            if ( buildTrack( track_mipids ) ) {
+                //able to build track from seed (add to collection) 
+                HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
                 
-                //add real point to track
-                std::vector<double> point, errors;
-                cmip->getPoint( point , errors );
-                track->addPoint( point , errors );
+                for ( unsigned int mipid : track_mipids ) {
+                    numTouchLogs_++;
+                    MipCluster* cmip = &clusterLog_[ mipid ];
+    
+                    //add HcalHits to track
+                    for ( int i = 0; i < cmip->getNumHits(); i++ ) {
+                        track->addHit( cmip->getHcalHit( i ) );
+                    }//iterate through hits in cluster
+                    
+                    //add real point to track
+                    std::vector<double> point, errors;
+                    cmip->getPoint( point , errors );
+                    track->addPoint( point , errors );
+                    
+                    //erase mipid from log
+                    clusterLog_.erase( mipid );
+    
+                } //add clusters with mipids to track
                 
-                //erase mipid from log
-                clusterLog_.erase( mipid );
+                trackcnt++;
 
-            } //add clusters with mipids to track
-            
-            trackcnt++;
+            } else {
+                //Unable to build a track, mark as bad seed
+                isGoodSeed_[ seedID_ ] = false;
+            }//build or not build a track
 
-        } //repeat track construction until no more pairs of clusters
+        } //repeat track construction until no more viable seeds
         
         //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
@@ -158,35 +165,63 @@ namespace ldmx {
 
         return; 
     }
+
+    bool HcalMipTrackProducer::findSeed(  ) {
+        
+        seedMip_ = nullptr;
+        seedID_ = 0;
+
+        if ( clusterLog_.size() > minNumClusters_ ) {
+
+            double seed_z = 100000.0;
+            
+            std::vector< double > point , errors;
+            for ( auto keyclust : clusterLog_ ) {
+                numTouchLogs_++;
+                (keyclust.second).getPoint( point , errors );
+                if ( isGoodSeed_[keyclust.first] and point[2] < seed_z ) {
+                    seedMip_ = &(keyclust.second);
+                    seedID_ = keyclust.first;
+                } //if lower z coordinate
+            } //go through clusterLog_
+            
+        } //enough clusters in log
+
+        return (seedMip_ != nullptr);
+    }
  
     bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
         //for clusters:
         //  no suffix means that it isn't an endpoint
         //  suffice {1,2} means that it is one of the endpoints
         track_mipids.clear();
+        
+        //Get seed information
+        std::vector<double> origin, seederrors;
+        seedMip_->getPoint( origin , seederrors );
 
         //iterate through all pairs of points
         HcalMipTrack best_track;
-        std::map< unsigned int , MipCluster >::iterator itC1, itC2, itC; //iterators for map
-        for ( itC1 = clusterLog_.begin(); itC1 != clusterLog_.end(); ++itC1 ) {
-            for ( itC2 = std::next(itC1); itC2 != clusterLog_.end(); ++itC2 ) {
-                //construct track in cylinder
+        std::map< unsigned int , MipCluster >::iterator itEnd, itC; //iterators for map
+        for ( itEnd = clusterLog_.begin(); itEnd != clusterLog_.end(); ++itEnd ) {
+            
+            if ( itEnd->first != seedID_ ) {
                 
-                std::vector< double > point1, point2 , errors1 , errors2;
-                (itC1->second).getPoint( point1 , errors1 );
-                (itC2->second).getPoint( point2 , errors2 );
+                //construct track in cylinder
+                std::vector< double > endpoint, enderrors;
+                (itEnd->second).getPoint( endpoint , enderrors );
                 
                 //calculate line properties 
-                //  (origin, direction, negative direction, smudging factor)
-                std::vector< double > origin( point1 ), direction( 3 , 0.0 );
-                std::vector< double > negdirection( 3 , 0.0 ), linesmudge( errors1 );
+                //  (direction, negative direction, smudging factor)
+                std::vector< double > direction( 3 , 0.0 ), negdirection( 3 , 0.0 );
+                std::vector< double > linesmudge( seederrors );
                 for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                    direction[ iC ] = point2[iC] - point1[iC];
+                    direction[ iC ] = endpoint[iC] - origin[iC];
                     negdirection[ iC ] = -1*direction[iC];
-
+    
                     //determine line smudging
-                    if ( errors2[iC] < linesmudge[iC] ) {
-                        linesmudge[iC] = errors2[iC];
+                    if ( enderrors[iC] < linesmudge[iC] ) {
+                        linesmudge[iC] = enderrors[iC];
                     }
                 } //space coordinates (iC)
                 
@@ -194,7 +229,7 @@ namespace ldmx {
                 //iterate through all clusters to see if they are in track
                 for ( itC = clusterLog_.begin(); itC != clusterLog_.end(); ++itC ) {
                     numTouchLogs_++;
-                    std::vector< double> point, errors;
+                    std::vector< double > point, errors;
                     (itC->second).getPoint( point , errors );
                     
                     //construct hit box
@@ -210,16 +245,18 @@ namespace ldmx {
                          rayHitBox( origin , negdirection , minBox , maxBox ) ) {
                         ctrack_mipids.push_back( itC->first );
                     } 
-
+    
                 } //iterate through all clusters to see if they are in track (itC)
                 
                 //check if current track is an improvement
-                if ( ctrack_mipids.size() > minNumClusters_ and ctrack_mipids.size() > track_mipids.size() ) {
+                if ( ctrack_mipids.size() > minNumClusters_ and 
+                     ctrack_mipids.size() > track_mipids.size() ) {
                     track_mipids = ctrack_mipids;
                 }//ctrack is a plausible track and includes more clusters than other track
-                
-            } //go through remaining hits as second end point (itC2)
-        } //go through all hits as first end point (itC1)
+            
+            }//make sure origin and end aren't the same
+
+        } //go through remaining hits as end point (itEnd)
         
         return (!track_mipids.empty());
     }
