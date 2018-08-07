@@ -50,13 +50,17 @@ namespace ldmx {
 
             virtual void onProcessEnd() {
                 
-                printf( "Mean Time produce    [s]: %f \n", meanTime_produce_/1000 );
-                printf( "Mean Log Touches        : %f \n" , meanNumTouchLogs_ );
-
-                printf( "N Tracks : N Events \n" );
+                printf( "\n==========================================\n" );
+                printf( "|HcalMipTrackProducer - Performance Stats|\n");
+                printf( "|========================================|\n");
+                printf( "|Mean Time produce [s]: %-10.8f       |\n", meanTime_produce_/1000 );
+                printf( "|Mean Log Touches     : %-10.2f       |\n" , meanNumTouchLogs_ );
+                printf( "|========================================|\n" );
+                printf( "|          N Tracks : N Events           |\n" );
                 for ( auto keyvalpair : numTracksPerEvent_ ) {
-                    printf( "%-8d : %d \n" , keyvalpair.first , keyvalpair.second );
+                    printf( "|%18d : %-19d|\n" , keyvalpair.first , keyvalpair.second );
                 }
+                printf( "==========================================\n" );
 
                 return;
             }
