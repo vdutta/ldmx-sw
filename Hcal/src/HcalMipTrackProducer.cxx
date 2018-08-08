@@ -372,6 +372,15 @@ namespace ldmx {
     bool HcalMipTrackProducer::isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const {
         return ( track_mipids.size() > fracClustersLeft_*clusterLog_.size() );
     }
+
+    void HcalMipTrackProducer::mergeTracks() {
+        
+        //Get End points of each track
+        //Compare slopes
+        //compare starts to ends
+
+        return;
+    }
 }
 
 DECLARE_PRODUCER_NS( ldmx , HcalMipTrackProducer );

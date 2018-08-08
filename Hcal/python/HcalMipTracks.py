@@ -22,7 +22,10 @@ HcalMipTracks.parameters["MaximumEnergy"] = 4000.0
 HcalMipTracks.parameters["MinimumNumClusters"] = 5
 
 # minimum fraction of total number of clusters to continue search
-HcalMipTracks.parameters["FractionTotalClusters"] = 0.3
+HcalMipTracks.parameters["FractionTotalClusters"] = 0.4
 
 # minimum fraction of clusters currently in log to accept track
+#  The higher this fraction is, the slower the algorithm will be
+#  Lower this parameter to speed up algorithm (but then you might
+#  get single tracks splitting into multiple pieces)
 HcalMipTracks.parameters["FractionClustersLeft"] = 0.7

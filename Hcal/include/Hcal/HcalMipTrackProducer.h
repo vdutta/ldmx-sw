@@ -136,6 +136,12 @@ namespace ldmx {
              */
             bool isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const;
 
+            /**
+             * Merge track pieces together. This may or may not alter the list of tracks
+             * depening on if the separate tracks are considered pieces.
+             */
+            void mergeTracks();
+
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
 
