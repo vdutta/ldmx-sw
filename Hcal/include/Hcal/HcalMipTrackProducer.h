@@ -173,8 +173,8 @@ namespace ldmx {
             /** Max distance between end points of two tracks to merge [mm] */
             double maxEndPtDist_;
 
-            /** Maximum difference in slope (magnitude of cross product) of two tracks to merge */
-            double maxSlopeDiff_;
+            /** Maximum difference in slope angles of two tracks to merge */
+            double maxSlopeAngleDiff_;
            
             /** Geometry class instance to calculate transformation between detector id and real space */
             static HcalDetectorGeometry hdg_;

@@ -28,4 +28,10 @@ HcalMipTracks.parameters["FractionTotalClusters"] = 0.4
 #  The higher this fraction is, the slower the algorithm will be
 #  Lower this parameter to speed up algorithm (but then you might
 #  get single tracks splitting into multiple pieces)
-HcalMipTracks.parameters["FractionClustersLeft"] = 0.7
+HcalMipTracks.parameters["FractionClustersLeft"] = 0.5
+
+# maximum distance between end ponts of two tracks to consider merging them [mm]
+HcalMipTracks.parameters["MaximumDistanceBetweenEndPoints"] = 50.0
+
+# maximum angle between slope vectors to allow tracks to merge [rad]
+HcalMipTracks.parameters["MaximumSlopeAngleDifference"] = 0.2

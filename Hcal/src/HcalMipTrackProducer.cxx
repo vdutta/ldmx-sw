@@ -42,7 +42,7 @@ namespace ldmx {
 
         maxEndPtDist_ = ps.getDouble( "MaximumDistanceBetweenEndPoints" );
 
-        maxSlopeDiff_ = ps.getDouble( "MaximumSlopeDifference" );
+        maxSlopeAngleDiff_ = ps.getDouble( "MaximumSlopeAngleDifference" );
 
         meanTime_produce_ = 0.0;
         meanNumTouchLogs_ = 0.0;
@@ -444,7 +444,7 @@ namespace ldmx {
         crossProdMag = sqrt(crossProdMag);
         
         //end points are close, in correct order, and slopes are close
-        if ( ptdist < maxEndPtDist_ and diff[2] > 0.0 and crossProdMag < maxSlopeDiff_ ) {
+        if ( ptdist < maxEndPtDist_ and diff[2] > 0.0 and crossProdMag < sin(maxSlopeAngleDiff_) ) {
             //merge tracks 
             yes = true;    
         } 
