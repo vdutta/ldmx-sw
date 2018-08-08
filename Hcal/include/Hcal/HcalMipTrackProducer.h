@@ -156,8 +156,11 @@ namespace ldmx {
             /** Maximum energy of a cluster to be considered a mip */
             double maxEnergy_;
 
-            /** Fraction of total number of clusters required in track to be considered acceptable */
-            double fracClusters_;
+            /** Fraction of total number of clusters required to find a seed */
+            double fracTotalClusters_;
+
+            /** Fraction of clusters currently in log to consider track acceptable */
+            double fracClustersLeft_;
            
             /** Geometry class instance to calculate transformation between detector id and real space */
             static HcalDetectorGeometry hdg_;
@@ -168,10 +171,7 @@ namespace ldmx {
             /** Log of clusters still being considered for track */
             std::map< unsigned int , MipCluster > clusterLog_;
 
-            /** Total number of clusters before removing any tracks */
-            unsigned int totalNumClusters_;
- 
-            /** Minimum number of clusters in track to be considered acceptable */
+            /** Minimum number of clusters to allow to search for more tracks */
             int minNumClusters_;
 
             /** Seed point */

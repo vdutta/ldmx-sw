@@ -21,5 +21,8 @@ HcalMipTracks.parameters["MaximumEnergy"] = 4000.0
 # minimum number of clusters to be willing to be considered a plausible track
 HcalMipTracks.parameters["MinimumNumClusters"] = 5
 
-# minimum fraction of total number of clusters to accept a track
-HcalMipTracks.parameters["FractionTotalClusters"] = 0.5
+# minimum fraction of total number of clusters to continue search
+HcalMipTracks.parameters["FractionTotalClusters"] = 0.3
+
+# minimum fraction of clusters currently in log to accept track
+HcalMipTracks.parameters["FractionClustersLeft"] = 0.7

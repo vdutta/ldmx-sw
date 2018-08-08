@@ -24,12 +24,20 @@ namespace ldmx {
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
 
-        fracClusters_ = ps.getDouble( "FractionTotalClusters" );
-        
-        if ( fracClusters_ < 0.0 or fracClusters_ > 1.0 ) {
+        fracTotalClusters_ = ps.getDouble( "FractionTotalClusters" );
+
+        if ( fracTotalClusters_ < 0.0 or fracTotalClusters_ > 1.0 ) {
             std::cerr << "[ HcalMipTrackProducer::configure ] : FractionTotalClusters is out of viable range!\n";
             std::cerr << "                                      Must be set within [0,1]\n";
-            fracClusters_ = 0.5;
+            fracTotalClusters_ = 0.2;
+        }
+        
+        fracClustersLeft_ = ps.getDouble( "FractionClustersLeft" );
+        
+        if ( fracClustersLeft_ < 0.0 or fracClustersLeft_ > 1.0 ) {
+            std::cerr << "[ HcalMipTrackProducer::configure ] : FractionClustersLeft is out of viable range!\n";
+            std::cerr << "                                      Must be set within [0,1]\n";
+            fracClustersLeft_ = 0.8;
         }
 
         meanTime_produce_ = 0.0;
@@ -170,8 +178,7 @@ namespace ldmx {
         }
         
         //set the total number of clusters
-        totalNumClusters_ = clusterLog_.size();
-        minNumClusters_ = static_cast<int>( fracClusters_*totalNumClusters_ );
+        minNumClusters_ = static_cast<int>( clusterLog_.size()*fracTotalClusters_ );
 
         return; 
     }
@@ -268,17 +275,17 @@ namespace ldmx {
     
                 } //iterate through all clusters to see if they are in track (itC)
                 
-                //check if current track is an improvement
-                if ( ctrack_mipids.size() > minNumClusters_ and 
+                //check if current track is acceptable and an improvement
+                if ( isAcceptableTrack( ctrack_mipids ) and 
                      ctrack_mipids.size() > track_mipids.size() ) {
                     track_mipids = ctrack_mipids;
-                }//ctrack is a plausible track and includes more clusters than other track
+                }//ctrack is a acceptable and includes more clusters than other track
             
             }//make sure origin and end aren't the same
 
         } //go through remaining hits as end point (itEnd)
         
-        return isAcceptableTrack( track_mipids );
+        return (!track_mipids.empty());
     }
    
     bool HcalMipTrackProducer::rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
@@ -350,7 +357,7 @@ namespace ldmx {
     }
 
     bool HcalMipTrackProducer::isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const {
-        return ( !track_mipids.empty() and track_mipids.size() > minNumClusters_ );
+        return ( track_mipids.size() > fracClustersLeft_*clusterLog_.size() );
     }
 }
 
