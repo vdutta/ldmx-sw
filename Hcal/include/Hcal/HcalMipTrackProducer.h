@@ -110,12 +110,14 @@ namespace ldmx {
             bool buildTrack( std::vector< unsigned int > &track_mipids );
 
             /**
-             * Determine if line (defined by origin and direction) hits the box defined by minimum and maximum corners.
+             * Determine if line (defined by origin and direction) hits the axis-oriented box
+             *  defined by minimum and maximum corners.
              * Assumes all inputs are formatted correctly.
              * This algorithm is the Fast Ray-Box Intersection Algorithm developed by Andrew Woo
              *  from "Graphics Gems", Academic Press, 1990.
-             * This algorithm returns false if ray points away from box (even if the extended line would intersect it),
-             *  so it is suggested to project the ray back to a plane one one side of all boxes and then use an origin there.
+             * This algorithm returns false if ray points away from box
+             *  (even if the extended line would intersect it),
+             *  so it is suggested to check both directions from origin.
              *
              * @param origin originating point of ray
              * @param dir direction vector of ray
@@ -124,7 +126,7 @@ namespace ldmx {
              * @return true if ray hits box
              */
             bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
-                             const std::vector<double> minBox , const std::vector<double> maxBox ) const;
+                            const std::vector<double> minBox , const std::vector<double> maxBox ) const;
             
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;

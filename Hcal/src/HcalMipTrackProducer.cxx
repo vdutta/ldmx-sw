@@ -114,8 +114,10 @@ namespace ldmx {
         
         int ievent = event.getEventHeader()->getEventNumber();
         double time_produce = (std::clock() - start_produce)/(double)(CLOCKS_PER_SEC / 1000 ); //ms
-        meanTime_produce_ = ((double)(ievent)/(double)(ievent+1))*meanTime_produce_ + time_produce/(double)(ievent+1);
-        meanNumTouchLogs_ = ((double)(ievent)/(double)(ievent+1))*meanNumTouchLogs_ + numTouchLogs_/(double)(ievent+1);
+        meanTime_produce_ = ((double)(ievent)/(double)(ievent+1))*meanTime_produce_ +
+            time_produce/(double)(ievent+1);
+        meanNumTouchLogs_ = ((double)(ievent)/(double)(ievent+1))*meanNumTouchLogs_ +
+            numTouchLogs_/(double)(ievent+1);
 
         return;
     }
@@ -192,15 +194,20 @@ namespace ldmx {
             
             std::map< const double , unsigned int >::iterator seed_it = zpos_id.begin();
             
-            if ( useMedian ) {
-                //move seed_it to rough media
-                for ( int i = 0; i < zpos_id.size()/2; i++ )
-                    ++seed_it;
-            }
+            if ( seed_it != zpos_id.end() ) {
+            
+                if ( useMedian ) {
+                    //move seed_it to rough media
+                    for ( int i = 0; i < zpos_id.size()/2; i++ )
+                        ++seed_it;
+                }
+    
+                seedID_ = seed_it->second;
+                clusterLog_.at( seedID_ ).getPoint( seedPoint_ , seedErrors_ );
+                numTouchLogs_++;
 
-            seedID_ = seed_it->second;
-            clusterLog_.at( seedID_ ).getPoint( seedPoint_ , seedErrors_ );
-            numTouchLogs_++;
+            } //zpos_id is not empty
+
         } //enough clusters in log
         std::cout << seedID_ << " ";
         return (!seedPoint_.empty());
