@@ -80,6 +80,7 @@ namespace ldmx {
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
+        int nclustersintracks = 0;
         while ( findSeed( false ) and trackcnt < maxTrackCount_ ) {
             
             if ( buildTrack( track_mipids ) ) {
@@ -101,9 +102,10 @@ namespace ldmx {
                     
                     //erase mipid from log
                     clusterLog_.erase( mipid );
-                    
+
                 } //add clusters with mipids to track
                 
+                nclustersintracks += track_mipids.size();
                 trackcnt++;
 
             } else {
@@ -118,6 +120,17 @@ namespace ldmx {
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
         numTracksPerEvent_[ trackcnt ] ++;
+        
+        if ( meanClustersPerTrack_.count( trackcnt ) < 1 )
+            meanClustersPerTrack_[ trackcnt ] = 0.0;
+        
+        double meanclusters = 0.0;
+        if ( trackcnt > 0 )
+            meanclusters = (double)(nclustersintracks)/(double)(trackcnt);
+        double prev_mean = meanClustersPerTrack_.at(trackcnt);
+        int nevents = numTracksPerEvent_.at( trackcnt );
+        meanClustersPerTrack_[ trackcnt ] = ((double)(nevents-1)/(double)(nevents))*prev_mean +
+            meanclusters/nevents;
         
         int ievent = event.getEventHeader()->getEventNumber();
         double time_produce = (std::clock() - start_produce)/(double)(CLOCKS_PER_SEC / 1000 ); //ms

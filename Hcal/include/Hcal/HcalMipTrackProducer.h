@@ -57,9 +57,10 @@ namespace ldmx {
                 printf( "|Mean Time produce    : %-10.8fs      |\n", meanTime_produce_/1000 );
                 printf( "|Mean Log Touches     : %-10.2f       |\n" , meanNumTouchLogs_ );
                 printf( "|========================================|\n" );
-                printf( "|          N Tracks : N Events           |\n" );
-                for ( auto keyvalpair : numTracksPerEvent_ ) {
-                    printf( "|%18d : %-19d|\n" , keyvalpair.first , keyvalpair.second );
+                printf( "| N Tracks : N Events : Mean N Clusters  |\n" );
+                for ( auto keyval : numTracksPerEvent_ ) {
+                    printf( "|%9d : %-8d : %-16.2f |\n" , 
+                        keyval.first , keyval.second , meanClustersPerTrack_.at(keyval.first) );
                 }
                 printf( "==========================================\n" );
 
@@ -187,6 +188,9 @@ namespace ldmx {
 
             /** Record the number of events that have a certain number of tracks */
             std::map< int , int > numTracksPerEvent_;
+
+            /** Record the number of clusters in each track per event (separated by numTracksPerEvent) */
+            std::map< int , double > meanClustersPerTrack_;
 
             /** Record the mean time it takes to produce the tracks */
             double meanTime_produce_;
