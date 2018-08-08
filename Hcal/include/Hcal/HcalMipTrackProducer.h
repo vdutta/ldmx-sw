@@ -128,6 +128,13 @@ namespace ldmx {
             bool rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
                             const std::vector<double> minBox , const std::vector<double> maxBox ) const;
             
+            /**
+             * Determine if track from the list of mip ids is acceptable.
+             *
+             * @return true if acceptable
+             */
+            bool isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const;
+
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
 
@@ -149,9 +156,9 @@ namespace ldmx {
             /** Maximum energy of a cluster to be considered a mip */
             double maxEnergy_;
 
-            /** Minimum number of clusters in track to be considered for ranking */
-            int minNumClusters_;
-            
+            /** Fraction of total number of clusters required in track to be considered acceptable */
+            double fracClusters_;
+           
             /** Geometry class instance to calculate transformation between detector id and real space */
             static HcalDetectorGeometry hdg_;
 
@@ -160,6 +167,12 @@ namespace ldmx {
 
             /** Log of clusters still being considered for track */
             std::map< unsigned int , MipCluster > clusterLog_;
+
+            /** Total number of clusters before removing any tracks */
+            unsigned int totalNumClusters_;
+ 
+            /** Minimum number of clusters in track to be considered acceptable */
+            int minNumClusters_;
 
             /** Seed point */
             std::vector<double> seedPoint_;

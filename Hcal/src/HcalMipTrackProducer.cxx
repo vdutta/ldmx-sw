@@ -24,14 +24,14 @@ namespace ldmx {
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
 
-        minNumClusters_ = ps.getInteger( "MinimumNumClusters" );
+        fracClusters_ = ps.getDouble( "FractionTotalClusters" );
         
-        //tracks are started with a pair of points, so
-        //  the absolute minimum number of clusters in a track is 2
-        if ( minNumClusters_ < 2 ) {
-            minNumClusters_ = 2;
-        } //minNumClusters_ validation check
-        
+        if ( fracClusters_ < 0.0 or fracClusters_ > 1.0 ) {
+            std::cerr << "[ HcalMipTrackProducer::configure ] : FractionTotalClusters is out of viable range!\n";
+            std::cerr << "                                      Must be set within [0,1]\n";
+            fracClusters_ = 0.5;
+        }
+
         meanTime_produce_ = 0.0;
         meanNumTouchLogs_ = 0.0;
 
@@ -73,7 +73,7 @@ namespace ldmx {
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
         while ( findSeed( false ) and trackcnt < maxTrackCount_ ) {
-            std::cout << "FOUND SEED" << std::endl;
+            
             if ( buildTrack( track_mipids ) ) {
                 //able to build track from seed (add to collection) 
                 HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
@@ -94,19 +94,18 @@ namespace ldmx {
                     //erase mipid from log
                     clusterLog_.erase( mipid );
                     
-                    std::cout << mipid << " ";
                 } //add clusters with mipids to track
-                std::cout << std::endl;
+                
                 trackcnt++;
 
             } else {
-                
+                //unable to build track, mark as bad seed     
                 clusterLog_.at( seedID_ ).hasBeenSeed( true );
 
             } //if able to build track
 
         } //repeat track construction until no more viable seeds
-        std::cout << std::endl;
+        
         //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
         
@@ -169,6 +168,10 @@ namespace ldmx {
             delete current_cluster;
             current_cluster = nullptr;
         }
+        
+        //set the total number of clusters
+        totalNumClusters_ = clusterLog_.size();
+        minNumClusters_ = static_cast<int>( fracClusters_*totalNumClusters_ );
 
         return; 
     }
@@ -209,7 +212,7 @@ namespace ldmx {
             } //zpos_id is not empty
 
         } //enough clusters in log
-        std::cout << seedID_ << " ";
+        
         return (!seedPoint_.empty());
     }
  
@@ -275,7 +278,7 @@ namespace ldmx {
 
         } //go through remaining hits as end point (itEnd)
         
-        return (!track_mipids.empty());
+        return isAcceptableTrack( track_mipids );
     }
    
     bool HcalMipTrackProducer::rayHitBox( const std::vector<double> origin , const std::vector<double> dir , 
@@ -344,6 +347,10 @@ namespace ldmx {
         } //iterate through coordinates (iC)
 
         return true;
+    }
+
+    bool HcalMipTrackProducer::isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const {
+        return ( !track_mipids.empty() and track_mipids.size() > minNumClusters_ );
     }
 }
 
