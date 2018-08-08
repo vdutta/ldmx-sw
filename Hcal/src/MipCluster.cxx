@@ -29,8 +29,9 @@ namespace ldmx {
         setRealPoint();
 
         setTotalEnergy();
-
-        hasBeenSeed( false );
+        
+        //cluster hasn't been checked as a seed yet
+        wasBadSeed( false );
 
         return;
     }

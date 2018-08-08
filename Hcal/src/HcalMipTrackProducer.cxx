@@ -100,7 +100,7 @@ namespace ldmx {
 
             } else {
                 //unable to build track, mark as bad seed     
-                clusterLog_.at( seedID_ ).hasBeenSeed( true );
+                clusterLog_.at( seedID_ ).wasBadSeed();
 
             } //if able to build track
 
@@ -189,7 +189,7 @@ namespace ldmx {
             std::vector< double > point , errors;
             for ( auto keyclust : clusterLog_ ) {
                 numTouchLogs_++;
-                if ( !( (keyclust.second).wasSeed() ) ) {
+                if ( (keyclust.second).isGoodSeed() ) {
                     (keyclust.second).getPoint( point , errors );
                     zpos_id[ point[2] ] = keyclust.first;
                 } //if not been a seed before

@@ -76,12 +76,12 @@ namespace ldmx {
             /**
              * Set whether this cluster has been used as a seed
              */
-            void hasBeenSeed( const bool wasSeed = true ) { wasSeed_ = wasSeed; return; }
+            void wasBadSeed( const bool wasBadSeed = true ) { wasBadSeed_ = wasBadSeed; return; }
 
             /**
-             * Get whether this cluster has been used as a seed
+             * Get whether this cluster is a good seed
              */
-            bool wasSeed() const { return wasSeed_; }
+            bool isGoodSeed() const { return !wasBadSeed_; }
 
         private:
             
@@ -105,7 +105,7 @@ namespace ldmx {
             unsigned int uID_;
 
             /** Flag to say it has been checked as a seed */
-            bool wasSeed_;
+            bool wasBadSeed_;
  
             /** Storage vector of pointers to HcalHits */
             std::vector< HcalHit* > hcalHits_;
