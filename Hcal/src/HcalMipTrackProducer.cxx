@@ -111,20 +111,21 @@ namespace ldmx {
                 } //add clusters with mipids to track
                 
                 //check if track should be merged with a previous track
-                int iT = 0;
-                HcalMipTrack *listedtrack = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( iT ));
-                while ( iT < trackcnt ) {
+                int iT;
+                for ( iT = 0; iT < hcalMipTracks_->GetEntriesFast(); iT++ ) {
+                    HcalMipTrack *listedtrack = (HcalMipTrack *)(hcalMipTracks_->At( iT ));
                     if ( shouldMergeTracks( listedtrack , track ) or
                          shouldMergeTracks( track , listedtrack ) ) {
                         //tracks look like two pieces of one track
+                        // Use current iT for merging
                         break;
                     }
-                    iT++;
-                    listedtrack = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( iT ));
                 }
                 
                 //put newly built track into tclonesarray
                 // this may point to a new HcalMipTrack created at end of TClonesArray or an old one
+                // iT == trackcnt if new
+                HcalMipTrack *listedtrack = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( iT ));
                 listedtrack->merge( track );
                 delete track;
                 
