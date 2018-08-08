@@ -11,7 +11,7 @@ ClassImp( ldmx::HcalMipTrack );
 namespace ldmx {
     
     HcalMipTrack::HcalMipTrack() 
-        : TObject()
+        : TObject() , start_( 3 , 0.0 ), end_( 3 , 0.0 )
           { } 
 
     HcalMipTrack::~HcalMipTrack() {
@@ -42,6 +42,11 @@ namespace ldmx {
         zxGr_.Set( 0 );
         zyGr_.Set( 0 );
 
+        for ( int i = 0; i < 3; i++ ) {
+            start_[i] = 0.0;
+            end_[i] = 0.0;
+        }
+
         return;
     }
  
@@ -68,11 +73,25 @@ namespace ldmx {
     HcalHit* HcalMipTrack::getHit( int i ) const {
         return ( dynamic_cast<HcalHit*>(hcalHits_.At(i)) );
     }
-
-    void HcalMipTrack::evalFit( const double z , double &x , double &y ) {
+    
+    void HcalMipTrack::setFit() {
         
+        zxGr_.Sort();
+        zyGr_.Sort();
+
+        zxGr_.GetPoint( 0 , start_[2] , start_[0] );
+        zyGr_.GetPoint( 0 , start_[2] , start_[1] );
+
+        zxGr_.GetPoint( zxGr_.GetN()-1 , end_[2] , end_[0] );
+        zyGr_.GetPoint( zyGr_.GetN()-1 , end_[2] , end_[1] );
+
         zxGr_.Fit( "pol1" , "Q" );
         zyGr_.Fit( "pol1" , "Q" );
+        
+        return;
+    }
+
+    void HcalMipTrack::evalFit( const double z , double &x , double &y ) const {
         
         TF1 *fitresult;
         fitresult = zxGr_.GetFunction( "pol1" );
@@ -81,6 +100,27 @@ namespace ldmx {
         y = fitresult->Eval( z );
         
         return;
+    }
+
+    void HcalMipTrack::merge( HcalMipTrack *track ) {
+        
+        //add all hits to this track
+        for ( int i = 0; i < track->getNHits(); i++ ) {
+            this->addHit( track->getHit( i ) );
+        }
+
+        TRefArray *zxGrColl = new TRefArray();
+        zxGrColl->Add( (TObject *)(&track->zxGr_) );
+        this->zxGr_.Merge( zxGrColl );
+
+        TRefArray *zyGrColl = new TRefArray();
+        zyGrColl->Add( (TObject *)(&track->zyGr_) );
+        this->zyGr_.Merge( zyGrColl );
+
+        zxGrColl->Delete();
+        zyGrColl->Delete();
+
+        this->setFit();
     }
     
     bool HcalMipTrack::isEmpty() const {

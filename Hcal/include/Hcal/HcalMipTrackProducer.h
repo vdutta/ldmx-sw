@@ -137,10 +137,11 @@ namespace ldmx {
             bool isAcceptableTrack( const std::vector< unsigned int > &track_mipids ) const;
 
             /**
-             * Merge track pieces together. This may or may not alter the list of tracks
-             * depening on if the separate tracks are considered pieces.
+             * Checks if the two tracks should be merged together or not.
+             *
+             * @return true if should be merged
              */
-            void mergeTracks();
+            bool shouldMergeTracks( HcalMipTrack *first , HcalMipTrack *second ) const;
 
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
@@ -168,6 +169,12 @@ namespace ldmx {
 
             /** Fraction of clusters currently in log to consider track acceptable */
             double fracClustersLeft_;
+
+            /** Max distance between end points of two tracks to merge [mm] */
+            double maxEndPtDist_;
+
+            /** Maximum difference in slope (magnitude of cross product) of two tracks to merge */
+            double maxSlopeDiff_;
            
             /** Geometry class instance to calculate transformation between detector id and real space */
             static HcalDetectorGeometry hdg_;

@@ -70,16 +70,37 @@ namespace ldmx {
              * Get hit at a certain index in track.
              */
             HcalHit* getHit( int i ) const; 
+            
+            /**
+             * Fit the TGraphs after sorting them.
+             * Set the start and end points.
+             */
+            void setFit();
 
             /**
-             * Fit the graphs linearly and assign their values
+             * Evaluate the linear fits and assign their values
              *  to the corresponding inputs.
              *
              * @param z z coordinate to evaluate at
              * @param x x coordinate to find
              * @param y y coordinate to find
              */
-            void evalFit( const double z , double &x , double &y );
+            void evalFit( const double z , double &x , double &y ) const;
+
+            /**
+             * Merge the input HcalMipTrack into this HcalMipTrack
+             */
+            void merge( HcalMipTrack * );
+
+            /**
+             * Get Starting point
+             */
+            std::vector<double> getStart() const { return start_; }
+
+            /**
+             * Get Ending Point
+             */
+            std::vector<double> getEnd() const { return end_; }
             
             /**
              * Check to see if HcalMipTrack is empty.
@@ -103,6 +124,12 @@ namespace ldmx {
 
             /** Graph relating z and y coordinates */
             TGraphErrors zyGr_;
+            
+            /** Starting point of track */
+            std::vector<double> start_;
+
+            /** Ending point of track */
+            std::vector<double> end_;
 
             /**
              * ROOT Class Definition

@@ -40,6 +40,10 @@ namespace ldmx {
             fracClustersLeft_ = 0.8;
         }
 
+        maxEndPtDist_ = ps.getDouble( "MaximumDistanceBetweenEndPoints" );
+
+        maxSlopeDiff_ = ps.getDouble( "MaximumSlopeDifference" );
+
         meanTime_produce_ = 0.0;
         meanNumTouchLogs_ = 0.0;
 
@@ -84,8 +88,9 @@ namespace ldmx {
         while ( findSeed( false ) and trackcnt < maxTrackCount_ ) {
             
             if ( buildTrack( track_mipids ) ) {
-                //able to build track from seed (add to collection) 
-                HcalMipTrack *track = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( trackcnt ));
+
+                //able to build track from seed 
+                HcalMipTrack *track = new HcalMipTrack(); 
                 for ( unsigned int mipid : track_mipids ) {
                     numTouchLogs_++;
                     MipCluster* cmip = &clusterLog_[ mipid ];
@@ -105,8 +110,31 @@ namespace ldmx {
 
                 } //add clusters with mipids to track
                 
+                //check if track should be merged with a previous track
+                int iT = 0;
+                HcalMipTrack *listedtrack = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( iT ));
+                while ( iT < trackcnt ) {
+                    if ( shouldMergeTracks( listedtrack , track ) or
+                         shouldMergeTracks( track , listedtrack ) ) {
+                        //tracks look like two pieces of one track
+                        break;
+                    }
+                    iT++;
+                    listedtrack = (HcalMipTrack *)(hcalMipTracks_->ConstructedAt( iT ));
+                }
+                
+                //put newly built track into tclonesarray
+                // this may point to a new HcalMipTrack created at end of TClonesArray or an old one
+                listedtrack->merge( track );
+                delete track;
+                
                 nclustersintracks += track_mipids.size();
-                trackcnt++;
+
+                if ( iT == trackcnt ) {
+                    trackcnt++;
+                } else if ( iT > trackcnt ) {
+                    std::cerr << "[ HcalMipTrackProducer::produce ] : Iterated past the number of tracks!" << std::endl;
+                }
 
             } else {
                 //unable to build track, mark as bad seed     
@@ -373,13 +401,55 @@ namespace ldmx {
         return ( track_mipids.size() > fracClustersLeft_*clusterLog_.size() );
     }
 
-    void HcalMipTrackProducer::mergeTracks() {
-        
-        //Get End points of each track
-        //Compare slopes
-        //compare starts to ends
+    bool HcalMipTrackProducer::shouldMergeTracks( HcalMipTrack *first , HcalMipTrack *secon ) const {
+       
+        bool yes = false;
 
-        return;
+        std::vector<double> firstStart = first->getStart();
+        std::vector<double> firstEnd = first->getEnd();
+        std::vector<double> firstSlope( 3 , 0.0 );
+
+        std::vector<double> seconStart = secon->getStart();
+        std::vector<double> seconEnd = secon->getEnd();
+        std::vector<double> seconSlope( 3 , 0.0 );
+
+        std::vector<double> diff( 3 , 0.0 );
+        double ptdist = 0.0, firstSlopeMag = 0.0, seconSlopeMag = 0.0;
+        for ( int i = 0; i < 3; i++ ) {
+            //vector between first and secon and magnitude
+            diff[i] = seconStart[i] - firstEnd[i];
+            ptdist += diff[i]*diff[i];
+            
+            //slope of first and magnitude
+            firstSlope[i] = firstEnd[i] - firstStart[i];
+            firstSlopeMag += firstSlope[i]*firstSlope[i];
+            
+            //slope of secon and magnitude
+            seconSlope[i] = seconEnd[i] - seconStart[i];
+            seconSlopeMag += seconSlope[i]*seconSlope[i];
+        }
+        
+        double normalize = sqrt( firstSlopeMag * seconSlopeMag );
+        std::vector<double> unitSlope_CrossProd( 3 , 0.0 );
+        double crossProdMag = 0.0;
+        for ( int i = 0; i < 3; i++ ) {
+            
+            int hi =  (i+1) % 3;
+
+            double coordinate_val = (firstSlope[i]*seconSlope[hi])/normalize +
+                (firstSlope[hi]*seconSlope[i])/normalize;
+            
+            crossProdMag += coordinate_val*coordinate_val;
+        }
+        crossProdMag = sqrt(crossProdMag);
+        
+        //end points are close, in correct order, and slopes are close
+        if ( ptdist < maxEndPtDist_ and diff[2] > 0.0 and crossProdMag < maxSlopeDiff_ ) {
+            //merge tracks 
+            yes = true;    
+        } 
+
+        return yes;
     }
 }
 
