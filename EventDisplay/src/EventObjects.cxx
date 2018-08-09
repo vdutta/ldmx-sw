@@ -307,7 +307,6 @@ namespace ldmx {
         //iterate through tracks
         int iT = 0; //current track index
         ldmx::HcalMipTrack* track; //current track pointer
-        double start_x,start_y,start_z,end_x,end_y,end_z; //current track end points
         for (TIter next(tracks); track = (ldmx::HcalMipTrack*)next();) {
             
             if ( !track or track->isEmpty() ) {
@@ -319,18 +318,19 @@ namespace ldmx {
             TString trackname;
             trackname.Form("Hcal MIP Track %d", iT);
             
-            start_z = 0.0;
-            end_z = 7000.0;
-            track->evalFit( start_z , start_x , start_y );
-            track->evalFit( end_z   , end_x   , end_y   );
+            std::vector<double> start , end;
+            track->setFit();
+            start = track->getStart();
+            end = track->getEnd();
             
-            double r = pow(pow(end_x-start_x,2) + pow(end_y-start_y,2) + pow(end_z-start_z,2),0.5);
+            double r = pow(pow(end[0]-start[0],2) + pow(end[1]-start[1],2) + pow(end[2]-start[2],2),0.5);
             
-            TEveArrow *trackray = new TEveArrow( end_x - start_x , end_y - start_y , end_z - start_z ,
-                                                 start_x , start_y , start_z );
-            trackray->SetTubeR(60*0.02/r);
-            trackray->SetConeL(100*0.02/r);
-            trackray->SetConeR(150*0.02/r);
+            TEveArrow *trackray = new TEveArrow( end[0] - start[0] , end[1] - start[1] , end[2] - start[2] ,
+                                                 start[0] , start[1] , start[2] );
+            double scale = 0.5;
+            trackray->SetTubeR(60*scale/r);
+            trackray->SetConeL(200*scale/r);
+            trackray->SetConeR(150*scale/r);
             if ( iT < hcaltrackcolors_.size() )
                 trackray->SetMainColor( hcaltrackcolors_.at(iT) );
             else
