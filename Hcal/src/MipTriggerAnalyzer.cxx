@@ -23,10 +23,21 @@ namespace ldmx {
         const TClonesArray *triggers = event.getCollection( "Trigger" , hcalMipTriggerPassName_ );
         
         //get hcal mip trigger
-        const TriggerResult *hcalMipTrigger = 
-            (const TriggerResult *)(triggers->FindObject( hcalMipTriggerObjectName_.c_str() ));
+        int ntriggers = triggers->GetEntriesFast();
+        const TriggerResult *hcalMipTrigger;
+        for ( int i = 0; i < ntriggers; i++ ) {
+            hcalMipTrigger = (const TriggerResult *)(triggers->At(i));
+            if ( hcalMipTrigger->getName() == hcalMipTriggerObjectName_ )
+                break;
+        }
         
-        hTracksPerEvent_->Fill( hcalMipTrigger->getAlgoVar4() );
+        if ( hcalMipTrigger ) {
+            hTracksPerEvent_->Fill( hcalMipTrigger->getAlgoVar4() );
+        } else {
+            std::cerr << hcalMipTriggerObjectName_ << " was not found in Trigger Collection in pass ";
+            std::cerr << hcalMipTriggerPassName_ << std::endl;
+        }
+
         return;
     }
 
