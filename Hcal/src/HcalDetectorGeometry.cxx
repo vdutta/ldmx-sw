@@ -77,7 +77,8 @@ namespace ldmx {
             point[2] = zeroLayer_.at( section ) + layercenter;
             errs[2] = elayer;
             
-            if ( ( (layer ^ parityVertical_) & 1) == 0 ) { //checks for same parity
+            //only horizontal layers implemented currently
+            if ( true ) { //( (layer ^ parityVertical_) & 1) == 0 ) { //checks for same parity
                 //Vertical Layers
                 
                 point[0] = zeroStrip_.at( section ) + stripcenter;
