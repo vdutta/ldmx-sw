@@ -59,6 +59,13 @@ namespace ldmx {
              */
             G4UIcmdWithAString* boundCmd_{nullptr};
 
+            /**
+             * Command used to specify the number of incident electrons. The 
+             * biasing code requires the number of electrons in order to 
+             * apply the filtering to the biased track.
+             */
+            G4UIcmdWithAString* nElectronsCmd_{nullptr}; 
+
 
     }; // EcalProcessFilterMessenger
 }
