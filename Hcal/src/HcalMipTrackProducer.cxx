@@ -115,8 +115,7 @@ namespace ldmx {
                 int iT;
                 for ( iT = 0; iT < hcalMipTracks_->GetEntriesFast(); iT++ ) {
                     HcalMipTrack *listedtrack = (HcalMipTrack *)(hcalMipTracks_->At( iT ));
-                    if ( shouldMergeTracks( listedtrack , track ) or
-                         shouldMergeTracks( track , listedtrack ) ) {
+                    if ( shouldMergeTracks( listedtrack , track ) ) {
                         //tracks look like two pieces of one track
                         // Use current iT for merging
                         break;
