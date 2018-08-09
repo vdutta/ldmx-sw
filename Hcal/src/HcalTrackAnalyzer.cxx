@@ -43,7 +43,7 @@ namespace ldmx {
  
         getHistoDirectory();
         
-        hTracksPerEvent_ = new TH1F( "h_tracksperevent_" , "Tracks Per Event" ,
+        hTracksPerEvent_ = new TH1F( "hTracksPerEvent_" , "Tracks Per Event" ,
             5 , -0.5 , 4.5 );
         
         hClustersPerTrack_ = new TH1F( "hClustersPerTrack_" , "MIP Clusters Per Track" ,
