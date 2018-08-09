@@ -12,7 +12,7 @@
 #include <map> //cluster and hit logs
 #include <set> //set of bad seed ids
 #include <iterator> //std::prev
-#include <cmath> //sqrt and abs
+#include <cmath> //sqrt, abs, asin
 #include <iostream> //cerr and cout
 #include <ctime> //timing produce function
 
@@ -138,6 +138,14 @@ namespace ldmx {
 
             /**
              * Checks if the two tracks should be merged together or not.
+             * If the two tracks direction vectors have an angle between them that is 
+             *  smaller than the input parameter, the two tracks are merged.
+             *
+             * Uses cross product to calculate angle between tracks (theta):
+             *  |first x second| = |first||second|sin(theta)
+             *  theta = asin( | first x second | / |first||second| )
+             *
+             * Compares abs(theta) to input parameter.
              *
              * @return true if should be merged
              */
@@ -170,12 +178,9 @@ namespace ldmx {
             /** Fraction of clusters currently in log to consider track acceptable */
             double fracClustersLeft_;
 
-            /** Max distance between end points of two tracks to merge [mm] */
-            double maxEndPtDist_;
-
             /** Maximum difference in slope angles of two tracks to merge */
             double maxSlopeAngleDiff_;
-           
+
             /** Geometry class instance to calculate transformation between detector id and real space */
             static HcalDetectorGeometry hdg_;
 

@@ -40,8 +40,6 @@ namespace ldmx {
             fracClustersLeft_ = 0.8;
         }
 
-        maxEndPtDist_ = ps.getDouble( "MaximumDistanceBetweenEndPoints" );
-
         maxSlopeAngleDiff_ = ps.getDouble( "MaximumSlopeAngleDifference" );
 
         meanTime_produce_ = 0.0;
@@ -109,6 +107,9 @@ namespace ldmx {
                     clusterLog_.erase( mipid );
 
                 } //add clusters with mipids to track
+                
+                //construct fit so we can compare to previous tracks for merging
+                track->setFit();
                 
                 //check if track should be merged with a previous track
                 int iT;
@@ -414,12 +415,8 @@ namespace ldmx {
         std::vector<double> seconEnd = secon->getEnd();
         std::vector<double> seconSlope( 3 , 0.0 );
 
-        std::vector<double> diff( 3 , 0.0 );
-        double ptdist = 0.0, firstSlopeMag = 0.0, seconSlopeMag = 0.0;
+        double firstSlopeMag(0.0), seconSlopeMag(0.0);
         for ( int i = 0; i < 3; i++ ) {
-            //vector between first and secon and magnitude
-            diff[i] = seconStart[i] - firstEnd[i];
-            ptdist += diff[i]*diff[i];
             
             //slope of first and magnitude
             firstSlope[i] = firstEnd[i] - firstStart[i];
@@ -430,24 +427,24 @@ namespace ldmx {
             seconSlopeMag += seconSlope[i]*seconSlope[i];
         }
         
-        double normalize = sqrt( firstSlopeMag * seconSlopeMag );
-        std::vector<double> unitSlope_CrossProd( 3 , 0.0 );
         double crossProdMag = 0.0;
         for ( int i = 0; i < 3; i++ ) {
             
             int hi =  (i+1) % 3;
 
-            double coordinate_val = (firstSlope[i]*seconSlope[hi])/normalize +
-                (firstSlope[hi]*seconSlope[i])/normalize;
+            double coordinate_val = (firstSlope[i]*seconSlope[hi]) +
+                (firstSlope[hi]*seconSlope[i]);
             
             crossProdMag += coordinate_val*coordinate_val;
         }
-        crossProdMag = sqrt(crossProdMag);
+        crossProdMag = sqrt(crossProdMag/(firstSlopeMag*seconSlopeMag));
         
-        //end points are close, in correct order, and slopes are close
-        if ( ptdist < maxEndPtDist_ and diff[2] > 0.0 and crossProdMag < sin(maxSlopeAngleDiff_) ) {
+        //check if angle between direction vectors is less than
+        // parameter input by user
+        double angledif = abs(asin( crossProdMag ));
+        if ( angledif < maxSlopeAngleDiff_ ) {
             //merge tracks 
-            yes = true;    
+            yes = true;
         } 
 
         return yes;
