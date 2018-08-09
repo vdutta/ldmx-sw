@@ -11,22 +11,22 @@
 namespace ldmx {
     
     void HcalTrackAnalyzer::configure(const ldmx::ParameterSet& ps) {
-        trackcollname_ = ps.getString( "HcalTrackCollectionName" );
-       
+        
+        hcalMipTracksCollName_ = ps.getString( "HcalMipTracksCollectionName" );
+        hcalMipTracksPassName_ = ps.getString( "HcalMipTracksPassName" );
+
         return;
     }
 
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
        
-        const TClonesArray* tracks = event.getCollection(trackcollname_);
+        const TClonesArray* tracks = event.getCollection( hcalMipTracksCollName_ , hcalMipTracksPassName_ );
         
         int ntracks = tracks->GetEntriesFast();
-        h_tracksperevent_->Fill( ntracks );
+        hTracksPerEvent_->Fill( ntracks );
         for( int iT = 0; iT < ntracks; iT++ ) {
-            if (iT < 3 ) {
-            } else {
-                std::cout << "[ HcalTrackAnalyzer::analyze ]: More than 3 tracks!" << std::endl;
-            }
+            HcalMipTrack *track = (HcalMipTrack *)( tracks->At( iT ));
+            hClustersPerTrack_->Fill( track->getNClusters() );
         } //tracks in event (iT)
         
         //Drop non-interesting events
@@ -43,15 +43,11 @@ namespace ldmx {
  
         getHistoDirectory();
         
-        h_tracksperevent_ = new TH1F( "h_tracksperevent_" , "Tracks Per Event" ,
-            11 , -0.5 , 10.5 );
+        hTracksPerEvent_ = new TH1F( "h_tracksperevent_" , "Tracks Per Event" ,
+            5 , -0.5 , 4.5 );
         
-        for ( int i = 0; i < 3; i++ ) {
-            h_layhitspertrack_[i] = new TH1F( ("h_layhitspertrack_"+std::to_string(i)).c_str() ,
-                ("Layer Hits Per Track "+std::to_string(i)).c_str() ,
-                201 , -0.5 , 200.5 );
-            h_layhitspertrack_[i]->SetLineColor( i+1 );
-        }
+        hClustersPerTrack_ = new TH1F( "hClustersPerTrack_" , "MIP Clusters Per Track" ,
+            120 , 0.0 , 120.0 );
 
         return;
     }

@@ -101,6 +101,10 @@ namespace ldmx {
         
         return;
     }
+    
+    int HcalMipTrack::getNClusters() const {
+        return ( zxGr_.GetN() );
+    }
 
     void HcalMipTrack::merge( HcalMipTrack *track ) {
         

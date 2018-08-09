@@ -88,6 +88,13 @@ namespace ldmx {
             void evalFit( const double z , double &x , double &y ) const;
 
             /**
+             * Get the number of clusters.
+             * The number of clusters is assumed to be equal to the
+             *  number of points in the TGraph.
+             */
+            int getNClusters() const;
+
+            /**
              * Merge the input HcalMipTrack into this HcalMipTrack
              */
             void merge( HcalMipTrack * );

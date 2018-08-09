@@ -47,10 +47,17 @@ namespace ldmx {
 
         private:
             
-            std::string trackcollname_; //* name of the collection of HcalTracks 
+            /** Name of the collection of HcalMipTracks */
+            std::string hcalMipTracksCollName_;
+
+            /** Names of the pass that created the HcalMipTracks */
+            std::string hcalMipTracksPassName_;
             
-            TH1F* h_tracksperevent_; //* number of tracks per event
-            TH1F* h_layhitspertrack_[3]; //* number of layer hits per track, index i is the ith track found in the event
+            /** Number of tracks found per event */
+            TH1F* hTracksPerEvent_;
+
+            /** Number of clusters per track */
+            TH1F* hClustersPerTrack_;
     };
 }
 
