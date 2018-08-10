@@ -9,6 +9,7 @@
 #include "Event/EcalCluster.h"
 #include "Event/SimParticle.h"
 #include "Event/HcalMipTrack.h"
+#include "Hcal/HcalDetectorGeometry.h"
 
 #include "EventDisplay/DetectorGeometry.h"
 #include "EventDisplay/EveShapeDrawer.h"
@@ -80,6 +81,9 @@ namespace ldmx {
 
             EcalHexReadout* hexReadout_{nullptr};
             EveShapeDrawer* drawer_{nullptr};
+            
+            /** class that transforms an HcalHit into a real space coordinate with errors */
+            HcalDetectorGeometry hdg_;
 
             double simThresh_ = 0;
             TRandom r_;
