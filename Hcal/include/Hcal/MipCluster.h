@@ -12,7 +12,7 @@
 
 //LDMX Framework
 #include "DetDescr/HcalID.h" //for the HcalSection enum
-#include "Hcal/HcalDetectorGeometry.h" //to calculate real space coordinates
+#include "Tools/HcalDetectorGeometry.h" //to calculate real space point
 
 namespace ldmx {
     
@@ -95,9 +95,6 @@ namespace ldmx {
              */
             void setRealPoint();
             
-            /** Class instance to help calculate real space coordinates */
-            HcalDetectorGeometry hdg_;
-
             /** The total energy of the MipCluster */
             float totalEnergy_;
 
@@ -106,6 +103,9 @@ namespace ldmx {
 
             /** Flag to say it has been checked as a seed */
             bool wasBadSeed_;
+
+            /** Class instance to calculate real space pont */
+            static HcalDetectorGeometry hdg_;
  
             /** Storage vector of pointers to HcalHits */
             std::vector< HcalHit* > hcalHits_;

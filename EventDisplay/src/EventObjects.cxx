@@ -146,6 +146,7 @@ namespace ldmx {
 
         ldmx::HcalID detID;
         ldmx::HcalHit* hit;
+        ldmx::HcalDetectorGeometry hdg;
 
         TEveRGBAPalette* palette = new TEveRGBAPalette(0,100.0);
 
@@ -178,7 +179,7 @@ namespace ldmx {
             TEveBox* hcalDigiHit = 0;
             
             std::vector<double> boxCenter, boxHalfWidth;
-            hdg_.transformDet2Real( hitVec[i] , boxCenter , boxHalfWidth );
+            hdg.transformDet2Real( hitVec[i] , boxCenter , boxHalfWidth );
 
             hcalDigiHit = drawer_->drawBox( boxCenter[0] , boxCenter[1] , boxCenter[2]-boxHalfWidth[2] ,
                 2*boxHalfWidth[0] , 2*boxHalfWidth[1] , boxCenter[2]+boxHalfWidth[2] ,

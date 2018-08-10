@@ -3,7 +3,7 @@
  * @brief Implementation file for class HcalDetectorGeometry
  */
 
-#include "Hcal/HcalDetectorGeometry.h"
+#include "Tools/HcalDetectorGeometry.h"
 
 namespace ldmx {
     

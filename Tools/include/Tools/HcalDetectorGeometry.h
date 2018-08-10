@@ -4,8 +4,8 @@
  * @brief Header file for class HcalDetectorGeometry
  */
 
-#ifndef HCAL_HCALDETECTORGEOMETRY_H
-#define HCAL_HCALDETECTORGEOMETRY_H
+#ifndef TOOLS_HCALDETECTORGEOMETRY_H
+#define TOOLS_HCALDETECTORGEOMETRY_H
 
 //STL
 #include <map> //storage maps
@@ -86,4 +86,4 @@ namespace ldmx {
     };
 }
 
-#endif /* HCAL_HCALDETECTORGEOMETRY_H */
+#endif /* TOOLS_HCALDETECTORGEOMETRY_H */

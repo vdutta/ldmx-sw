@@ -22,7 +22,6 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/EventConstants.h" //for HcalMipTrack string
 #include "Event/HcalMipTrack.h" //mip track container
-#include "Hcal/HcalDetectorGeometry.h" //calculating real space coordinates
 #include "Hcal/MipCluster.h" //cluster object
 
 namespace ldmx {
@@ -182,9 +181,6 @@ namespace ldmx {
 
             /** Maximum difference in slope angles of two tracks to merge */
             double maxSlopeAngleDiff_;
-
-            /** Geometry class instance to calculate transformation between detector id and real space */
-            static HcalDetectorGeometry hdg_;
 
             /** Log of HcalHits, sorted by section,layer,strip information */
             std::map< unsigned int , HcalHit* > hcalHitLog_;
