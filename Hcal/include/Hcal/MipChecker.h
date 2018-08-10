@@ -43,10 +43,10 @@ namespace ldmx {
         private:
             
             /** Counters for trigger */
-            unsigned int numFalsePos_;
-            unsigned int numTruePos_;
-            unsigned int numFalseNeg_;
-            unsigned int numTrueNeg_;
+            unsigned int numFalsePass_;
+            unsigned int numTruePass_;
+            unsigned int numFalseFail_;
+            unsigned int numTrueFail_;
 
             /** Counters for track */
             unsigned int numWrong_;

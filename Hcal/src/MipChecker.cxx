@@ -10,10 +10,10 @@ namespace ldmx {
 
     void MipChecker::configure(const ldmx::ParameterSet& ps) {
         
-        numFalsePos_ = 0;
-        numTruePos_ = 0;
-        numFalseNeg_ = 0;
-        numTrueNeg_ = 0;
+        numFalsePass_ = 0;
+        numTruePass_ = 0;
+        numFalseFail_ = 0;
+        numTrueFail_ = 0;
 
         numWrong_ = 0;
         numRight_ = 0;
@@ -58,31 +58,44 @@ namespace ldmx {
         bool triggerpass = hcalMipTrigger->passed();
         bool realpass = ( nmuons > 0 );
         if ( triggerpass and realpass)
-            numTruePos_++;
+            numTruePass_++;
         else if ( triggerpass and !realpass )
-            numFalsePos_++;
+            numFalsePass_++;
         else if ( !triggerpass and realpass )
-            numFalseNeg_++;
+            numFalseFail_++;
         else
-            numTrueNeg_++;
+            numTrueFail_++;
+        
+        numEvents_++;
 
         return;
     }
     
     void MipChecker::onProcessEnd() {
         
+        //Percentage
+        double events = numEvents_/100.0;
+
+        double truepass  = (double)(numTruePass_)/events;
+        double falsepass = (double)(numFalsePass_)/events;
+        double falsefail = (double)(numFalseFail_)/events;
+        double truefail  = (double)(numTrueFail_)/events;
+
         printf( "\n==================================\n" );
-        printf( "|                | Mip Trigger   |\n" );
-        printf( "|________________| Pass  | Fail  |\n" );
-        printf( "|Sim        Pass | %5.4f | %5.4f |\n" );
-        printf( "|Particles  Fail | %5.4f | %5.4f |\n" );
+        printf( "|                |  Mip Trigger    |\n" );
+        printf( "|________________| Pass   | Fail   |\n" );
+        printf( "|Sim        Pass | %5.2f%% | %5.2f%% |\n" , truepass , falsefail );
+        printf( "|Particles  Fail | %5.2f%% | %5.2f%% |\n" , falsepass , truefail );
         printf( "==================================\n" );
         
-        printf( "\n===========================\n" );
-        printf( "|     Mip Track Recon     |\n" );
-        printf( "|Right Count | Wrong Count|\n" );
-        printf( "|%11.6f | %11.6f|\n" );
-        printf( "===========================\n" );
+        double right = (double)(numRight_)/events;
+        double wrong = (double)(numWrong_)/events;
+
+        printf( "\n=============================\n" );
+        printf( "|      Mip Track Recon      |\n" );
+        printf( "| Right Count | Wrong Count |\n" );
+        printf( "| %10.6f%% | %10.6f%% |\n" , right , wrong );
+        printf( "=============================\n" );
         
         return;
     }
