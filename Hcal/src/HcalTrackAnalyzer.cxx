@@ -56,7 +56,7 @@ namespace ldmx {
             5 , -0.5 , 4.5 );
         
         hClustersPerTrack_ = new TH1F( "hClustersPerTrack_" , "MIP Clusters Per Track" ,
-            120 , 0.0 , 120.0 );
+            100 , 0.0 , 200.0 );
 
         hStripsInTracks_ = new TH1F( "hStripsInTracks_" , "Strips In Each Track" ,
             50 , 0.0 , 50.0 );
