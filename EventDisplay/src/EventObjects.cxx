@@ -319,7 +319,6 @@ namespace ldmx {
             trackname.Form("Hcal MIP Track %d", iT);
             
             std::vector<double> start , end;
-            track->setFit();
             start = track->getStart();
             end = track->getEnd();
             

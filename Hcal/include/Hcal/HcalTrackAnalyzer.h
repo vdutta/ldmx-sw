@@ -58,6 +58,9 @@ namespace ldmx {
 
             /** Number of clusters per track */
             TH1F* hClustersPerTrack_;
+
+            /** Strips numbers that are in tracks */
+            TH1F* hStripsInTracks_;
     };
 }
 
