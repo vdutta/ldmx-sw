@@ -33,21 +33,21 @@ namespace ldmx {
         zeroLayer_[ HcalSection::LEFT   ] = 525./2.;
         zeroLayer_[ HcalSection::RIGHT  ] = -525./2.;
          
-        zeroStrip_[ HcalSection::BACK   ] = -3100./2.;
+        zeroStrip_[ HcalSection::BACK   ] = -3100./2.; 
         zeroStrip_[ HcalSection::TOP    ] = 200.;
         zeroStrip_[ HcalSection::BOTTOM ] = 200.;
         zeroStrip_[ HcalSection::LEFT   ] = 200.;
         zeroStrip_[ HcalSection::RIGHT  ] = 200.;
 
-        parityVertical_ = 0;
+        parityVertical_ = 1;
 
         uncertaintyTimingPos_ = 200.0;
 
-        thicknessScint_ = 20.0;
+        thicknessScint_ = 20.0; 
 
         widthScint_ = 100.0;
 
-        thicknessLayer_ = 50. + 20. + 2*2.;
+        thicknessLayer_ = 50. + thicknessScint_ + 2*2.; //absorber + scint +2*air
     }
 
     void HcalDetectorGeometry::transformDet2Real( HcalHit* hit ,
@@ -66,11 +66,11 @@ namespace ldmx {
 
         //calculate center of layer,strip with respect to detector section
         double layercenter = (layer + 0.5)*thicknessLayer_;
-        double stripcenter = (strip + 0.5)*thicknessScint_;
+        double stripcenter = (strip + 0.5)*widthScint_;
 
         //calculate error in layer,strip position
         double elayer = 0.5*thicknessLayer_;
-        double estrip = 0.5*thicknessScint_;
+        double estrip = 0.5*widthScint_;
 
         if ( section == HcalSection::BACK ) {
             
