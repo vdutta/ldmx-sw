@@ -13,7 +13,7 @@
 //ROOT
 #include "TRefArray.h" //store pointers to hits
 #include "TObject.h" //inherit from TObject
-#include "TGraphErrors.h" //store points for fit
+#include "TGraphAsymmErrors.h" //store points for fit
 #include "TF1.h" //fitting graphs
 
 //LDMX Framework
@@ -59,7 +59,8 @@ namespace ldmx {
             /**
              * Add point to graphs for fitting.
              */
-            void addPoint( const std::vector<double> &point , const std::vector<double> &errors );
+            void addPoint( const std::vector<double> &min , const std::vector<double> &origin ,
+                           const std::vector<double> &max );
             
             /**
              * Get number of hits in track
@@ -128,10 +129,10 @@ namespace ldmx {
             TRefArray hcalHits_; 
             
             /** Graph relating z and x coordinates */
-            TGraphErrors zxGr_;
+            TGraphAsymmErrors zxGr_;
 
             /** Graph relating z and y coordinates */
-            TGraphErrors zyGr_;
+            TGraphAsymmErrors zyGr_;
             
             /** Starting point of track */
             std::vector<double> start_;

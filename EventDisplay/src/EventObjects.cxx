@@ -178,11 +178,14 @@ namespace ldmx {
 
             TEveBox* hcalDigiHit = 0;
             
-            std::vector<double> boxCenter, boxHalfWidth;
-            hdg.transformDet2Real( hitVec[i] , boxCenter , boxHalfWidth );
+            std::vector<double> boxCenter, boxMin , boxMax;
+            HitBox box = hdg.transformDet2Real( hitVec[i] );
+            boxCenter = box.getOrigin();
+            boxMin = box.getMin();
+            boxMax = box.getMax();
 
-            hcalDigiHit = drawer_->drawBox( boxCenter[0] , boxCenter[1] , boxCenter[2]-boxHalfWidth[2] ,
-                2*boxHalfWidth[0] , 2*boxHalfWidth[1] , boxCenter[2]+boxHalfWidth[2] ,
+            hcalDigiHit = drawer_->drawBox( boxCenter[0] , boxCenter[1] , boxMin[2] ,
+                boxMax[0]-boxMin[0] , boxMax[1]-boxMin[1] , boxMax[2] ,
                 0 , color , 0 , digiName );
 
             if (hcalDigiHit != 0) {

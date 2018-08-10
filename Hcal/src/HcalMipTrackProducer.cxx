@@ -100,9 +100,8 @@ namespace ldmx {
                     }//iterate through hits in cluster
                     
                     //add real point to track
-                    std::vector<double> point, errors;
-                    cmip->getPoint( point , errors );
-                    track->addPoint( point , errors );
+                    HitBox cmip_box = cmip->getBox();
+                    track->addPoint( cmip_box.getMin() , cmip_box.getOrigin() , cmip_box.getMax() );
                     
                     //erase mipid from log
                     clusterLog_.erase( mipid );
@@ -230,19 +229,19 @@ namespace ldmx {
 
     bool HcalMipTrackProducer::findSeed( const bool useMedian ) {
         
-        seedPoint_.clear();
-        seedErrors_.clear();
         seedID_ = 0;
 
         if ( clusterLog_.size() > minNumClusters_ ) {
 
             std::map< const double , unsigned int > zpos_id;
             
-            std::vector< double > point , errors;
+            HitBox mipbox;
+            std::vector<double> point;
             for ( auto keyclust : clusterLog_ ) {
                 numTouchLogs_++;
                 if ( (keyclust.second).isGoodSeed() ) {
-                    (keyclust.second).getPoint( point , errors );
+                    mipbox = (keyclust.second).getBox();
+                    point = mipbox.getOrigin();
                     zpos_id[ point[2] ] = keyclust.first;
                 } //if not been a seed before
             } //go through clusterLog_
@@ -258,20 +257,24 @@ namespace ldmx {
                 }
     
                 seedID_ = seed_it->second;
-                clusterLog_.at( seedID_ ).getPoint( seedPoint_ , seedErrors_ );
+                seedBox_ = clusterLog_.at( seedID_ ).getBox();
                 numTouchLogs_++;
 
             } //zpos_id is not empty
 
         } //enough clusters in log
         
-        return (!seedPoint_.empty());
+        return (seedID_ != 0);
     }
  
     bool HcalMipTrackProducer::buildTrack( std::vector< unsigned int > &track_mipids ) {
 
         track_mipids.clear();
         
+        std::vector< double > seedpoint = seedBox_.getOrigin();
+        std::vector< double > seedmin = seedBox_.getMin();
+        std::vector< double > seedmax = seedBox_.getMax();
+
         //iterate through all pairs of points
         HcalMipTrack best_track;
         std::map< unsigned int , MipCluster >::iterator itEnd, itC; //iterators for map
@@ -280,41 +283,43 @@ namespace ldmx {
             if ( itEnd->first != seedID_ ) {
                 
                 //construct track in cylinder
-                std::vector< double > endpoint, enderrors;
-                (itEnd->second).getPoint( endpoint , enderrors );
-                
+                HitBox endBox = (itEnd->second).getBox();
+                std::vector< double > endpoint = endBox.getOrigin();
+                std::vector< double > endmin = endBox.getMin();
+                std::vector< double > endmax = endBox.getMax();
+
                 //calculate line properties 
                 //  (direction, negative direction, smudging factor)
                 std::vector< double > direction( 3 , 0.0 ), negdirection( 3 , 0.0 );
-                std::vector< double > linesmudge( seedErrors_ );
+                std::vector< double > linesmudge( 3 );
                 for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                    direction[ iC ] = endpoint[iC] - seedPoint_[iC];
+                    direction[ iC ] = endpoint[iC] - seedpoint[iC];
                     negdirection[ iC ] = -1*direction[iC];
-    
-                    //determine line smudging
-                    if ( enderrors[iC] < linesmudge[iC] ) {
-                        linesmudge[iC] = enderrors[iC];
+                    
+                    //determine line smudge
+                    std::vector< double > err_opts;
+                    err_opts.push_back( abs( endpoint[iC] - endmin[iC] ) );
+                    err_opts.push_back( abs( endpoint[iC] - endmax[iC] ) );
+                    err_opts.push_back( abs( seedpoint[iC] - seedmin[iC] ) );
+                    err_opts.push_back( abs( seedpoint[iC] - seedmax[iC] ) );
+                    linesmudge[iC] = err_opts[0];
+                    for ( unsigned int ie = 0; ie < 4; ie++ ) {
+                        if ( err_opts[ie] < linesmudge[iC] )
+                            linesmudge[iC] = err_opts[ie];
                     }
+
                 } //space coordinates (iC)
                 
                 std::vector< unsigned int > ctrack_mipids; //ids of mip clusters in track
                 //iterate through all clusters to see if they are in track
                 for ( itC = clusterLog_.begin(); itC != clusterLog_.end(); ++itC ) {
                     numTouchLogs_++;
-                    std::vector< double > point, errors;
-                    (itC->second).getPoint( point , errors );
                     
-                    //construct hit box
-                    // could add a fudge factor controlled by user
-                    std::vector< double > maxBox( 3 , 0.0 ), minBox( 3 , 0.0 );
-                    for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                        maxBox[iC] = point[iC] + errors[iC] + linesmudge[iC];
-                        minBox[iC] = point[iC] - errors[iC] - linesmudge[iC];
-                    }
+                    HitBox mip_box = (itC->second).getBox();
                     
                     //see if ray hits box on either side of origin along line
-                    if ( rayHitBox( seedPoint_ , direction    , minBox , maxBox ) or
-                         rayHitBox( seedPoint_ , negdirection , minBox , maxBox ) ) {
+                    if ( rayHitBox( seedpoint , direction    , mip_box.getMin() , mip_box.getMax() ) or
+                         rayHitBox( seedpoint , negdirection , mip_box.getMin() , mip_box.getMax() ) ) {
                         ctrack_mipids.push_back( itC->first );
                     } 
     

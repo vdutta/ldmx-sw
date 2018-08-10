@@ -23,6 +23,7 @@
 #include "Event/EventConstants.h" //for HcalMipTrack string
 #include "Event/HcalMipTrack.h" //mip track container
 #include "Hcal/MipCluster.h" //cluster object
+#include "Tools/HitBox.h" //real space representation of MipCluster
 
 namespace ldmx {
     
@@ -191,12 +192,9 @@ namespace ldmx {
             /** Minimum number of clusters to allow to search for more tracks */
             int minNumClusters_;
 
-            /** Seed point */
-            std::vector<double> seedPoint_;
-
-            /** Errors aroudn seed point */
-            std::vector<double> seedErrors_;
-
+            /** Seed cluster box */
+            HitBox seedBox_;
+            
             /** Seed Mip ID */
             unsigned int seedID_;
 

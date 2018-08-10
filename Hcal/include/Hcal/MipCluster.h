@@ -13,6 +13,7 @@
 //LDMX Framework
 #include "DetDescr/HcalID.h" //for the HcalSection enum
 #include "Tools/HcalDetectorGeometry.h" //to calculate real space point
+#include "Tools/HitBox.h" //to represent real space point
 
 namespace ldmx {
     
@@ -61,7 +62,7 @@ namespace ldmx {
             /**
              * Get the real space point and errors in each coordinate.
              */
-            void getPoint( std::vector<double> &point , std::vector<double> &errors ) const;
+            HitBox getBox() const;
 
             /**
              * Set the uniqe event id.
@@ -90,11 +91,6 @@ namespace ldmx {
              */
             void setTotalEnergy();
 
-            /**
-             * Calculate the real space point and errors of the MipCluster.
-             */
-            void setRealPoint();
-            
             /** The total energy of the MipCluster */
             float totalEnergy_;
 
@@ -104,18 +100,19 @@ namespace ldmx {
             /** Flag to say it has been checked as a seed */
             bool wasBadSeed_;
 
-            /** Class instance to calculate real space pont */
-            static HcalDetectorGeometry hdg_;
- 
+            /** Class instance to calculate real space pont 
+             *
+             * Anyone know how to make a self-defined class static?
+             * That would be helpful here so the O(100) different MipClusters
+             * in each event can share one calculator.
+             */
+            HcalDetectorGeometry hdg_;
+
             /** Storage vector of pointers to HcalHits */
             std::vector< HcalHit* > hcalHits_;
 
-            /** Real Space point representing cluster */
-            std::vector< double > point_;
-
-            /** "Error" (more like uncertainty) in each coordinate of the point */
-            std::vector< double > errs_;
-
+            /** Real Space point representing cluster in the form of axis-aligned box */
+            HitBox box_;
     };
 
 }

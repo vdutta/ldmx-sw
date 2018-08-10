@@ -50,16 +50,10 @@ namespace ldmx {
         thicknessLayer_ = 50. + thicknessScint_ + 2*2.; //absorber + scint +2*air
     }
 
-    void HcalDetectorGeometry::transformDet2Real( HcalHit* hit ,
-        std::vector< double > &point , std::vector< double > &errs ) const {
+    HitBox HcalDetectorGeometry::transformDet2Real( HcalHit* hit ) const {
         
-        point.clear();
-        errs.clear();
-        for ( int i = 0; i < 3; i++ ) {
-            point.push_back( 0.0 );
-            errs.push_back( 0.0 );
-        }    
-        
+        HitBox hbox;
+
         HcalSection section = (HcalSection)( hit->getSection() );
         int layer = hit->getLayer();
         int strip = hit->getStrip();
@@ -71,81 +65,74 @@ namespace ldmx {
         //calculate error in layer,strip position
         double elayer = 0.5*thicknessScint_;
         double estrip = 0.5*widthScint_;
-
+        
+        double x,y,z;
         if ( section == HcalSection::BACK ) {
             
-            point[2] = zeroLayer_.at( section ) + layercenter;
-            errs[2] = elayer;
+            z = zeroLayer_.at( section ) + layercenter;
+            hbox.setZ( z - elayer , z , z + elayer ); 
             
             //only horizontal layers implemented currently
             if ( false ) { //( (layer ^ parityVertical_) & 1) == 0 ) { //checks for same parity
                 //Vertical Layers
                 
-                point[0] = zeroStrip_.at( section ) + stripcenter;
-                errs[0] = estrip;
-
-                point[1] = hit->getY();
-                errs[1] = uncertaintyTimingPos_;
+                x = zeroStrip_.at( section ) + stripcenter;
+                hbox.setX( x - estrip , x , x + estrip );
+                
+                y = hit->getY();
+                hbox.setY( y - uncertaintyTimingPos_ , y , y + uncertaintyTimingPos_ );
 
             } else {
                 //Horizontal Layers
                 
-                point[0] = hit->getX();
-                errs[0] = uncertaintyTimingPos_;
+                x = hit->getX();
+                hbox.setX( x - uncertaintyTimingPos_ , x , x + uncertaintyTimingPos_ );
 
-                point[1] = zeroStrip_.at( section ) + stripcenter;
-                errs[1] = estrip;
+                y = zeroStrip_.at( section ) + stripcenter;
+                hbox.setY( y - estrip , y , y + estrip );
 
             } //calculate depending on layer
 
         } else {
             
-            point[2] = zeroStrip_.at( section ) + stripcenter;
-            errs[2] = estrip;
+            z = zeroStrip_.at( section ) + stripcenter;
+            hbox.setZ( z - estrip , z , z + estrip );
 
             if ( section == HcalSection::TOP or section == HcalSection::BOTTOM ) {
                 
-                point[0] = hit->getX();
-                errs[0] = uncertaintyTimingPos_;
+                x = hit->getX();
+                hbox.setX( x - uncertaintyTimingPos_ , x , x + uncertaintyTimingPos_ );
                 
                 if ( section == HcalSection::TOP ) {
-                    point[1] = zeroLayer_.at( section ) + layercenter;
+                    y = zeroLayer_.at( section ) + layercenter;
                 } else {
-                    point[1] = zeroLayer_.at( section ) - layercenter;
+                    y = zeroLayer_.at( section ) - layercenter;
                 } //top or bottom hcal
-                errs[1] = elayer;
+                hbox.setY( y - elayer , y , y + elayer );
                 
             } else if ( section == HcalSection::LEFT or section == HcalSection::RIGHT ) {
                 
-                point[1] = hit->getY();
-                errs[1] = uncertaintyTimingPos_;
+                y = hit->getY();
+                hbox.setY( y - uncertaintyTimingPos_ , y , y + uncertaintyTimingPos_ );
 
                 if ( section == HcalSection::LEFT ) {
-                    point[0] = zeroLayer_.at( section ) + layercenter;
+                    x = zeroLayer_.at( section ) + layercenter;
                 } else {
-                    point[0] = zeroLayer_.at( section ) - layercenter;
+                    x = zeroLayer_.at( section ) - layercenter;
                 } //left or right hcal
-                errs[0] = elayer;
+                hbox.setX( x - elayer , x , x + elayer );
     
             } else {
                 std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknown Hcal Section!" << std::endl;
-                return;
+                return hbox;
             } //side hcal
         
         } //calculate depending on section
 
-        return;
+        return hbox;
     }
     
-    void HcalDetectorGeometry::transformDet2Real( const std::vector<HcalHit*>  &hitVec ,
-        std::vector< double > &point , std::vector< double > &errs ) const {
-        
-        point.clear();
-        errs.clear();
-        for ( int i = 0; i < 3; i++ ) {
-            point.push_back( 0.0 );
-            errs.push_back( 0.0 );
-        }
+    HitBox HcalDetectorGeometry::transformDet2Real( const std::vector<HcalHit*>  &hitVec ) const {
         
         std::vector<double> pointSum( 3 , 0.0 ); //sums of weighted coordinates
         std::vector<double> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
@@ -153,25 +140,34 @@ namespace ldmx {
         //calculate real space point for each hit
         for ( HcalHit* hit : hitVec ) {
             
-            std::vector<double> cpt, cer;
-
-            transformDet2Real( hit , cpt , cer );
+            HitBox box = transformDet2Real( hit );
+            
+            std::vector< double > boxMin, boxOrigin, boxMax;
+            boxMin = box.getMin();
+            boxOrigin = box.getOrigin();
+            boxMax = box.getMax();
             
             //Add weighted values to sums
             double weight;
             for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                weight = 1.0 / ( cer[iC]*cer[iC] );
+                
+                double cer = std::max( abs(boxMax[iC] - boxOrigin[iC]) , 
+                                       abs(boxOrigin[iC] - boxMin[iC]) );
+
+                weight = 1.0 / ( cer*cer );
                 weightSum[ iC ] += weight;
-                pointSum[ iC ] += weight*cpt[iC];
+                pointSum[ iC ] += weight*boxOrigin[iC];
             }
         } //go through hitVec
         
-        //calculate final weighted mean
-        for ( unsigned int iC = 0; iC < 3; iC++ ) {
-            point[iC] = pointSum[iC]/weightSum[iC];
-            errs[iC] = sqrt( 1.0 / weightSum[iC] );
+        //Construct final HitBox
+        HitBox hbox;
+        for ( int iC = 0; iC < 3; iC++ ) {
+            double c = pointSum[ iC ] / weightSum[ iC ];
+            double ec = 1.0 / sqrt( weightSum[ iC ] );
+            hbox.setCoordinate( iC , c - ec , c , c + ec );
         }
 
-        return;
+        return hbox;
     }
 }

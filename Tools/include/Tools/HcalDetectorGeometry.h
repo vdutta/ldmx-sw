@@ -15,6 +15,7 @@
 //LDMX Framework
 #include "DetDescr/HcalID.h" //HcalSection enum
 #include "Event/HcalHit.h" //hit pointer
+#include "Tools/HitBox.h" //return type
 
 namespace ldmx {
     
@@ -34,11 +35,9 @@ namespace ldmx {
              * Calculate real space coordinates from detector location.
              *
              * @param hit HcalHit to find real space hit for
-             * @param point vector that will contain real space point
-             * @param errs vector that will contain errors in each coordinate
+             * @return HitBox in real space
              */
-            void transformDet2Real( HcalHit* hit ,
-                std::vector< double > &point , std::vector< double > &errs ) const;
+            HitBox transformDet2Real( HcalHit* hit ) const;
             
             /**
              * Calculate real space coordinates of a cluster of hits.
@@ -46,11 +45,9 @@ namespace ldmx {
              * Determines cluster's coordinates by a weighted mean of the individuals.
              * 
              * @param hitVec vector of HcalHits to find a "center" for
-             * @param point vector that will contain real space point
-             * @param errs vector that will contain errors in each coordinate
+             * @return HitBox in real space
              */
-            void transformDet2Real( const std::vector< HcalHit* > &hitVec ,
-                std::vector< double > &point , std::vector< double > &errs ) const;
+            HitBox transformDet2Real( const std::vector< HcalHit* > &hitVec ) const;
         
         private:
             /** Number of layers in each section */
