@@ -146,7 +146,6 @@ namespace ldmx {
 
         ldmx::HcalID detID;
         ldmx::HcalHit* hit;
-        ldmx::HcalDetectorGeometry hdg;
 
         TEveRGBAPalette* palette = new TEveRGBAPalette(0,100.0);
 
@@ -179,7 +178,7 @@ namespace ldmx {
             TEveBox* hcalDigiHit = 0;
             
             std::vector<double> boxCenter, boxMin , boxMax;
-            HitBox box = hdg.transformDet2Real( hitVec[i] );
+            HitBox box = HCAL_DETECTOR_GEOMETRY.transformDet2Real( hitVec[i] );
             boxCenter = box.getOrigin();
             boxMin = box.getMin();
             boxMax = box.getMax();

@@ -26,11 +26,12 @@ namespace ldmx {
 
     void MipCluster::set() {
         
-        //hdg_ is meant to contain all relationship between detector coordinates (section, layer, strip)
+        //HCAL_DETECTOR_GEOMETRY
+        // is meant to contain all relationship between detector coordinates (section, layer, strip)
         // and real space coordinates (x,y,z). This allows for there to be only one place where updates
         // to the detector geometry need to be input. Investigate the HcalDetectorGeoemetry class to see
         // about changing how the real space point is calculated from HcalHits.
-        box_ = hdg_.transformDet2Real( hcalHits_ );
+        box_ = HCAL_DETECTOR_GEOMETRY.transformDet2Real( hcalHits_ );
 
         setTotalEnergy();
         

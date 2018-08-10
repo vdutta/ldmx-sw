@@ -81,6 +81,11 @@ namespace ldmx {
             double thicknessLayer_;
            
     };
+
+    /**
+     * Namespace Wide Instance
+     */
+    const HcalDetectorGeometry HCAL_DETECTOR_GEOMETRY;
 }
 
 #endif /* TOOLS_HCALDETECTORGEOMETRY_H */

@@ -100,14 +100,6 @@ namespace ldmx {
             /** Flag to say it has been checked as a seed */
             bool wasBadSeed_;
 
-            /** Class instance to calculate real space pont 
-             *
-             * Anyone know how to make a self-defined class static?
-             * That would be helpful here so the O(100) different MipClusters
-             * in each event can share one calculator.
-             */
-            HcalDetectorGeometry hdg_;
-
             /** Storage vector of pointers to HcalHits */
             std::vector< HcalHit* > hcalHits_;
 
