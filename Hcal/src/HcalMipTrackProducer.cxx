@@ -44,6 +44,7 @@ namespace ldmx {
 
         meanTime_produce_ = 0.0;
         meanNumTouchLogs_ = 0.0;
+        meanClustersIgnored_ = 0.0;
 
         return;
     }
@@ -79,6 +80,8 @@ namespace ldmx {
         } //iterate through rawhits (iH)
         
         clusterHits();
+
+        int totalClusters = clusterLog_.size();
         
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
@@ -147,7 +150,8 @@ namespace ldmx {
         
         //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
-        
+
+        int clustersIgnored = clusterLog_.size() - totalClusters;
         numTracksPerEvent_[ trackcnt ] ++;
         
         if ( meanClustersPerTrack_.count( trackcnt ) < 1 )
@@ -167,6 +171,8 @@ namespace ldmx {
             time_produce/(double)(ievent+1);
         meanNumTouchLogs_ = ((double)(ievent)/(double)(ievent+1))*meanNumTouchLogs_ +
             numTouchLogs_/(double)(ievent+1);
+        meanClustersIgnored_ = ((double)(ievent)/(double)(ievent+1))*meanClustersIgnored_ +
+            clustersIgnored/(double)(ievent+1);
 
         return;
     }

@@ -314,6 +314,8 @@ namespace ldmx {
                 break;
             }
             
+            printf( "N Clusters: %d\n" , track->getNClusters() );
+
             //construct track, drawing hcal hits
             TString trackname;
             trackname.Form("Hcal MIP Track %d", iT);

@@ -96,6 +96,7 @@ namespace ldmx {
 
             /**
              * Merge the input HcalMipTrack into this HcalMipTrack
+             * Re-sets Fit post merge.
              */
             void merge( HcalMipTrack * );
 

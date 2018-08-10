@@ -54,8 +54,10 @@ namespace ldmx {
                 printf( "\n==========================================\n" );
                 printf( "|HcalMipTrackProducer - Performance Stats|\n");
                 printf( "|========================================|\n");
-                printf( "|Mean Time produce    : %-10.8fs      |\n", meanTime_produce_/1000 );
-                printf( "|Mean Log Touches     : %-10.2f       |\n" , meanNumTouchLogs_ );
+                printf( "|                Stat : Mean             |\n");
+                printf( "|        Time produce : %-10.8fs      |\n", meanTime_produce_/1000 );
+                printf( "|         Log Touches : %-10.2f       |\n" , meanNumTouchLogs_ );
+                printf( "|    Clusters Ignored : %-10.2f       |\n" , meanClustersIgnored_ );
                 printf( "|========================================|\n" );
                 printf( "| N Tracks : N Events : Mean N Clusters  |\n" );
                 for ( auto keyval : numTracksPerEvent_ ) {
@@ -218,6 +220,9 @@ namespace ldmx {
 
             /** Number of accesses to both logs */
             double meanNumTouchLogs_;
+
+            /** Number of clusters not included in track */
+            double meanClustersIgnored_;
     };
 }
 
