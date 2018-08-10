@@ -65,11 +65,11 @@ namespace ldmx {
         int strip = hit->getStrip();
 
         //calculate center of layer,strip with respect to detector section
-        double layercenter = (layer + 0.5)*thicknessLayer_;
+        double layercenter = layer*thicknessLayer_ + 0.5*thicknessScint_;
         double stripcenter = (strip + 0.5)*widthScint_;
 
         //calculate error in layer,strip position
-        double elayer = 0.5*thicknessLayer_;
+        double elayer = 0.5*thicknessScint_;
         double estrip = 0.5*widthScint_;
 
         if ( section == HcalSection::BACK ) {
@@ -128,7 +128,7 @@ namespace ldmx {
                 errs[0] = elayer;
     
             } else {
-                std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknow Hcal Section!" << std::endl;
+                std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknown Hcal Section!" << std::endl;
                 return;
             } //side hcal
         
