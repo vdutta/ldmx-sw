@@ -81,8 +81,6 @@ namespace ldmx {
         
         clusterHits();
 
-        int totalClusters = clusterLog_.size();
-        
         std::vector< unsigned int > track_mipids;
         int trackcnt = 0;
         int nclustersintracks = 0;
@@ -94,7 +92,7 @@ namespace ldmx {
                 HcalMipTrack *track = new HcalMipTrack(); 
                 for ( unsigned int mipid : track_mipids ) {
                     numTouchLogs_++;
-                    MipCluster* cmip = &clusterLog_[ mipid ];
+                    MipCluster* cmip = &clusterLog_.at( mipid );
                      
                     //add HcalHits to track
                     for ( int i = 0; i < cmip->getNumHits(); i++ ) {
@@ -151,7 +149,6 @@ namespace ldmx {
         //store collection in event bus
         event.add( hcalMipTracksCollName_ , hcalMipTracks_ ); 
 
-        int clustersIgnored = clusterLog_.size() - totalClusters;
         numTracksPerEvent_[ trackcnt ] ++;
         
         if ( meanClustersPerTrack_.count( trackcnt ) < 1 )
@@ -172,7 +169,7 @@ namespace ldmx {
         meanNumTouchLogs_ = ((double)(ievent)/(double)(ievent+1))*meanNumTouchLogs_ +
             numTouchLogs_/(double)(ievent+1);
         meanClustersIgnored_ = ((double)(ievent)/(double)(ievent+1))*meanClustersIgnored_ +
-            clustersIgnored/(double)(ievent+1);
+            clusterLog_.size()/(double)(ievent+1);
 
         return;
     }
