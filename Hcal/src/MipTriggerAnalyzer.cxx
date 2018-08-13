@@ -14,6 +14,11 @@ namespace ldmx {
 
         hcalMipTriggerPassName_ = ps.getString( "HcalMipTriggerPassName" );
 
+        numFalsePass_ = 0;
+        numTruePass_ = 0;
+        numFalseFail_ = 0;
+        numTrueFail_ = 0;
+
         return;
     }
 
@@ -21,6 +26,8 @@ namespace ldmx {
         
         //get list of triggers
         const TClonesArray *triggers = event.getCollection( "Trigger" , hcalMipTriggerPassName_ );
+        //get list of actual sim particles
+        const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
         
         //get hcal mip trigger
         int ntriggers = triggers->GetEntriesFast();
@@ -36,7 +43,29 @@ namespace ldmx {
         } else {
             std::cerr << hcalMipTriggerObjectName_ << " was not found in Trigger Collection in pass ";
             std::cerr << hcalMipTriggerPassName_ << std::endl;
+            return;
         }
+
+        //count number of actual muons
+        int nmuons = 0;
+        for ( int iP = 0; iP < simparticles->GetEntriesFast(); iP++ ) {
+            SimParticle *simp = (SimParticle *)(simparticles->At(iP));
+            if ( simp->getPdgID() == 13 or simp->getPdgID() == -13 ) {
+                nmuons++;
+            } //if a muon
+        }
+
+        //check accuracy of mip trigger
+        bool triggerpass = hcalMipTrigger->passed();
+        bool realpass = ( nmuons > 0 );
+        if ( triggerpass and realpass)
+            numTruePass_++;
+        else if ( triggerpass and !realpass )
+            numFalsePass_++;
+        else if ( !triggerpass and realpass )
+            numFalseFail_++;
+        else
+            numTrueFail_++;
 
         return;
     }
@@ -47,6 +76,24 @@ namespace ldmx {
 
         hTracksPerEvent_ = new TH1F( "hTracksPerEvent_" , "Tracks Found Per Event" ,
             11 , -0.5 , 10.5 );
+
+        return;
+    }
+
+    void MipTriggerAnalyzer::onProcessEnd() {
+        
+        unsigned int numEvents = numTruePass_+numTrueFail_+numFalsePass_+numTrueFail_;
+        double triggeraccuracy = (numTruePass_ + numTrueFail_)/(double)(numEvents);
+        printf( "\n" );
+        printf( " ===============================\n" );
+        printf( " | Mip Trigger Confusion Table |\n" );
+        printf( " | Mip     ||    Sim Particle  |\n" );
+        printf( " | Trigger ||   Pass | Fail    |\n" );
+        printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
+        printf( " |    Fail ||%7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
+        printf( " |=============================|\n" );
+        printf( " | Accuracy | %-16f |\n" , triggeraccuracy );
+        printf( " ===============================\n" );
 
         return;
     }

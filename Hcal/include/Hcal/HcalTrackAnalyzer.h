@@ -21,6 +21,7 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/Event.h" //Study event by event
 #include "Event/HcalMipTrack.h" //Study hcal tracks
+#include "Event/SimParticle.h"
 
 namespace ldmx {
     
@@ -43,7 +44,7 @@ namespace ldmx {
 
             virtual void onProcessStart(); 
 
-            virtual void onProcessEnd() {}
+            virtual void onProcessEnd();
 
         private:
             
@@ -52,7 +53,10 @@ namespace ldmx {
 
             /** Names of the pass that created the HcalMipTracks */
             std::string hcalMipTracksPassName_;
-            
+
+            /** Counters for track */
+            unsigned int numTracks_[4][4];
+           
             /** Number of tracks found per event */
             TH1F* hTracksPerEvent_;
 

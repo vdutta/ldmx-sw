@@ -16,6 +16,7 @@
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/TriggerResult.h" //studying triggers
+#include "Event/SimParticle.h" //verifying trigger
 
 namespace ldmx {
     
@@ -38,7 +39,7 @@ namespace ldmx {
 
             virtual void onProcessStart(); 
 
-            virtual void onProcessEnd() { }
+            virtual void onProcessEnd();
 
         private:
             
@@ -50,7 +51,14 @@ namespace ldmx {
 
             /** Number of "tracks" found per event */
             TH1F *hTracksPerEvent_;
-    };
+ 
+            /** Counters for trigger */
+            unsigned int numFalsePass_;
+            unsigned int numTruePass_;
+            unsigned int numFalseFail_;
+            unsigned int numTrueFail_;
+
+   };
 }
 
 #endif /* HCAL_MIPTRIGGERANALYZER_H */
