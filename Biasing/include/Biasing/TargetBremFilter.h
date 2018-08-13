@@ -101,6 +101,9 @@ namespace ldmx {
              */
             static std::vector<G4Track*> getBremGammaList() { return bremGammaTracks_; }
 
+            
+            static G4Track* getBiasedBrem() { return biasedBremTrack_; }
+
             /** 
              * Enable/disable killing of the recoil electron track.  If the 
              * recoil track is killed, only the brem gamma is propagated.
@@ -138,7 +141,12 @@ namespace ldmx {
             /** Messenger used to pass arguments to this class. */
             TargetBremFilterMessenger* messenger_{nullptr};
 
-            static std::vector<G4Track*> bremGammaTracks_; 
+            static std::vector<G4Track*> bremGammaTracks_;
+
+            static G4Track* biasedBremTrack_;  
+            
+            /** Pointer to the current track being processed. */
+            G4Track* currentTrack_{nullptr};
 
             /** The volume that the filter will be applied to. */
             G4String volumeName_{"target_PV"};
@@ -151,6 +159,9 @@ namespace ldmx {
 
             /** Flag indicating if the recoil electron track should be killed. */
             bool killRecoilElectron_{false};
+
+            /** Flag indicating whether a candidate brem has been found.*/
+            bool bremCandidateFound_{false}; 
 
 
     }; // TargetBremFilter
