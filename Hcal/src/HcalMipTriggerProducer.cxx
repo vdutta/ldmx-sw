@@ -117,12 +117,8 @@ namespace ldmx {
                 
                 } //startPt and finishPt are not on the same layer
                 
-                float layfrac = static_cast<float>( laycnt ) /
-                    static_cast<float>( nLayersPerOrientation_[ corient ] );
-                
-                if ( layfrac > static_cast<float>(minFracLayersHit_) ) { 
+                if ( laycnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
                     //good track found
-                    //result_.addTrack( track );
                     
                     for ( unsigned int rawID : track ) {
                         hitLog_[ corient ].erase( rawID );
