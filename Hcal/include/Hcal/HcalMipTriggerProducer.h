@@ -55,6 +55,9 @@ namespace ldmx {
 
             virtual void onProcessStart() { } 
 
+            /**
+             * Prints performance trackers
+             */
             virtual void onProcessEnd(); 
 
         private:
@@ -75,7 +78,7 @@ namespace ldmx {
             /**
              * Find end points that haven't been tested before.
              * 
-             * @param orientation HcalOrientation of orientation to search
+             * @param orientation orientation to search
              * @return true if new end points are found
              */
             bool findEndPoints( int orientation );
@@ -91,16 +94,9 @@ namespace ldmx {
                 /** flag if hit could be a good end point */
                 bool isGood;
             };
+                   
+            // INPUT PARAMETERS
 
-            /** Hits sorted by their orientations and stored as their raw IDs */
-            std::map< unsigned int , HitLogNode > hitLog_[6];
-
-            /** Current Starting Point */
-            std::map< unsigned int , HitLogNode >::iterator startPt_;
-
-            /** Current Finish Point */
-            std::map< unsigned int , HitLogNode >::iterator finishPt_;
-            
             /** array of layers in each orientation */
             int nLayersPerOrientation_[6]; 
             
@@ -127,7 +123,18 @@ namespace ldmx {
 
             /** Trigger object to add to event */
             TriggerResult result_;
-            
+
+            // HELPER MEMBER VARIABLES
+         
+            /** Hits sorted by their orientations and stored as their raw IDs */
+            std::map< unsigned int , HitLogNode > hitLog_[6];
+
+            /** Current Starting Point */
+            std::map< unsigned int , HitLogNode >::iterator startPt_;
+
+            /** Current Finish Point */
+            std::map< unsigned int , HitLogNode >::iterator finishPt_;
+    
             // PERFORMANCE TRACKERS
 
             /** Number of Events Passed */

@@ -22,6 +22,8 @@ namespace ldmx {
     /**
      * @class MipChecker
      * @brief Class to compare mip track and trigger producers to actual sim particles.
+     *
+     * Constructs a confusion matrix for the trigger and track reconstruction.
      */
     class MipChecker : public ldmx::Analyzer {
         public:

@@ -31,6 +31,11 @@ namespace ldmx {
      * @class HcalMipTrackProducer
      * @brief Producer that reconstructs MIP tracks through the hcal.
      *
+     * All calculations transforming detector coordinates (section, layer, strip) to
+     * real space coordiantes (x,y,z) are contained in the HcalDetectorGeometry class
+     * in the Tools module. There, a single instance of the class is created in order
+     * to be used across the ldmx namespace. The actual calling of this class is done
+     * in the MipCluster class in this module.
      */
     class HcalMipTrackProducer : public ldmx::Producer {
         public:
@@ -124,13 +129,17 @@ namespace ldmx {
             /**
              * Checks if the two tracks should be merged together or not.
              * If the two tracks direction vectors have an angle between them that is 
-             *  smaller than the input parameter, the two tracks are merged.
+             *  smaller than the input parameter and the distance between one of
+             *  the end points and the other track is smaller than the input parameter, 
+             *  then the tracks are merged.
              *
              * Uses cross product to calculate angle between tracks (theta):
              *  |first x second| = |first||second|sin(theta)
              *  theta = asin( | first x second | / |first||second| )
              *
              * Compares abs(theta) to input parameter.
+             *
+             * @sa distPt2Line
              *
              * @return true if should be merged
              */
@@ -143,6 +152,8 @@ namespace ldmx {
              */
             double distPt2Line( const std::vector<double> &start, const std::vector<double> &dir,
                                 const std::vector<double> &point ) const;
+            
+            // INPUT PARAMETERS
 
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
@@ -176,6 +187,8 @@ namespace ldmx {
 
             /** Maximum distance between two tracks to merge */
             double maxTrackDist_;
+            
+            // HELPER MEMBER VARIABLES
 
             /** Log of HcalHits, sorted by section,layer,strip information */
             std::map< unsigned int , HcalHit* > hcalHitLog_;
