@@ -51,8 +51,7 @@ namespace ldmx {
             unsigned int numTrueFail_;
 
             /** Counters for track */
-            unsigned int numWrong_;
-            unsigned int numRight_;
+            unsigned int numTracks_[4][4];
 
             /** Number simulated events */
             unsigned int numEvents_;

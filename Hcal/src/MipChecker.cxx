@@ -15,8 +15,11 @@ namespace ldmx {
         numFalseFail_ = 0;
         numTrueFail_ = 0;
 
-        numWrong_ = 0;
-        numRight_ = 0;
+        for ( int actual = 0; actual < 4; actual++ ) {
+            for ( int pred = 0; pred < 4; pred++ ) {
+                numTracks_[actual][pred] = 0;
+            }
+        }
 
         numEvents_ = 0;
 
@@ -49,12 +52,9 @@ namespace ldmx {
         } //go through sim particles
         
         //check accuracy of mip track recon
-        if ( miptracks->GetEntriesFast() == nmuons ) {
-            numRight_++;
-        } else {
-            numWrong_++;
-        }
-        
+        if ( nmuons < 4 and miptracks->GetEntriesFast() < 4 )
+            numTracks_[ nmuons ][ miptracks->GetEntriesFast() ] ++;
+
         //check accuracy of mip trigger
         bool triggerpass = hcalMipTrigger->passed();
         bool realpass = ( nmuons > 0 );
@@ -74,25 +74,40 @@ namespace ldmx {
     
     void MipChecker::onProcessEnd() {
         
-        double accuracy = (numTruePass_ + numTrueFail_)/(double)(numEvents_);
+        double triggeraccuracy = (numTruePass_ + numTrueFail_)/(double)(numEvents_);
         printf( "\n" );
-        printf( " ====================================\n" );
-        printf( " |              |    Sim Particle   |\n" );
-        printf( " |--------------|    Pass | Fail    |\n" );
-        printf( " |Mip      Pass | %7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
-        printf( " |Trigger  Fail | %7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
-        printf( " =====================================\n" );
-        printf( " |     Accuracy | %-18f |\n" , accuracy );
+        printf( " ===============================\n" );
+        printf( " | Mip Trigger Confusion Table |\n" );
+        printf( " | Mip     ||    Sim Particle  |\n" );
+        printf( " | Trigger ||   Pass | Fail    |\n" );
+        printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
+        printf( " |    Fail ||%7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
+        printf( " |=============================|\n" );
+        printf( " | Accuracy | %-16f |\n" , triggeraccuracy );
+        printf( " ===============================\n" );
         
-        double right = (double)(numRight_)/events;
-        double wrong = (double)(numWrong_)/events;
-
+        double reconaccuracy = 0.0;
+        for ( int i = 0; i < 4; i++ ) {
+            reconaccuracy += (double)( numTracks_[i][i] );
+        }
+        reconaccuracy /= (double)(numEvents_);
+        
         printf( "\n" );
-        printf( " =============================\n" );
-        printf( " |      Mip Track Recon      |\n" );
-        printf( " | Right Count | Wrong Count |\n" );
-        printf( " | %10.6f%% | %10.6f%% |\n" , right , wrong );
-        printf( " =============================\n" );
+        printf( " ======================================================\n" );
+        printf( " |      Mip Track Reconstruction Confusion Table      |\n" );
+        printf( " | Predicted ||            Actual N Tracks            |\n" );
+        printf( " | N Tracks  ||    0    |    1    |    2    |    3    |\n" );
+        for ( int pred = 0; pred < 4; pred++ ) {
+            
+            printf( " |%10d ||" , pred );
+            for ( int actual = 0; actual < 4; actual++ ) {
+                printf( " %7d |" , numTracks_[ actual ][ pred ] );
+            } //actual number of tracks (actual)
+            printf( "\n" );
+        } //predicted number of tracks (pred)
+        printf( " |====================================================|\n" );
+        printf( " | Accuracy  || %-37f |\n" , reconaccuracy );
+        printf( " ======================================================\n" );
         
         return;
     }
