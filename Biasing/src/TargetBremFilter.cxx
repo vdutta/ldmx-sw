@@ -32,7 +32,7 @@ namespace ldmx {
         //std::cout << "********************************" << std::endl;
 
         // get the PDGID of the track.
-        G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
+        //G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
 
         // Get the particle type.
         G4String particleName = track->GetParticleDefinition()->GetParticleName();

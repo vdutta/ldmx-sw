@@ -66,7 +66,7 @@ namespace ldmx {
         //if (track->GetParentID() != 1) return; 
 
         // get the PDGID of the track.
-        G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
+        //G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
         
         // Get the volume the particle is in.
         G4VPhysicalVolume* volume = track->GetVolume();
@@ -76,7 +76,7 @@ namespace ldmx {
         G4String particleName = track->GetParticleDefinition()->GetParticleName();
         
         // Get the kinetic energy of the particle.
-        double incidentParticleEnergy = step->GetPreStepPoint()->GetTotalEnergy();
+        //double incidentParticleEnergy = step->GetPreStepPoint()->GetTotalEnergy();
 
         /*std::cout << "*******************************" << std::endl; 
         std::cout << "*   Step " << track->GetCurrentStepNumber() << std::endl;
