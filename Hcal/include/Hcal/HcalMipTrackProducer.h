@@ -48,26 +48,11 @@ namespace ldmx {
             virtual void onFileClose() { }
 
             virtual void onProcessStart() { } 
-
-            virtual void onProcessEnd() {
-                
-                printf( "\n ==========================================\n" );
-                printf( " |HcalMipTrackProducer - Performance Stats|\n");
-                printf( " |========================================|\n");
-                printf( " |                Stat : Mean             |\n");
-                printf( " |        Time produce : %-10.8fs      |\n", meanTime_produce_/1000 );
-                printf( " |         Log Touches : %-10.2f       |\n" , meanNumTouchLogs_ );
-                printf( " |    Clusters Ignored : %-10.2f       |\n" , meanClustersIgnored_ );
-                printf( " |========================================|\n" );
-                printf( " | N Tracks : N Events : Mean N Clusters  |\n" );
-                for ( auto keyval : numTracksPerEvent_ ) {
-                    printf( " |%9d : %-8d : %-16.2f |\n" , 
-                        keyval.first , keyval.second , meanClustersPerTrack_.at(keyval.first) );
-                }
-                printf( " ==========================================\n" );
-
-                return;
-            }
+            
+            /**
+             * Prints performance trackers
+             */
+            virtual void onProcessEnd(); 
 
         private:
             
