@@ -51,44 +51,50 @@ namespace ldmx {
 
     void EcalProcessFilter::stepping(const G4Step* step) { 
 
-        if (TargetBremFilter::getBremGammaList().empty()) { 
-            return;
-        } 
-        
         // Get the track associated with this step.
         G4Track* track = step->GetTrack();
 
+        if (TargetBremFilter::getBremGammaList().empty()) { 
+            return;
+        } else if (track != TargetBremFilter::getBiasedBrem()) {
+            currentTrack_ = track;
+            track->SetTrackStatus(fSuspend);
+            return; 
+        }
+
         // Only process tracks whose parent is the primary particle
-        if (track->GetParentID() != 1) return; 
+        //if (track->GetParentID() != 1) return; 
 
         // get the PDGID of the track.
         G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
-
-        // Make sure that the particle being processed is an electron.
-        // TODO: At some point all particle types should be allowed.
-        if (pdgID != 22) return; 
-
+        
         // Get the volume the particle is in.
         G4VPhysicalVolume* volume = track->GetVolume();
         G4String volumeName = volume->GetName();
-
-        /*std::cout << "*******************************" << std::endl;*/ 
-        /*std::cout << "*   Step " << track->GetCurrentStepNumber() << std::endl;*/
-        /*std::cout << "********************************" << std::endl;*/
-        
+ 
         // Get the particle type.
         G4String particleName = track->GetParticleDefinition()->GetParticleName();
         
         // Get the kinetic energy of the particle.
-        //double incidentParticleEnergy = step->GetPreStepPoint()->GetTotalEnergy();
+        double incidentParticleEnergy = step->GetPreStepPoint()->GetTotalEnergy();
 
-        /*std::cout << "[ EcalProcessFilter ]:\n" 
+        /*std::cout << "*******************************" << std::endl; 
+        std::cout << "*   Step " << track->GetCurrentStepNumber() << std::endl;
+        std::cout << "********************************" << std::endl;
+
+        std::cout << "[ EcalProcessFilter ]:\n" 
                     << "\tTotal energy of " << particleName  << ": " << incidentParticleEnergy << " MeV \n"
                     << "\tPDG ID: " << pdgID << "\n"
                     << "\tTrack ID: " << track->GetTrackID() << "\n" 
                     << "\tStep #: " << track->GetCurrentStepNumber() << "\n"
                     << "\tParent ID: " << track->GetParentID() << "\n"
                     << "\tParticle currently in " << volumeName  << std::endl;*/
+
+
+
+        // Make sure that the particle being processed is an electron.
+        // TODO: At some point all particle types should be allowed.
+        //if (pdgID != 22) return; 
 
         // If the particle isn't in the specified volume, stop processing the 
         // event.
@@ -149,7 +155,7 @@ namespace ldmx {
             
             /*std::cout << "[ EcalProcessFilter ]: "
                         << "Brem photon did not interact --> Continue propogating track."
-                        << std::endl;*/    
+                        << std::endl;*/
         
             // If the particle is exiting the bounding volume, kill it.
             if (!boundVolumes_.empty() && step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary) {
@@ -157,7 +163,7 @@ namespace ldmx {
 
                     /*std::cout << "[ EcalProcessFilter ]: "
                                 << "Brem photon is exiting the volume --> particle will be killed or suspended."
-                                << std::endl;*/    
+                                << std::endl;*/
                     
                     if (bremGammaList.size() == 1) { 
                         track->SetTrackStatus(fKillTrackAndSecondaries);
@@ -202,8 +208,8 @@ namespace ldmx {
                     G4RunManager::GetRunManager()->AbortEvent();
                     currentTrack_ = nullptr;
                     /*std::cout << "[ EcalProcessFilter ]: " 
-                              << " Brem list is empty --> Killing all tracks!"
-                              << std::endl;*/
+                                << " Brem list is empty --> Killing all tracks!"
+                                << std::endl;*/
                     return;
                 } else { 
                     currentTrack_ = track; 
