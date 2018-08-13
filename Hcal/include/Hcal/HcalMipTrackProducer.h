@@ -31,8 +31,6 @@ namespace ldmx {
      * @class HcalMipTrackProducer
      * @brief Producer that reconstructs MIP tracks through the hcal.
      *
-     * @note Currently, some event cause an infinity loop. Investigating
-     *  for logical error in code.
      */
     class HcalMipTrackProducer : public ldmx::Producer {
         public:

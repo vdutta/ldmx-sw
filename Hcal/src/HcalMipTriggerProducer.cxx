@@ -155,7 +155,26 @@ namespace ldmx {
         result_.setAlgoVar( 4 , static_cast<double>( trackcnt ) );
 
         event.addToCollection( "Trigger" , result_ );
+        
+        numTracksPerEvent_[ trackcnt ] ++;
 
+        return;
+    }
+    
+    void HcalMipTriggerProducer::onProcessEnd() {
+        
+        printf( "\n" );
+        printf( " ============================================\n" );
+        printf( " |HcalMipTriggerProducer - Performance Stats|\n" );
+        printf( " |==========================================|\n" );
+        printf( " |          Num Passed : %-19d|\n" , numPass_ );
+        printf( " |==========================================|\n" );
+        printf( " |            N Tracks : N Events           |\n" );
+        for ( auto track_event : numTracksPerEvent_ ) {
+            printf( " |%20d : %-19d|\n" , track_event.first , track_event.second );
+        }
+        printf( " ============================================\n" );
+        
         return;
     }
 

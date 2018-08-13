@@ -27,6 +27,14 @@ namespace ldmx {
      * @brief Constructs Trigger Result depending on Section, Layer, Strip, PE, and 
      *  Energy information of hits in the Hcal.
      *
+     * In the interest of speed (and at the expense of accuracy), this producer looks for
+     * tracks in each orientation of the Hcal (i.e. layers in the Hcal that are orientated
+     * the same way). This means if there is one track through the back Hcal, this producer
+     * may count that as two tracks: one through the horizontal layers and one through the
+     * vertical layers. Additionally, the sections in the side Hcal are isolated similarly.
+     * No attempt at combining these tracks is made, if a track is found anywhere, the event
+     * passes this trigger.
+     *
      * @note Right now, this producer assumes that there is no alternating orientation
      *  in the back hcal. When alternating bar orientations are implemented in the hcal,
      *  this can be implemented here by changing the lines containing ALT in the implementation.
@@ -123,10 +131,14 @@ namespace ldmx {
 
             /** Trigger object to add to event */
             TriggerResult result_;
+            
+            // PERFORMANCE TRACKERS
 
             /** Number of Events Passed */
             int numPass_;
-
+            
+            /** Number events that have a certain number of tracks */
+            std::map< int , int > numTracksPerEvent_;
     };
 }
 

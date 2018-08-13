@@ -175,7 +175,8 @@ namespace ldmx {
 
     void HcalMipTrackProducer::onProcessEnd() {
                 
-        printf( "\n ==========================================\n" );
+        printf( "\n" );
+        printf( " ==========================================\n" );
         printf( " |HcalMipTrackProducer - Performance Stats|\n");
         printf( " |========================================|\n");
         printf( " |                Stat : Mean             |\n");
