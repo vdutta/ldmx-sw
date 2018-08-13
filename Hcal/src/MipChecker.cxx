@@ -29,7 +29,8 @@ namespace ldmx {
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
         const TClonesArray *miptracks = event.getCollection( "hcalMipTracks" , "recon" );
         const TClonesArray *triggers = event.getCollection( "Trigger" , "recon" );
-        
+       
+        //get trigger object
         const TriggerResult *hcalMipTrigger;
         for ( int iT = 0; iT < triggers->GetEntriesFast(); iT++ ) {
             hcalMipTrigger = (const TriggerResult *)(triggers->At(iT));
@@ -81,21 +82,23 @@ namespace ldmx {
         double falsefail = (double)(numFalseFail_)/events;
         double truefail  = (double)(numTrueFail_)/events;
 
-        printf( "\n==================================\n" );
-        printf( "|                |  Mip Trigger    |\n" );
-        printf( "|________________| Pass   | Fail   |\n" );
-        printf( "|Sim        Pass | %5.2f%% | %5.2f%% |\n" , truepass , falsefail );
-        printf( "|Particles  Fail | %5.2f%% | %5.2f%% |\n" , falsepass , truefail );
-        printf( "==================================\n" );
+        printf( "\n" );
+        printf( " ==================================\n" );
+        printf( " |                |    Mip Trigger    |\n" );
+        printf( " |----------------|    Pass | Fail    |\n" );
+        printf( " |Sim        Pass | %6.2f%% | %-6.2f%% |\n" , truepass , falsefail );
+        printf( " |Particles  Fail | %6.2f%% | %-6.2f%% |\n" , falsepass , truefail );
+        printf( " ==================================\n" );
         
         double right = (double)(numRight_)/events;
         double wrong = (double)(numWrong_)/events;
 
-        printf( "\n=============================\n" );
-        printf( "|      Mip Track Recon      |\n" );
-        printf( "| Right Count | Wrong Count |\n" );
-        printf( "| %10.6f%% | %10.6f%% |\n" , right , wrong );
-        printf( "=============================\n" );
+        printf( "\n" );
+        printf( " =============================\n" );
+        printf( " |      Mip Track Recon      |\n" );
+        printf( " | Right Count | Wrong Count |\n" );
+        printf( " | %10.6f%% | %10.6f%% |\n" , right , wrong );
+        printf( " =============================\n" );
         
         return;
     }
