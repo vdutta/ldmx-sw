@@ -24,10 +24,6 @@ namespace ldmx {
                                            G4ApplicationState::G4State_Idle);
             volumeCmd_->SetGuidance("Volume to apply the filter to. Note that multiple volumes may be added."); 
 
-            nElectronsCmd_ = new G4UIcmdWithAString{std::string(getPath() + "n_electrons").c_str(), this}; 
-            nElectronsCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit, 
-                                               G4ApplicationState::G4State_Idle); 
-            nElectronsCmd_->SetGuidance("Number of incident beam electrons."); 
     }
 
     EcalProcessFilterMessenger::~EcalProcessFilterMessenger() {
@@ -41,6 +37,5 @@ namespace ldmx {
 
         if (command == volumeCmd_) filter_->addVolume(newValue);
         else if (command == boundCmd_) filter_->addBoundingVolume(newValue);
-        else if (command == nElectronsCmd_) filter_->setNElectrons(G4UIcommand::ConvertToInt(newValue));  
     }
 }
