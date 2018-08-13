@@ -74,21 +74,15 @@ namespace ldmx {
     
     void MipChecker::onProcessEnd() {
         
-        //Percentage
-        double events = numEvents_/100.0;
-
-        double truepass  = (double)(numTruePass_)/events;
-        double falsepass = (double)(numFalsePass_)/events;
-        double falsefail = (double)(numFalseFail_)/events;
-        double truefail  = (double)(numTrueFail_)/events;
-
+        double accuracy = (numTruePass_ + numTrueFail_)/(double)(numEvents_);
         printf( "\n" );
-        printf( " ==================================\n" );
-        printf( " |                |    Mip Trigger    |\n" );
-        printf( " |----------------|    Pass | Fail    |\n" );
-        printf( " |Sim        Pass | %6.2f%% | %-6.2f%% |\n" , truepass , falsefail );
-        printf( " |Particles  Fail | %6.2f%% | %-6.2f%% |\n" , falsepass , truefail );
-        printf( " ==================================\n" );
+        printf( " ====================================\n" );
+        printf( " |              |    Sim Particle   |\n" );
+        printf( " |--------------|    Pass | Fail    |\n" );
+        printf( " |Mip      Pass | %7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
+        printf( " |Trigger  Fail | %7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
+        printf( " =====================================\n" );
+        printf( " |     Accuracy | %-18f |\n" , accuracy );
         
         double right = (double)(numRight_)/events;
         double wrong = (double)(numWrong_)/events;
