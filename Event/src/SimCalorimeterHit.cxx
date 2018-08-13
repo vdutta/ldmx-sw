@@ -52,17 +52,6 @@ namespace ldmx {
         ++nContribs_;
     }
 
-    unsigned int SimCalorimeterHit::getNumberOfContribs( std::vector<int> pdgCodes ) const {
-        int n = 0;
-        for ( int pdg : pdgCodeContribs_ ) {
-            for ( int cnt_pdg : pdgCodes ) {
-                if ( pdg == cnt_pdg )
-                    n++; break;
-            } //all test pdg codes
-        } //all pdg codes
-        return n; 
-    }
-
     SimCalorimeterHit::Contrib SimCalorimeterHit::getContrib(int i) {
         Contrib contrib;
         contrib.particle = (SimParticle*) simParticleContribs_->At(i);

@@ -141,14 +141,6 @@ namespace ldmx {
             }
 
             /**
-             * Get the number of hit contributions given by specific particles.
-             *
-             * @param pdgCode pdgCodes for specific particles to count
-             * @return The number of contributions
-             */
-            unsigned int getNumberOfContribs( std::vector<int> pdgCode ) const;
-
-            /**
              * Add a hit contribution from a SimParticle.
              * @param simParticle The particle that made the contribution.
              * @param pdgCode The PDG code of the actual track.
