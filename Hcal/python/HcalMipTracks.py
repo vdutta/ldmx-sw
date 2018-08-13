@@ -34,4 +34,4 @@ HcalMipTracks.parameters["FractionClustersLeft"] = 0.5
 HcalMipTracks.parameters["MaximumSlopeAngleDifference"] = 0.2
 
 # maximum distance between traks to allow them to merge [mm]
-HcalMipTracks.parameters["MaximumDistanceBetweenTracks"] = 100.0
+HcalMipTracks.parameters["MaximumDistanceBetweenTracks"] = 250.0
