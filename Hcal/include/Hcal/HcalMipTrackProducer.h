@@ -136,6 +136,14 @@ namespace ldmx {
              */
             bool shouldMergeTracks( HcalMipTrack *first , HcalMipTrack *second ) const;
 
+            /**
+             * Calculates closest distance between a line and a point
+             * Assumes inputs are correctly formatted and the direction vector of the line
+             *  is normalized (unit length);
+             */
+            double distPt2Line( const std::vector<double> &start, const std::vector<double> &dir,
+                                const std::vector<double> &point ) const;
+
             /** Name of collection of HcalHits */
             std::string hcalHitCollName_;
 
@@ -165,6 +173,9 @@ namespace ldmx {
 
             /** Maximum difference in slope angles of two tracks to merge */
             double maxSlopeAngleDiff_;
+
+            /** Maximum distance between two tracks to merge */
+            double maxTrackDist_;
 
             /** Log of HcalHits, sorted by section,layer,strip information */
             std::map< unsigned int , HcalHit* > hcalHitLog_;

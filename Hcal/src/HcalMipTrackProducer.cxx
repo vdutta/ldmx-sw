@@ -42,6 +42,8 @@ namespace ldmx {
 
         maxSlopeAngleDiff_ = ps.getDouble( "MaximumSlopeAngleDifference" );
 
+        maxTrackDist_ = ps.getDouble( "MaximumDistanceBetweenTracks" );
+
         meanTime_produce_ = 0.0;
         meanNumTouchLogs_ = 0.0;
         meanClustersIgnored_ = 0.0;
@@ -455,7 +457,16 @@ namespace ldmx {
             seconSlope[i] = seconEnd[i] - seconStart[i];
             seconSlopeMag += seconSlope[i]*seconSlope[i];
         }
+        firstSlopeMag = sqrt( firstSlopeMag );
+        seconSlopeMag = sqrt( seconSlopeMag );
+
+        //normalize direction vectors
+        for ( int i = 0; i < 3; i++ ) {
+            firstSlope[i] /= firstSlopeMag;
+            seconSlope[i] /= seconSlopeMag;
+        }
         
+        //calculate magnitude of cross produce of direction vectors
         double crossProdMag = 0.0;
         for ( int i = 0; i < 3; i++ ) {
             
@@ -466,18 +477,61 @@ namespace ldmx {
             
             crossProdMag += coordinate_val*coordinate_val;
         }
-        crossProdMag = sqrt(crossProdMag/(firstSlopeMag*seconSlopeMag));
+        crossProdMag = sqrt( crossProdMag );
         
         //check if angle between direction vectors is less than
         // parameter input by user
         double angledif = abs(asin( crossProdMag ));
         if ( angledif < maxSlopeAngleDiff_ ) {
-            //merge tracks 
-            yes = true;
-        } 
+            //angle is close enough to calculate distance between segments
+            // we pretend the lines are close enough to parallel to only
+            // check the end points
+            
+            // distances between end points and other line
+            std::vector<double> distVec;
+            
+            //seconStart <-> first line
+            distVec.push_back( distPt2Line( first->getStart() , firstSlope , secon->getStart() ) );
+
+            //seconEnd <-> first line
+            distVec.push_back( distPt2Line( first->getStart() , firstSlope , secon->getEnd() ) );
+
+            //firstStart <-> secon line
+            distVec.push_back( distPt2Line( secon->getStart() , seconSlope , first->getStart() ) );
+
+            //firstEnd <-> secon line
+            distVec.push_back( distPt2Line( secon->getStart() , seconSlope , first->getEnd() ) );
+
+            for ( double d : distVec ) {
+                if ( d < maxTrackDist_ ) {
+                    yes = true;
+                    break;
+                } //distance is small enough
+            } //check distances between tracks (d)
+        } // track directions are close 
 
         return yes;
     }
+    
+    double HcalMipTrackProducer::distPt2Line( const std::vector<double> &start, const std::vector<double> &dir,
+                                              const std::vector<double> &point ) const {
+        
+        std::vector<double> diff( 3 , 0.0 );
+        double dot = 0.0;
+        for ( int i = 0; i < 3; i++ ) {
+            diff[i] = start.at(i) - point.at(i);
+            dot += diff[i]*dir.at(i);
+        }
+
+        double dist = 0.0;
+        for ( int i = 0; i < 3; i++ ) {
+            dist += ( diff[i] - dot*dir.at(i) )*( diff[i] - dot*dir.at(i) );
+        }
+
+        return sqrt( dist );
+    }
+
+
 }
 
 DECLARE_PRODUCER_NS( ldmx , HcalMipTrackProducer );
