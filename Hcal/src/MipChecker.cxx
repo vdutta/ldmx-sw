@@ -26,7 +26,7 @@ namespace ldmx {
     void MipChecker::analyze(const ldmx::Event& event) {
         
         //get necessary collections
-        const TClonesArray *simhits = event.getCollection( "HcalSimHits" , "sim" );
+        const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
         const TClonesArray *miptracks = event.getCollection( "hcalMipTracks" , "recon" );
         const TClonesArray *triggers = event.getCollection( "Trigger" , "recon" );
         
@@ -39,13 +39,13 @@ namespace ldmx {
 
         //count real number of muons in hcal
         int nmuons = 0;
-        std::vector<int> muon_pdgs( 2 , 13 );
-        muon_pdgs[1] *= -1;
-
-        for ( size_t iH = 0; iH < simhits->GetEntriesFast(); iH++ ) {
-            SimCalorimeterHit* simhit = (SimCalorimeterHit *)(simhits->At(iH));
-            nmuons += simhit->getNumberOfContribs( muon_pdgs );
-        }
+        for ( size_t iH = 0; iH < simparticles->GetEntriesFast(); iH++ ) {
+            SimParticle* simparticle = (SimParticle *)(simparticles->At(iH));
+            if ( simparticle->getPdgID() == 13 or simparticle->getPdgID() == -13 ) {
+                //muon or anti-muon
+                nmuons++;
+            } //check if muon
+        } //go through sim particles
         
         //check accuracy of mip track recon
         if ( miptracks->GetEntriesFast() == nmuons ) {
