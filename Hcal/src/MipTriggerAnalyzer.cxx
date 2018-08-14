@@ -55,18 +55,23 @@ namespace ldmx {
             } //if a muon
         }
 
-        //check accuracy of mip trigger
+        //check accuracy of mip trigger and set storage hint
         bool triggerpass = hcalMipTrigger->passed();
         bool realpass = ( nmuons > 0 );
-        if ( triggerpass and realpass)
+        if ( triggerpass and realpass) {
             numTruePass_++;
-        else if ( triggerpass and !realpass )
+            setStorageHint( hint_mustDrop );
+        } else if ( triggerpass and !realpass ) {
             numFalsePass_++;
-        else if ( !triggerpass and realpass )
+            setStorageHint( hint_mustKeep );
+        } else if ( !triggerpass and realpass ) {
             numFalseFail_++;
-        else
+            setStorageHint( hint_mustKeep );
+        } else {
             numTrueFail_++;
-
+            setStorageHint( hint_mustDrop );
+        }
+        
         return;
     }
 
@@ -82,8 +87,12 @@ namespace ldmx {
 
     void MipTriggerAnalyzer::onProcessEnd() {
         
-        unsigned int numEvents = numTruePass_+numTrueFail_+numFalsePass_+numTrueFail_;
-        double triggeraccuracy = (numTruePass_ + numTrueFail_)/(double)(numEvents);
+        unsigned int numEvents = numTruePass_+numTrueFail_+numFalsePass_+numFalseFail_;
+        double accuracy = ((double)(numTruePass_) + (double)(numTrueFail_))/(double)(numEvents);
+        double sensitivity = (double)(numTruePass_)/(double)(numTruePass_ + numFalseFail_);
+        double precision = (double)(numTruePass_)/(double)(numTruePass_ + numFalsePass_);
+        double missrate = 1 - sensitivity;
+        double falsePassRate = (double)(numFalsePass_)/(double)(numFalsePass_+numTruePass_);
         printf( "\n" );
         printf( " ===============================\n" );
         printf( " | Mip Trigger Confusion Table |\n" );
@@ -92,7 +101,12 @@ namespace ldmx {
         printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
         printf( " |    Fail ||%7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
         printf( " |=============================|\n" );
-        printf( " | Accuracy | %-16f |\n" , triggeraccuracy );
+        printf( " | N Events    | %-13d |\n" , numEvents );
+        printf( " | Accuracy    | %-13f |\n" , accuracy );
+        printf( " | Sensitivity | %-13f |\n" , sensitivity );
+        printf( " | Precision   | %-13f |\n" , precision );
+        printf( " | Miss Rate   | %-13f |\n" , missrate );
+        printf( " | False Pass  | %-13f |\n" , falsePassRate );
         printf( " ===============================\n" );
 
         return;

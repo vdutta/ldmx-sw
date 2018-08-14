@@ -55,12 +55,12 @@ namespace ldmx {
         
         numTracks_[ nmuons ][ ntracks ] ++;
 
-//        //Drop non-interesting events
-//        if ( ntracks != 1 ) {
-//            setStorageHint( hint_mustKeep );
-//        } else {
-//            setStorageHint( hint_mustDrop );
-//        }
+        //Drop non-interesting events
+        if ( ntracks != nmuons ) {
+            setStorageHint( hint_mustKeep );
+        } else {
+            setStorageHint( hint_mustDrop );
+        }
         
         return;
     }
@@ -107,6 +107,7 @@ namespace ldmx {
             printf( "\n" );
         } //predicted number of tracks (pred)
         printf( " |====================================================|\n" );
+        printf( " | N Events  || %-37d |\n" , numEvents );
         printf( " | Accuracy  || %-37f |\n" , reconaccuracy );
         printf( " ======================================================\n" );
         
