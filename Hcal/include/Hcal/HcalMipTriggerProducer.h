@@ -112,6 +112,9 @@ namespace ldmx {
             /** Minimum Fraction of Layers Hit to be considered a MIP */
             double minFracLayersHit_;
 
+            /** Absolute minimum number of hits to attempt to construct a track */
+            int absoluteMinHits_;
+
             /** Maximum Energy of a HcalHit to be considered a MIP */
             double maxEnergy_;
 

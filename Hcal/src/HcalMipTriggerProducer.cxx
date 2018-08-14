@@ -27,6 +27,8 @@ namespace ldmx {
         trackRadius_ = ps.getDouble( "TrackRadius" );
 
         minFracLayersHit_ = ps.getDouble( "MinFractionLayersHit" );
+        
+        absoluteMinHits_ = ps.getInteger( "AbsoluteMinNumberHits" );
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
 
@@ -183,7 +185,7 @@ namespace ldmx {
         startPt_ = hitLog_[ orientation ].end();
         finishPt_ = hitLog_[ orientation ].end();
 
-        if ( hitLog_[ orientation ].size() > 1 ) {
+        if ( hitLog_[ orientation ].size() >= absoluteMinHits_ ) {
             
             for ( std::map< unsigned int , HitLogNode >::iterator it = hitLog_[ orientation ].begin();
                 it != hitLog_[ orientation ].end(); ++it ) {

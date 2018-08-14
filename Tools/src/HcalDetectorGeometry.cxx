@@ -9,11 +9,13 @@ namespace ldmx {
     
     HcalDetectorGeometry::HcalDetectorGeometry() {
         
-        nLayers_[ HcalSection::BACK   ] = 81;
-        nLayers_[ HcalSection::TOP    ] = 17;
-        nLayers_[ HcalSection::BOTTOM ] = 17;
-        nLayers_[ HcalSection::LEFT   ] = 17;
-        nLayers_[ HcalSection::RIGHT  ] = 17;
+        //currently copied from v3 geometry (Detectors/data/ldmx-det-full-v3-fieldmap-magnet/hcal.gdml)
+
+        nLayers_[ HcalSection::BACK   ] = 150;
+        nLayers_[ HcalSection::TOP    ] = 63;
+        nLayers_[ HcalSection::BOTTOM ] = 63;
+        nLayers_[ HcalSection::LEFT   ] = 63;
+        nLayers_[ HcalSection::RIGHT  ] = 63;
         
         nStrips_[ HcalSection::BACK   ] = 31;
         nStrips_[ HcalSection::TOP    ] = 31;
@@ -28,10 +30,10 @@ namespace ldmx {
         lengthScint_[ HcalSection::RIGHT  ] = (3100.+525.)/2.;
          
         zeroLayer_[ HcalSection::BACK   ] = 200. + 290.;
-        zeroLayer_[ HcalSection::TOP    ] = 525./2.;
-        zeroLayer_[ HcalSection::BOTTOM ] = -525./2.;
-        zeroLayer_[ HcalSection::LEFT   ] = 525./2.;
-        zeroLayer_[ HcalSection::RIGHT  ] = -525./2.;
+        zeroLayer_[ HcalSection::TOP    ] = 520./2.;
+        zeroLayer_[ HcalSection::BOTTOM ] = -520./2.;
+        zeroLayer_[ HcalSection::LEFT   ] = 520./2.;
+        zeroLayer_[ HcalSection::RIGHT  ] = -520./2.;
          
         zeroStrip_[ HcalSection::BACK   ] = -3100./2.; 
         zeroStrip_[ HcalSection::TOP    ] = 200.;
@@ -43,11 +45,11 @@ namespace ldmx {
 
         uncertaintyTimingPos_ = 200.0;
 
-        thicknessScint_ = 20.0; 
+        thicknessScint_ = 6.;
 
         widthScint_ = 100.0;
 
-        thicknessLayer_ = 50. + thicknessScint_ + 2*2.; //absorber + scint +2*air
+        thicknessLayer_ = 10. + thicknessScint_ + 2*2.; //absorber + scint +2*air
     }
 
     HitBox HcalDetectorGeometry::transformDet2Real( HcalHit* hit ) const {
