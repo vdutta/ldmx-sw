@@ -34,10 +34,6 @@ namespace ldmx {
      * vertical layers. Additionally, the sections in the side Hcal are isolated similarly.
      * No attempt at combining these tracks is made, if a track is found anywhere, the event
      * passes this trigger.
-     *
-     * @note Right now, this producer assumes that there is no alternating orientation
-     *  in the back hcal. When alternating bar orientations are implemented in the hcal,
-     *  this can be implemented here by changing the lines containing ALT in the implementation.
      */
     class HcalMipTriggerProducer : public ldmx::Producer {
         public:

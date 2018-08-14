@@ -61,8 +61,7 @@ namespace ldmx {
                 
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
-                //Since alternating orientations aren't implemented, we pretend all layers are odd
-                if ( corient != HcalSection::BACK ) { //ALT or clayer % 2 == 1 ) {
+                if ( corient != HcalSection::BACK or clayer % 2 == 1 ) {
                     corient++;
                 }
                 
@@ -84,14 +83,16 @@ namespace ldmx {
                 //track to be constructed
                 std::vector< unsigned int > track;
                 
-                int laycnt = 0;
-                if ( (startPt_->second).layer != (finishPt_->second).layer ) {
+                int hitcnt = 0; //will not double count hits in same layer (if shallow) or same strip (if steep)
+                int startLayer = (startPt_->second).layer;
+                int startStrip = (startPt_->second).strip;
+                int dstrip = ( (finishPt_->second).strip - startStrip );
+                int dlayer = ( (finishPt_->second).layer - startLayer );
+                
+                if ( dlayer > 3 ) {
+                    //non-steep slope, shallow angle muon
                     
                     //calculate slope
-                    int startLayer = (startPt_->second).layer;
-                    int startStrip = (startPt_->second).strip;
-                    int dstrip = ( (finishPt_->second).strip - startStrip );
-                    int dlayer = ( (finishPt_->second).layer - startLayer );
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
                     
                     //count hits in this orientation that are in the cylinder
@@ -108,18 +109,48 @@ namespace ldmx {
                         if ( stripdif < trackRadius_ ) {
                             //hit is in track cylinder
                             if ( countedLayers.find( clayer ) == countedLayers.end() ) {
-                                laycnt++;
+                                hitcnt++;
                                 countedLayers.insert( clayer );
                             }
     
                             track.push_back( node.first ); 
                         } //check if hit is in track cylinder
     
-                    } //iterate through hitLog of current orientation (chit)
+                    } //iterate through hitLog of current orientation (node)
                 
-                } //startPt and finishPt are not on the same layer
+                } else if ( dstrip > 3 ) {
+                    //steep slope, check along strips instead
+
+                    //calculate slope
+                    float slope = static_cast<float>(dlayer)/static_cast<float>(dstrip);
+
+                    //count hits in this orientation that are in the track cylinder
+                    std::set<int> countedStrips; //strips that have already been counted
+                    for ( auto node : hitLog_[ corient ] ) {
+                        
+                        int cstrip = (node.second).strip;
+                        int clayer = (node.second).layer;
+
+                        float tracklayer = slope*( cstrip - startStrip ) + startLayer;
+
+                        float layerdif = std::abs( tracklayer - clayer );
+
+                        if ( layerdif < trackRadius_ ) {
+                            //hit is in track cylinder
+                            if ( countedStrips.find( cstrip ) == countedStrips.end() ) {
+                                hitcnt++;
+                                countedStrips.insert( cstrip );
+                            }
+
+                            track.push_back( node.first );
+                         } //check if hit is in the track cylinder
+
+                    } //iterate through hitLog of current orientation (node)
                 
-                if ( laycnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
+                } //steep/shallow slope
+                //skips end points if dlayer <= 3 and dstrip <= 3
+
+                if ( hitcnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
                     //good track found
                     
                     for ( unsigned int rawID : track ) {
@@ -142,7 +173,6 @@ namespace ldmx {
         if ( trackcnt > 0 ) { //result_.getNumTracks() > 0 ) {
             pass = true;
             numPass_++;
-            setStorageHint( hint_shouldDrop );
         }
 
         result_.set( triggerObjectName_ , pass , 5 );
