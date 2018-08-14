@@ -89,7 +89,7 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
-                if ( dlayer > 3 ) {
+                if ( dlayer > 1 ) {
                     //non-steep slope, shallow angle muon
                     
                     //calculate slope
@@ -118,7 +118,7 @@ namespace ldmx {
     
                     } //iterate through hitLog of current orientation (node)
                 
-                } else if ( dstrip > 3 ) {
+                } else if ( dstrip > 1 ) {
                     //steep slope, check along strips instead
 
                     //calculate slope
@@ -148,7 +148,7 @@ namespace ldmx {
                     } //iterate through hitLog of current orientation (node)
                 
                 } //steep/shallow slope
-                //skips end points if dlayer <= 3 and dstrip <= 3
+                //skips end points if dlayer < 2 and dstrip < 2
 
                 if ( hitcnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
                     //good track found
@@ -223,14 +223,21 @@ namespace ldmx {
                 if ( (it->second).isGood ) {
                 
                     int clayer = (it->second).layer;
+                    int cstrip = (it->second).strip;
     
-                    if ( startPt_ == hitLog_[ orientation ].end() or clayer < (startPt_->second).layer ) {
+                    if ( startPt_ == hitLog_[ orientation ].end() //haven't chosen a starting point yet
+                         or clayer < (startPt_->second).layer //lower layer
+                         or (clayer == (startPt_->second).layer and cstrip < (startPt_->second).strip) //same layer but lower strip
+                       ) {
                         startPt_ = it;
                     } //if it->second could be a good start point
     
-                    if ( finishPt_ == hitLog_[ orientation ].end() or clayer > (finishPt_->second).layer ) {
+                    if ( finishPt_ == hitLog_[ orientation ].end() //haven't chosen a finishing point yet
+                         or clayer > (finishPt_->second).layer //higher layer
+                         or (clayer == (finishPt_->second).layer and cstrip > (finishPt_->second).strip) //same layer but higher strip
+                       ) {
                         finishPt_ = it;
-                    } //if node.second could be a good finish point
+                    } //if it->second could be a good finish point
                 
                 } //is current hit good
 
