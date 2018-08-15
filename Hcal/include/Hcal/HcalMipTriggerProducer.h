@@ -8,6 +8,7 @@
 #define HCAL_HCALMIPTRIGGERPRODUCER_H
 
 //STL
+#include <cmath> //abs value
 #include <set> //listing layers that have already been counted
 #include <map> //logging hits
 #include <vector> //creating track

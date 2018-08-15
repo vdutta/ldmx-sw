@@ -89,7 +89,7 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
-                if ( dlayer > 1 ) {
+                if ( abs(dlayer) > 1 ) {
                     //non-steep slope, shallow angle muon
                     
                     //calculate slope
@@ -118,7 +118,7 @@ namespace ldmx {
     
                     } //iterate through hitLog of current orientation (node)
                 
-                } else if ( dstrip > 1 ) {
+                } else if ( abs(dstrip) > 1 ) {
                     //steep slope, check along strips instead
 
                     //calculate slope
@@ -148,7 +148,7 @@ namespace ldmx {
                     } //iterate through hitLog of current orientation (node)
                 
                 } //steep/shallow slope
-                //skips end points if dlayer < 2 and dstrip < 2
+                //skips end points if -1 <= dlayer <= 1 and -1 <= dstrip <= 1
 
                 if ( hitcnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
                     //good track found
