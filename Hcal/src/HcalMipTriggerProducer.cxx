@@ -17,9 +17,7 @@ namespace ldmx {
 
         minFracHit_ = ps.getDouble( "MinFractionHit" );
         
-        absoluteMinHitsToLook_ = ps.getInteger( "AbsoluteMinNumberHitsToLook" );
-
-        absoluteMinHitsToAccept_ = ps.getInteger( "AbsoluteMinNumberHitsToAccept" );
+        absoluteMinHits_ = ps.getInteger( "AbsoluteMinNumberHits" );
 
         maxEnergy_ = ps.getDouble( "MaximumEnergy" );
 
@@ -70,7 +68,7 @@ namespace ldmx {
         for ( int corient = 0; corient < 6; corient++ ) {
             
             //lowest number of hits to accept track
-            int hitCntFloor = absoluteMinHitsToAccept_;
+            int hitCntFloor = absoluteMinHits_;
             if ( minFracHit_*hitLog_[ corient ].size() > hitCntFloor )
                 hitCntFloor = static_cast<int>( minFracHit_*hitLog_[ corient ].size() );
 
@@ -198,7 +196,7 @@ namespace ldmx {
         startPt_ = hitLog_[ orientation ].end();
         finishPt_ = hitLog_[ orientation ].end();
 
-        if ( hitLog_[ orientation ].size() >= absoluteMinHitsToLook_ ) {
+        if ( hitLog_[ orientation ].size() >= absoluteMinHits_ ) {
             
             for ( std::map< unsigned int , HitLogNode >::iterator it = hitLog_[ orientation ].begin();
                 it != hitLog_[ orientation ].end(); ++it ) {
