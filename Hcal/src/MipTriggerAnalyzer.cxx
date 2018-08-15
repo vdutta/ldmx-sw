@@ -114,12 +114,13 @@ namespace ldmx {
         printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
         printf( " |    Fail ||%7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
         printf( " |=============================|\n" );
-        printf( " | N Events    | %-13d |\n" , numEvents );
-        printf( " | Accuracy    | %-13f |\n" , accuracy );
-        printf( " | Sensitivity | %-13f |\n" , sensitivity );
-        printf( " | Precision   | %-13f |\n" , precision );
-        printf( " | Miss Rate   | %-13f |\n" , missrate );
-        printf( " | False Pass  | %-13f |\n" , falsePassRate );
+        printf( " | N Events        | %-9d |\n" , numEvents );
+        printf( " | Accuracy        | %-9f |\n" , accuracy );
+        printf( " | Hit Rate        | %-9f |\n" , sensitivity );
+        printf( " | Miss Rate       | %-9f |\n" , missrate );
+        printf( " | False Pass Rate | %-9f |\n" , falsePassRate );
+        printf( " | Precision       | %-9f |\n" , precision );
+        printf( " | Informedness    | %-9f |\n" , sensitivity - falsePassRate );
         printf( " ===============================\n" );
 
         return;
