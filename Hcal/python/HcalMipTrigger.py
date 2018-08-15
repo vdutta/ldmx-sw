@@ -22,7 +22,10 @@ HcalMipTrigger.parameters["TrackRadius"] = 4.0
 HcalMipTrigger.parameters["MinFractionHit"] = 0.8
 
 # Absolute minimum number of hits to attempt to find track
-HcalMipTrigger.parameters["AbsoluteMinNumberHits"] = 2
+HcalMipTrigger.parameters["AbsoluteMinNumberHitsToLook"] = 2
+
+# Absolute minimum number of hits to consider track valid
+HcalMipTrigger.parameters["AbsoluteMinNumberHitsToAccept"] = 2
 
 # Name of track collection to be added to event bus
 HcalMipTrigger.parameters["HcalMipTriggerObjectName"] = "hcalMipTrigger"

@@ -107,7 +107,10 @@ namespace ldmx {
             double minFracHit_;
 
             /** Absolute minimum number of hits to attempt to construct a track */
-            int absoluteMinHits_;
+            int absoluteMinHitsToLook_;
+
+            /** Absolute minimum number of hits in track to accept */
+            int absoluteMinHitsToAccept_;
 
             /** Maximum Energy of a HcalHit to be considered a MIP */
             double maxEnergy_;
