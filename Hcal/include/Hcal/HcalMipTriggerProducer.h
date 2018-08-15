@@ -88,8 +88,8 @@ namespace ldmx {
                 /** Strip of HcalHit */
                 int strip;
 
-                /** flag if hit could be a good end point */
-                bool isGood;
+                /** flag if hit has been used as an end point */
+                bool isUsed;
             };
                    
             // INPUT PARAMETERS
@@ -103,7 +103,7 @@ namespace ldmx {
             /** Name of HcalHit pass */
             std::string hitPassName_;
             
-            /** Maximum Difference Between a hit and the center line of track */
+            /** Maximum Difference Between a hit and the center line of track [in N layers/strips] */
             double trackRadius_;
 
             /** Minimum Fraction of Hits included in track to accept track */

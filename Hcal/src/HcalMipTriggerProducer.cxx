@@ -68,8 +68,8 @@ namespace ldmx {
                 
                 HitLogNode cNode;
                 cNode.layer = clayer;
-                cNode.strip = chit->getStrip();
-                cNode.isGood = true;
+                cNode.strip = cstrip;
+                cNode.isUsed = false;
                 hitLog_[ corient ][ chit->getID() ] = cNode;
             } //could be a MIP
         } //iterate through rawhits (iH)
@@ -81,9 +81,6 @@ namespace ldmx {
             //while good end points are being found
             int longtracklen = 0; //num hits in longest track
             while ( findEndPoints( corient ) ) {
-                
-                //track to be constructed
-                std::vector< unsigned int > track;
                 
                 int hitcnt = 0; //will not double count hits in same layer (if shallow) or same strip (if steep)
                 int startLayer = (startPt_->second).layer;
@@ -110,12 +107,7 @@ namespace ldmx {
     
                         if ( stripdif < trackRadius_ ) {
                             //hit is in track cylinder
-//                            if ( countedLayers.find( clayer ) == countedLayers.end() ) {
-//                                hitcnt++;
-//                                countedLayers.insert( clayer );
-//                            }
                             hitcnt++;    
-                            track.push_back( node.first ); 
                         } //check if hit is in track cylinder
     
                     } //iterate through hitLog of current orientation (node)
@@ -139,12 +131,7 @@ namespace ldmx {
 
                         if ( layerdif < trackRadius_ ) {
                             //hit is in track cylinder
-//                            if ( countedStrips.find( cstrip ) == countedStrips.end() ) {
-//                                hitcnt++;
-//                                countedStrips.insert( cstrip );
-//                            }
                             hitcnt++;
-                            track.push_back( node.first );
                          } //check if hit is in the track cylinder
 
                     } //iterate through hitLog of current orientation (node)
@@ -152,28 +139,19 @@ namespace ldmx {
                 } //steep/shallow slope
                 //skips end points if -1 <= dlayer <= 1 and -1 <= dstrip <= 1
 
-                if ( hitcnt > minFracHit_*hitLog_[ corient ].size() 
-                     and hitcnt > longtracklen
-                   ) {
+                if ( hitcnt > longtracklen ) {
                     //good track found
-                    
                     longtracklen = hitcnt;
+                } 
 
-//                    for ( unsigned int rawID : track ) {
-//                        hitLog_[ corient ].erase( rawID );
-//                    } //iterate through track (rawID)
-//                    
-//                    trackcnt++;
-
-                } else {
-                    //mark the end points as not good end points
-                    (startPt_->second).isGood = false;
-                    (finishPt_->second).isGood = false;
-                } //what to do if track is good
-            
+                //mark the end points as used end points
+                (startPt_->second).isUsed = true;
+                (finishPt_->second).isUsed = true;
+        
             } //while good end points are still being found
             
-            if ( longtracklen > 0 )
+            //check if longest "track" found can be considered a track
+            if ( longtracklen > minFracHit_*hitLog_[ corient ].size() )
                 trackcnt++;
 
         } //for each orientation (corient)
@@ -229,7 +207,7 @@ namespace ldmx {
             for ( std::map< unsigned int , HitLogNode >::iterator it = hitLog_[ orientation ].begin();
                 it != hitLog_[ orientation ].end(); ++it ) {
 
-                if ( (it->second).isGood ) {
+                if ( !(it->second).isUsed ) {
                 
                     int clayer = (it->second).layer;
                     int cstrip = (it->second).strip;
