@@ -28,8 +28,14 @@ namespace ldmx {
         const TClonesArray *triggers = event.getCollection( "Trigger" , hcalMipTriggerPassName_ );
         //get list of actual sim particles
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
-        //get number of hcalHits
-        int nHcalHits = (event.getCollection( "hcalDigis" , "recon" ))->GetEntriesFast();
+        //get number of hcalHits that aren't noise
+        const TClonesArray *hcalHits = event.getCollection( "hcalDigis" , "recon" );
+        int nHcalHits = 0;
+        for ( int iH = 0; iH < hcalHits->GetEntriesFast(); iH++ ) {
+            HcalHit *chit = (HcalHit *)(hcalHits->At(iH));
+            if ( !chit->getNoise() )
+                nHcalHits++;
+        }
         
         //get hcal mip trigger
         int ntriggers = triggers->GetEntriesFast();

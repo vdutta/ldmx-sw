@@ -17,6 +17,7 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/TriggerResult.h" //studying triggers
 #include "Event/SimParticle.h" //verifying trigger
+#include "Event/HcalHit.h" //checking number of hcal hits
 
 namespace ldmx {
     
