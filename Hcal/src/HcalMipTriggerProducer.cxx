@@ -26,7 +26,7 @@ namespace ldmx {
 
         trackRadius_ = ps.getDouble( "TrackRadius" );
 
-        minFracLayersHit_ = ps.getDouble( "MinFractionLayersHit" );
+        minFracHit_ = ps.getDouble( "MinFractionHit" );
         
         absoluteMinHits_ = ps.getInteger( "AbsoluteMinNumberHits" );
 
@@ -78,6 +78,7 @@ namespace ldmx {
         for ( int corient = 0; corient < 6; corient++ ) {
             
             //while good end points are being found
+            int longtracklen = 0; //num hits in longest track
             while ( findEndPoints( corient ) ) {
                 
                 //track to be constructed
@@ -150,14 +151,18 @@ namespace ldmx {
                 } //steep/shallow slope
                 //skips end points if -1 <= dlayer <= 1 and -1 <= dstrip <= 1
 
-                if ( hitcnt > minFracLayersHit_*hitLog_[ corient ].size() ) {
+                if ( hitcnt > minFracHit_*hitLog_[ corient ].size() 
+                     and hitcnt > longtracklen
+                   ) {
                     //good track found
                     
-                    for ( unsigned int rawID : track ) {
-                        hitLog_[ corient ].erase( rawID );
-                    } //iterate through track (rawID)
-                    
-                    trackcnt++;
+                    longtracklen = hitcnt;
+
+//                    for ( unsigned int rawID : track ) {
+//                        hitLog_[ corient ].erase( rawID );
+//                    } //iterate through track (rawID)
+//                    
+//                    trackcnt++;
 
                 } else {
                     //mark the end points as not good end points
@@ -166,6 +171,9 @@ namespace ldmx {
                 } //what to do if track is good
             
             } //while good end points are still being found
+            
+            if ( longtracklen > 0 )
+                trackcnt++;
 
         } //for each orientation (corient)
         
@@ -178,7 +186,7 @@ namespace ldmx {
         result_.set( triggerObjectName_ , pass , 5 );
         result_.setAlgoVar( 0 , minPE_ );
         result_.setAlgoVar( 1 , maxEnergy_ );
-        result_.setAlgoVar( 2 , minFracLayersHit_ );
+        result_.setAlgoVar( 2 , minFracHit_ );
         result_.setAlgoVar( 3 , trackRadius_ );
         result_.setAlgoVar( 4 , static_cast<double>( trackcnt ) );
 
@@ -241,7 +249,7 @@ namespace ldmx {
                 
                 } //is current hit good
 
-            } //iterate through hits in this orientation hitlog (node)
+            } //iterate through hits in this orientation hitlog (it)
         
         } //two ore more hits in this part of the log
 

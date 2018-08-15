@@ -106,8 +106,8 @@ namespace ldmx {
             /** Maximum Difference Between a hit and the center line of track */
             double trackRadius_;
 
-            /** Minimum Fraction of Layers Hit to be considered a MIP */
-            double minFracLayersHit_;
+            /** Minimum Fraction of Hits included in track to accept track */
+            double minFracHit_;
 
             /** Absolute minimum number of hits to attempt to construct a track */
             int absoluteMinHits_;
