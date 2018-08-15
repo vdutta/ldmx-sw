@@ -28,6 +28,8 @@ namespace ldmx {
         const TClonesArray *triggers = event.getCollection( "Trigger" , hcalMipTriggerPassName_ );
         //get list of actual sim particles
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
+        //get number of hcalHits
+        int nHcalHits = (event.getCollection( "hcalDigis" , "recon" ))->GetEntriesFast();
         
         //get hcal mip trigger
         int ntriggers = triggers->GetEntriesFast();
@@ -54,21 +56,26 @@ namespace ldmx {
                 nmuons++;
             } //if a muon
         }
-
-        //check accuracy of mip trigger and set storage hint
-        bool triggerpass = hcalMipTrigger->passed();
-        bool realpass = ( nmuons > 0 );
-        if ( triggerpass and realpass) {
-            numTruePass_++;
-            setStorageHint( hint_mustDrop );
-        } else if ( triggerpass and !realpass ) {
-            numFalsePass_++;
-            setStorageHint( hint_mustKeep );
-        } else if ( !triggerpass and realpass ) {
-            numFalseFail_++;
-            setStorageHint( hint_mustKeep );
+        
+        //ignore events with zero hcalHits (boring)
+        if ( nHcalHits > 0 ) {
+            //check accuracy of mip trigger and set storage hint
+            bool triggerpass = hcalMipTrigger->passed();
+            bool realpass = ( nmuons > 0 );
+            if ( triggerpass and realpass) {
+                numTruePass_++;
+                setStorageHint( hint_mustDrop );
+            } else if ( triggerpass and !realpass ) {
+                numFalsePass_++;
+                setStorageHint( hint_mustKeep );
+            } else if ( !triggerpass and realpass ) {
+                numFalseFail_++;
+                setStorageHint( hint_mustKeep );
+            } else {
+                numTrueFail_++;
+                setStorageHint( hint_mustDrop );
+            }
         } else {
-            numTrueFail_++;
             setStorageHint( hint_mustDrop );
         }
         
