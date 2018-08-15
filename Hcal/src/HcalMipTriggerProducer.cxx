@@ -12,17 +12,6 @@ namespace ldmx {
         
         hitCollName_ = ps.getString( "HcalHitCollectionName" );
         hitPassName_ = ps.getString( "HcalHitPassName" );
-        
-        int nBackLayers = ps.getInteger( "NumLayersBackHcal" );
-        nLayersPerOrientation_[ 0 ] = nBackLayers/2;
-        nLayersPerOrientation_[ 1 ] = nBackLayers/2;
-        if ( nBackLayers % 2 == 1 ) { //odd number back layers
-            nLayersPerOrientation_[ 1 ] ++;
-        }
-        nLayersPerOrientation_[ 2 ] = ps.getInteger( "NumLayersTopHcal" );
-        nLayersPerOrientation_[ 3 ] = ps.getInteger( "NumLayersBottomHcal" );
-        nLayersPerOrientation_[ 4 ] = ps.getInteger( "NumLayersLeftHcal" );
-        nLayersPerOrientation_[ 5 ] = ps.getInteger( "NumLayersRightHcal" );
 
         trackRadius_ = ps.getDouble( "TrackRadius" );
 

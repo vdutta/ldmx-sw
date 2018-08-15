@@ -94,9 +94,6 @@ namespace ldmx {
                    
             // INPUT PARAMETERS
 
-            /** array of layers in each orientation */
-            int nLayersPerOrientation_[6]; 
-            
             /** Name of HcalHit collection */
             std::string hitCollName_;
 
