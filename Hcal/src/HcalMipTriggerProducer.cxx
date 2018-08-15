@@ -51,13 +51,14 @@ namespace ldmx {
         //obtain list of raw hits
         const TClonesArray *rawhits = event.getCollection( hitCollName_ , hitPassName_ );
 
-        //add only plausible mip hits to hitLog_
+        //add only plausible mip hits to hitLog
         for ( size_t iH = 0; iH < rawhits->GetEntriesFast(); iH++ ) {
             ldmx::HcalHit* chit = (ldmx::HcalHit*)(rawhits->At(iH));
             if ( isPlausibleMip( chit ) ) { //could be a MIP
                 
                 int corient = chit->getSection();
                 int clayer = chit->getLayer();
+                int cstrip = chit->getStrip();
                 
                 //The underlying ints for the HcalSection and HcalOrientation enums are shifted by one
                 // except for EVEN layers in the BACK Hcal.
@@ -109,11 +110,11 @@ namespace ldmx {
     
                         if ( stripdif < trackRadius_ ) {
                             //hit is in track cylinder
-                            if ( countedLayers.find( clayer ) == countedLayers.end() ) {
-                                hitcnt++;
-                                countedLayers.insert( clayer );
-                            }
-    
+//                            if ( countedLayers.find( clayer ) == countedLayers.end() ) {
+//                                hitcnt++;
+//                                countedLayers.insert( clayer );
+//                            }
+                            hitcnt++;    
                             track.push_back( node.first ); 
                         } //check if hit is in track cylinder
     
@@ -138,11 +139,11 @@ namespace ldmx {
 
                         if ( layerdif < trackRadius_ ) {
                             //hit is in track cylinder
-                            if ( countedStrips.find( cstrip ) == countedStrips.end() ) {
-                                hitcnt++;
-                                countedStrips.insert( cstrip );
-                            }
-
+//                            if ( countedStrips.find( cstrip ) == countedStrips.end() ) {
+//                                hitcnt++;
+//                                countedStrips.insert( cstrip );
+//                            }
+                            hitcnt++;
                             track.push_back( node.first );
                          } //check if hit is in the track cylinder
 
