@@ -82,8 +82,8 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
-                if ( abs(dlayer) > 1 ) {
-                    //non-steep slope, shallow angle muon
+                if ( corient < 2 and abs(dlayer) > 0 ) {
+                    //BACK HCAL, layer is independent variable for target muons
                     
                     //calculate slope
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
@@ -106,8 +106,8 @@ namespace ldmx {
     
                     } //iterate through hitLog of current orientation (node)
                 
-                } else if ( abs(dstrip) > 1 ) {
-                    //steep slope, check along strips instead
+                } else if ( abs(dstrip) > 0 ) {
+                    //SIDE HCAL, strip is independent variable for target muons
 
                     //calculate slope
                     float slope = static_cast<float>(dlayer)/static_cast<float>(dstrip);
@@ -151,7 +151,7 @@ namespace ldmx {
         } //for each orientation (corient)
         
         bool pass = false;
-        if ( trackcnt > 0 ) { //result_.getNumTracks() > 0 ) {
+        if ( trackcnt > 0 ) { 
             pass = true;
             numPass_++;
         }
