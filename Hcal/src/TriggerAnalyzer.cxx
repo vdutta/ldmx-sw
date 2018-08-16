@@ -90,7 +90,8 @@ namespace ldmx {
         double falsePassRate = (double)(numFalsePass_)/(double)(numFalsePass_+numTruePass_);
         printf( "\n" );
         printf( " ===============================\n" );
-        printf( " |   Trigger Confusion Table   |\n" );
+        printf( " | %27s |\n" , hcalTriggerObjectName_.c_str() );
+        printf( " |       Confusion Table       |\n" );
         printf( " |         ||    Sim Particle  |\n" );
         printf( " | Trigger ||   Pass | Fail    |\n" );
         printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
