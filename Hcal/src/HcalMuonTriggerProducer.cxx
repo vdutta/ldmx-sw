@@ -86,6 +86,9 @@ namespace ldmx {
             if ( minFracHit_*hitLog_[ corient ].size() > hitCntFloor )
                 hitCntFloor = static_cast<int>( minFracHit_*hitLog_[ corient ].size() );
 
+            //should use layers for this orienation
+            bool shouldUseLayers = ( layerUsers_.find( corient )  != layerUsers_.end() );
+
             //while good end points are being found
             int longtracklen = 0; //num hits in longest track
             while ( findEndPoints( corient ) ) {
@@ -96,12 +99,8 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
-                bool shouldUseLayers = true;
-                if ( layerUsers_.find( corient ) == layerUsers_.end() )
-                    shouldUseLayers = false;
-
                 if ( shouldUseLayers and abs(dlayer) > 0 ) {
-                    //BACK HCAL, layer is independent variable for target muons
+                    //layer is independent variable for muons
                     
                     //calculate slope
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
@@ -125,7 +124,7 @@ namespace ldmx {
                     } //iterate through hitLog of current orientation (node)
                 
                 } else if ( abs(dstrip) > 0 ) {
-                    //SIDE HCAL, strip is independent variable for target muons
+                    //strip is independent variable for muons
 
                     //calculate slope
                     float slope = static_cast<float>(dlayer)/static_cast<float>(dstrip);
