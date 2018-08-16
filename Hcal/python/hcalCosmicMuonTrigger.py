@@ -25,5 +25,5 @@ hcalCosmicMuonTrigger.parameters["MinFractionHit"] = 0.8
 hcalCosmicMuonTrigger.parameters["AbsoluteMinNumberHits"] = 2
 
 # Name of track collection to be added to event bus
-hcalCosmicMuonTrigger.parameters["HcalMipTriggerObjectName"] = "hcalCosmicMuonTrigger"
+hcalCosmicMuonTrigger.parameters["HcalCosmicMuonTriggerObjectName"] = "hcalCosmicMuonTrigger"
  

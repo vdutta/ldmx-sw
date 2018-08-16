@@ -1,11 +1,11 @@
 /**
- * @file MipTriggerAnalyzer.h
- * @brief Header file for MipTriggerAnalyzer class
+ * @file TriggerAnalyzer.h
+ * @brief Header file for TriggerAnalyzer class
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef HCAL_MIPTRIGGERANALYZER_H
-#define HCAL_MIPTRIGGERANALYZER_H
+#ifndef HCAL_TRIGGERANALYZER_H
+#define HCAL_TRIGGERANALYZER_H
 
 //ROOT
 #include "TH1.h" //histograms
@@ -22,13 +22,13 @@
 namespace ldmx {
     
     /**
-     * @class MipTriggerAnalyzer
+     * @class TriggerAnalyzer
      * @brief Creates histogram of the number of tracks found by trigger
      */
-    class MipTriggerAnalyzer : public ldmx::Analyzer {
+    class TriggerAnalyzer : public ldmx::Analyzer {
         public:
 
-            MipTriggerAnalyzer(const std::string& name, ldmx::Process& process) : ldmx::Analyzer(name, process) {}
+            TriggerAnalyzer(const std::string& name, ldmx::Process& process) : ldmx::Analyzer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
@@ -38,21 +38,18 @@ namespace ldmx {
 
             virtual void onFileClose() { }
 
-            virtual void onProcessStart(); 
+            virtual void onProcessStart() { } 
 
             virtual void onProcessEnd();
 
         private:
             
-            /** Name of MipTrigger object */
-            std::string hcalMipTriggerObjectName_;
+            /** Name of Trigger object */
+            std::string hcalTriggerObjectName_;
 
-            /** Name of pass that created mip trigger object */
-            std::string hcalMipTriggerPassName_;
+            /** Name of pass that created trigger object */
+            std::string hcalTriggerPassName_;
 
-            /** Number of "tracks" found per event */
-            TH1F *hTracksPerEvent_;
- 
             /** Counters for trigger */
             unsigned int numFalsePass_;
             unsigned int numTruePass_;
@@ -62,4 +59,4 @@ namespace ldmx {
    };
 }
 
-#endif /* HCAL_MIPTRIGGERANALYZER_H */
+#endif /* HCAL_TRIGGERANALYZER_H */

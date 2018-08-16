@@ -1,18 +1,18 @@
 /**
- * @file MipTriggerAnalyzer.cxx
- * @brief Implementation file for MipTriggerAnalyzer class
+ * @file TriggerAnalyzer.cxx
+ * @brief Implementation file for TriggerAnalyzer class
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/MipTriggerAnalyzer.h"
+#include "Hcal/TriggerAnalyzer.h"
 
 namespace ldmx {
 
-    void MipTriggerAnalyzer::configure(const ldmx::ParameterSet& ps) {
+    void TriggerAnalyzer::configure(const ldmx::ParameterSet& ps) {
         
-        hcalMipTriggerObjectName_ = ps.getString( "HcalMipTriggerObjectName" );
+        hcalTriggerObjectName_ = ps.getString( "HcalTriggerObjectName" );
 
-        hcalMipTriggerPassName_ = ps.getString( "HcalMipTriggerPassName" );
+        hcalTriggerPassName_ = ps.getString( "HcalTriggerPassName" );
 
         numFalsePass_ = 0;
         numTruePass_ = 0;
@@ -22,10 +22,10 @@ namespace ldmx {
         return;
     }
 
-    void MipTriggerAnalyzer::analyze(const ldmx::Event& event) {
+    void TriggerAnalyzer::analyze(const ldmx::Event& event) {
         
         //get list of triggers
-        const TClonesArray *triggers = event.getCollection( "Trigger" , hcalMipTriggerPassName_ );
+        const TClonesArray *triggers = event.getCollection( "Trigger" , hcalTriggerPassName_ );
         //get list of actual sim particles
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
         //get number of hcalHits that aren't noise
@@ -37,21 +37,13 @@ namespace ldmx {
                 nHcalHits++;
         }
         
-        //get hcal mip trigger
+        //get hcal  trigger
         int ntriggers = triggers->GetEntriesFast();
-        const TriggerResult *hcalMipTrigger;
+        const TriggerResult *hcalTrigger;
         for ( int i = 0; i < ntriggers; i++ ) {
-            hcalMipTrigger = (const TriggerResult *)(triggers->At(i));
-            if ( hcalMipTrigger->getName() == hcalMipTriggerObjectName_ )
+            hcalTrigger = (const TriggerResult *)(triggers->At(i));
+            if ( hcalTrigger->getName() == hcalTriggerObjectName_ )
                 break;
-        }
-        
-        if ( hcalMipTrigger ) {
-            hTracksPerEvent_->Fill( hcalMipTrigger->getAlgoVar4() );
-        } else {
-            std::cerr << hcalMipTriggerObjectName_ << " was not found in Trigger Collection in pass ";
-            std::cerr << hcalMipTriggerPassName_ << std::endl;
-            return;
         }
 
         //count number of actual muons
@@ -65,8 +57,8 @@ namespace ldmx {
         
         //ignore events with zero hcalHits (boring)
         if ( nHcalHits > 0 ) {
-            //check accuracy of mip trigger and set storage hint
-            bool triggerpass = hcalMipTrigger->passed();
+            //check accuracy of  trigger and set storage hint
+            bool triggerpass = hcalTrigger->passed();
             bool realpass = ( nmuons > 0 );
             if ( triggerpass and realpass) {
                 numTruePass_++;
@@ -88,17 +80,7 @@ namespace ldmx {
         return;
     }
 
-    void MipTriggerAnalyzer::onProcessStart() {
-        
-        getHistoDirectory();
-
-        hTracksPerEvent_ = new TH1F( "hTracksPerEvent_" , "Tracks Found Per Event" ,
-            11 , -0.5 , 10.5 );
-
-        return;
-    }
-
-    void MipTriggerAnalyzer::onProcessEnd() {
+    void TriggerAnalyzer::onProcessEnd() {
         
         unsigned int numEvents = numTruePass_+numTrueFail_+numFalsePass_+numFalseFail_;
         double accuracy = ((double)(numTruePass_) + (double)(numTrueFail_))/(double)(numEvents);
@@ -108,8 +90,8 @@ namespace ldmx {
         double falsePassRate = (double)(numFalsePass_)/(double)(numFalsePass_+numTruePass_);
         printf( "\n" );
         printf( " ===============================\n" );
-        printf( " | Mip Trigger Confusion Table |\n" );
-        printf( " | Mip     ||    Sim Particle  |\n" );
+        printf( " |   Trigger Confusion Table   |\n" );
+        printf( " |         ||    Sim Particle  |\n" );
         printf( " | Trigger ||   Pass | Fail    |\n" );
         printf( " |    Pass ||%7d | %-7d |\n" , numTruePass_ , numFalsePass_ );
         printf( " |    Fail ||%7d | %-7d |\n" , numFalseFail_ , numTrueFail_ );
@@ -128,4 +110,4 @@ namespace ldmx {
 
 }
 
-DECLARE_ANALYZER_NS(ldmx, MipTriggerAnalyzer);
+DECLARE_ANALYZER_NS(ldmx, TriggerAnalyzer);
