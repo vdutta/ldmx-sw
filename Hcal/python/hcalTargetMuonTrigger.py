@@ -3,7 +3,7 @@
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
-hcalTargetMuonTrigger = ldmxcfg.Producer( "hcalTargetMuonTrigger" , "ldmx::HcalTargetMuonTriggerProducer" )
+hcalTargetMuonTrigger = ldmxcfg.Producer( "hcalTargetMuonTrigger" , "ldmx::HcalMuonTriggerProducer" )
 
 # name of collection that contains the hcal hits 
 hcalTargetMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
@@ -28,5 +28,5 @@ hcalTargetMuonTrigger.parameters["MinFractionHit"] = 0.8
 hcalTargetMuonTrigger.parameters["AbsoluteMinNumberHits"] = 2
 
 # Name of track collection to be added to event bus
-hcalTargetMuonTrigger.parameters["HcalTargetMuonTriggerObjectName"] = "hcalTargetMuonTrigger"
+hcalTargetMuonTrigger.parameters["HcalMuonTriggerObjectName"] = "hcalTargetMuonTrigger"
  

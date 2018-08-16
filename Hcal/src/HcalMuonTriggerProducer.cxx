@@ -15,13 +15,13 @@ namespace ldmx {
         
         muonOrigin_ = ps.getString( "HcalMuonOrigin" );
         
-        int minL = 0; maxL = 2;
-        if ( muonOrigin == "Cosmic" ) {
+        int minL = 0, maxL = 2;
+        if ( muonOrigin_ == "Cosmic" ) {
             //Cosmic Muons
             // Use layers in side hcal and strips in Back
             minL = 2;
             maxL = 6;
-        } else if ( muonOrigin != "Target" ) {
+        } else if ( muonOrigin_ != "Target" ) {
             std::cerr << "WARNING [ HcalMuonTrigger ] : Unknown Muon Origin. Defaulting to Target" << std::endl;
         }
         for ( int l = minL; l < maxL; l++ )
