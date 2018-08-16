@@ -28,7 +28,7 @@ namespace ldmx {
         if (lheEvent != NULL) {
 
             G4PrimaryVertex* vertex = new G4PrimaryVertex();
-            vertex->SetPosition(0, 0, 0);
+            vertex->SetPosition(lheEvent->getVertex()[0],lheEvent->getVertex()[1],lheEvent->getVertex()[2]);
             vertex->SetWeight(lheEvent->getXWGTUP());
 
             std::map<LHEParticle*, G4PrimaryParticle*> particleMap;
@@ -47,13 +47,18 @@ namespace ldmx {
                         if (tungstenIonDef != NULL) {
                             primary->SetParticleDefinition(tungstenIonDef);
                         } else {
-                            G4Exception("LHEPrimaryGenerator::GeneratePrimaryVertex", "EventGenerationError", FatalException, "Failed to find particle definition for W ion.");
+                            G4Exception("LHEPrimaryGenerator::GeneratePrimaryVertex", 
+                                        "EventGenerationError", FatalException, 
+                                        "Failed to find particle definition for W ion.");
                         }
                     } else {
                         primary->SetPDGcode(particle->getIDUP());
                     }
 
-                    primary->Set4Momentum(particle->getPUP(0) * GeV, particle->getPUP(1) * GeV, particle->getPUP(2) * GeV, particle->getPUP(3) * GeV);
+                    primary->Set4Momentum(particle->getPUP(0) * GeV, 
+                                          particle->getPUP(1) * GeV, 
+                                          particle->getPUP(2) * GeV, 
+                                          particle->getPUP(3) * GeV);
                     primary->SetProperTime(particle->getVTIMUP() * nanosecond);
 
                     UserPrimaryParticleInformation* primaryInfo = new UserPrimaryParticleInformation();
@@ -74,12 +79,7 @@ namespace ldmx {
                         vertex->SetPrimary(primary);
                     }
 
-                    primary->Print();
-
-                } else {
-                }
-
-                std::cout << std::endl;
+                } 
 
                 ++particleIndex;
             }
