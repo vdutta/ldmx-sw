@@ -1,14 +1,14 @@
 /**
- * @file HcalMipTriggerProducer.cxx
- * @brief Implementaiton of HcalMipTriggerProducer class
+ * @file HcalTargetMuonTriggerProducer.cxx
+ * @brief Implementaiton of HcalTargetMuonTriggerProducer class
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/HcalMipTriggerProducer.h"
+#include "Hcal/HcalTargetMuonTriggerProducer.h"
 
 namespace ldmx {
 
-    void HcalMipTriggerProducer::configure(const ldmx::ParameterSet& ps) {
+    void HcalTargetMuonTriggerProducer::configure(const ldmx::ParameterSet& ps) {
         
         hitCollName_ = ps.getString( "HcalHitCollectionName" );
         hitPassName_ = ps.getString( "HcalHitPassName" );
@@ -23,14 +23,14 @@ namespace ldmx {
 
         minPE_ = ps.getDouble( "MinimumPE" );
 
-        triggerObjectName_ = ps.getString( "HcalMipTriggerObjectName" );
+        triggerObjectName_ = ps.getString( "HcalTargetMuonTriggerObjectName" );
 
         numPass_ = 0;
 
         return;
     }
 
-    void HcalMipTriggerProducer::produce(ldmx::Event& event) {
+    void HcalTargetMuonTriggerProducer::produce(ldmx::Event& event) {
         
         //initialize event containers
         for ( int iO = 0; iO < 6; iO++ ) {
@@ -170,11 +170,11 @@ namespace ldmx {
         return;
     }
     
-    void HcalMipTriggerProducer::onProcessEnd() {
+    void HcalTargetMuonTriggerProducer::onProcessEnd() {
         
         printf( "\n" );
         printf( " ============================================\n" );
-        printf( " |HcalMipTriggerProducer - Performance Stats|\n" );
+        printf( " |      HcalTargetMuonTriggerProducer       |\n" );
         printf( " |==========================================|\n" );
         printf( " |          Num Passed : %-19d|\n" , numPass_ );
         printf( " |==========================================|\n" );
@@ -187,11 +187,11 @@ namespace ldmx {
         return;
     }
 
-    bool HcalMipTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
+    bool HcalTargetMuonTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
         return ( hit->getPE() > minPE_ and hit->getEnergy() < maxEnergy_ );
     }
 
-    bool HcalMipTriggerProducer::findEndPoints( int orientation ) {
+    bool HcalTargetMuonTriggerProducer::findEndPoints( int orientation ) {
         
         startPt_ = hitLog_[ orientation ].end();
         finishPt_ = hitLog_[ orientation ].end();
@@ -232,4 +232,4 @@ namespace ldmx {
 
 }
 
-DECLARE_PRODUCER_NS( ldmx , HcalMipTriggerProducer );
+DECLARE_PRODUCER_NS( ldmx , HcalTargetMuonTriggerProducer );
