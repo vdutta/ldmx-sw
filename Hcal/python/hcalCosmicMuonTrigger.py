@@ -3,11 +3,14 @@
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
-hcalCosmicMuonTrigger = ldmxcfg.Producer( "hcalCosmicMuonTrigger" , "ldmx::HcalCosmicMuonTriggerProducer" )
+hcalCosmicMuonTrigger = ldmxcfg.Producer( "hcalCosmicMuonTrigger" , "ldmx::HcalMuonTriggerProducer" )
 
 # name of collection that contains the hcal hits 
 hcalCosmicMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
 hcalCosmicMuonTrigger.parameters["HcalHitPassName"] = "recon"
+
+# name of muon origin, should be either 'Target' or 'Cosmic'
+hcalCosmicMuonTrigger.parameters["HcalMuonOrigin"] = "Cosmic"
 
 # minimum PE for a single hit to be considered non-noise
 hcalCosmicMuonTrigger.parameters["MinimumPE"] = 5.5

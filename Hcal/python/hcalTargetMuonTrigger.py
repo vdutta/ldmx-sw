@@ -9,6 +9,9 @@ hcalTargetMuonTrigger = ldmxcfg.Producer( "hcalTargetMuonTrigger" , "ldmx::HcalT
 hcalTargetMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
 hcalTargetMuonTrigger.parameters["HcalHitPassName"] = "recon"
 
+# name of muon origin
+hcalTargetMuonTrigger.parameters["HcalMuonOrigin"] = "Target"
+
 # minimum PE for a single hit to be considered non-noise
 hcalTargetMuonTrigger.parameters["MinimumPE"] = 5.5
 
