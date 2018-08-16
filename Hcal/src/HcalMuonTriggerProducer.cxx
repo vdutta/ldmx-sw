@@ -1,17 +1,31 @@
 /**
- * @file HcalTargetMuonTriggerProducer.cxx
- * @brief Implementaiton of HcalTargetMuonTriggerProducer class
+ * @file HcalMuonTriggerProducer.cxx
+ * @brief Implementaiton of HcalMuonTriggerProducer class
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/HcalTargetMuonTriggerProducer.h"
+#include "Hcal/HcalMuonTriggerProducer.h"
 
 namespace ldmx {
 
-    void HcalTargetMuonTriggerProducer::configure(const ldmx::ParameterSet& ps) {
+    void HcalMuonTriggerProducer::configure(const ldmx::ParameterSet& ps) {
         
         hitCollName_ = ps.getString( "HcalHitCollectionName" );
         hitPassName_ = ps.getString( "HcalHitPassName" );
+        
+        muonOrigin_ = ps.getString( "HcalMuonOrigin" );
+        
+        int minL = 0; maxL = 2;
+        if ( muonOrigin == "Cosmic" ) {
+            //Cosmic Muons
+            // Use layers in side hcal and strips in Back
+            minL = 2;
+            maxL = 6;
+        } else if ( muonOrigin != "Target" ) {
+            std::cerr << "WARNING [ HcalMuonTrigger ] : Unknown Muon Origin. Defaulting to Target" << std::endl;
+        }
+        for ( int l = minL; l < maxL; l++ )
+            layerUsers_.insert( l );
 
         trackRadius_ = ps.getDouble( "TrackRadius" );
 
@@ -23,14 +37,14 @@ namespace ldmx {
 
         minPE_ = ps.getDouble( "MinimumPE" );
 
-        triggerObjectName_ = ps.getString( "HcalTargetMuonTriggerObjectName" );
+        triggerObjectName_ = ps.getString( "HcalMuonTriggerObjectName" );
 
         numPass_ = 0;
 
         return;
     }
 
-    void HcalTargetMuonTriggerProducer::produce(ldmx::Event& event) {
+    void HcalMuonTriggerProducer::produce(ldmx::Event& event) {
         
         //initialize event containers
         for ( int iO = 0; iO < 6; iO++ ) {
@@ -82,7 +96,11 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
-                if ( corient < 2 and abs(dlayer) > 0 ) {
+                bool shouldUseLayers = true;
+                if ( layerUsers_.find( corient ) == layerUsers_.end() )
+                    shouldUseLayers = false;
+
+                if ( shouldUseLayers and abs(dlayer) > 0 ) {
                     //BACK HCAL, layer is independent variable for target muons
                     
                     //calculate slope
@@ -170,11 +188,11 @@ namespace ldmx {
         return;
     }
     
-    void HcalTargetMuonTriggerProducer::onProcessEnd() {
+    void HcalMuonTriggerProducer::onProcessEnd() {
         
         printf( "\n" );
         printf( " ============================================\n" );
-        printf( " |      HcalTargetMuonTriggerProducer       |\n" );
+        printf( " | HcalMuonTriggerProducer | %14s |\n" , muonOrigin_.c_str() );
         printf( " |==========================================|\n" );
         printf( " |          Num Passed : %-19d|\n" , numPass_ );
         printf( " |==========================================|\n" );
@@ -187,11 +205,11 @@ namespace ldmx {
         return;
     }
 
-    bool HcalTargetMuonTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
+    bool HcalMuonTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
         return ( hit->getPE() > minPE_ and hit->getEnergy() < maxEnergy_ );
     }
 
-    bool HcalTargetMuonTriggerProducer::findEndPoints( int orientation ) {
+    bool HcalMuonTriggerProducer::findEndPoints( int orientation ) {
         
         startPt_ = hitLog_[ orientation ].end();
         finishPt_ = hitLog_[ orientation ].end();
@@ -232,4 +250,4 @@ namespace ldmx {
 
 }
 
-DECLARE_PRODUCER_NS( ldmx , HcalTargetMuonTriggerProducer );
+DECLARE_PRODUCER_NS( ldmx , HcalMuonTriggerProducer );

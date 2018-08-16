@@ -1,11 +1,11 @@
 /**
- * @file HcalTargetMuonTriggerProducer.h
- * @brief Header file for HcalTargetMuonTriggerProducer
+ * @file HcalMuonTriggerProducer.h
+ * @brief Header file for HcalMuonTriggerProducer
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef HCAL_HCALTARGETMUONTRIGGERPRODUCER_H
-#define HCAL_HCALTARGETMUONTRIGGERPRODUCER_H
+#ifndef HCAL_HCALMUONTRIGGERPRODUCER_H
+#define HCAL_HCALMUONTRIGGERPRODUCER_H
 
 //STL
 #include <cmath> //abs value
@@ -24,7 +24,7 @@
 namespace ldmx {
     
     /**
-     * @class HcalTargetMuonTriggerProducer
+     * @class HcalMuonTriggerProducer
      * @brief Constructs Trigger Result depending on Section, Layer, Strip, PE, and 
      *  Energy information of hits in the Hcal.
      *
@@ -36,10 +36,10 @@ namespace ldmx {
      * No attempt at combining these tracks is made, if a track is found anywhere, the event
      * passes this trigger.
      */
-    class HcalTargetMuonTriggerProducer : public ldmx::Producer {
+    class HcalMuonTriggerProducer : public ldmx::Producer {
         public:
 
-            HcalTargetMuonTriggerProducer(const std::string& name, ldmx::Process& process) 
+            HcalMuonTriggerProducer(const std::string& name, ldmx::Process& process) 
                 : ldmx::Producer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
@@ -99,6 +99,9 @@ namespace ldmx {
 
             /** Name of HcalHit pass */
             std::string hitPassName_;
+
+            /** Origin of Muons (Target or Cosmic) */
+            std::string muonOrigin_;
             
             /** Maximum Difference Between a hit and the center line of track [in N layers/strips] */
             double trackRadius_;
@@ -131,6 +134,10 @@ namespace ldmx {
 
             /** Current Finish Point */
             std::map< unsigned int , HitLogNode >::iterator finishPt_;
+
+            /** Set that contains list of orientations that should use the layer
+             * as the independent variable */
+            std::set< int > layerUsers_;
     
             // PERFORMANCE TRACKERS
 
@@ -142,4 +149,4 @@ namespace ldmx {
     };
 }
 
-#endif /* HCAL_HCALTARGETMUONTRIGGERPRODUCER_H */
+#endif /* HCAL_HCALMUONTRIGGERPRODUCER_H */
