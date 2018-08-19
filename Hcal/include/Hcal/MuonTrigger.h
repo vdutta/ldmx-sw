@@ -1,11 +1,11 @@
 /**
- * @file CosmicMuonTrigger.h
- * @brief Header file for CosmicMuonTrigger producer
+ * @file MuonTrigger.h
+ * @brief Header file for MuonTrigger producer
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef HCAL_COSMICMUONTRIGGER_H
-#define HCAL_COSMICMUONTRIGGER_H
+#ifndef HCAL_MUONTRIGGER_H
+#define HCAL_MUONTRIGGER_H
 
 //LDMX Framework
 #include "Event/Event.h"
@@ -16,8 +16,8 @@
 namespace ldmx {
     
     /**
-     * @class CosmicMuonTrigger
-     * @brief Producer to trigger on cosmic muons in order to separate them
+     * @class MuonTrigger
+     * @brief Producer to trigger on  muons in order to separate them
      *  from interactions originating from the beam.
      *
      * Currently, this trigger is cutting on the number of consecutive layers and strips hit in any section.
@@ -30,10 +30,10 @@ namespace ldmx {
      * This is an upper bound estimate because if layers and strips are not counted more than once when
      * sorting the hits, so any overlap decreases the number of loops in the analysis.
      */
-    class CosmicMuonTrigger : public ldmx::Producer {
+    class MuonTrigger : public ldmx::Producer {
         public:
 
-            CosmicMuonTrigger(const std::string& name, ldmx::Process& process) : ldmx::Producer(name, process) {}
+            MuonTrigger(const std::string& name, ldmx::Process& process) : ldmx::Producer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
@@ -74,4 +74,4 @@ namespace ldmx {
     };
 }
 
-#endif /* HCAL_COSMICMUONTRIGGER_H */
+#endif /* HCAL_MUONTRIGGER_H */

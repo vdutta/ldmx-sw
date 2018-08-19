@@ -1,14 +1,14 @@
 /**
- * @file CosmicMuonTrigger.cxx
- * @brief Implementation file for CosmicMuonTrigger producer
+ * @file MuonTrigger.cxx
+ * @brief Implementation file for MuonTrigger producer
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/CosmicMuonTrigger.h"
+#include "Hcal/MuonTrigger.h"
 
 namespace ldmx {
 
-    void CosmicMuonTrigger::configure(const ldmx::ParameterSet& ps) {
+    void MuonTrigger::configure(const ldmx::ParameterSet& ps) {
         
         hcalHitCollName_ = ps.getString( "HcalHitCollectionName" );
         hcalHitPassName_ = ps.getString( "HcalHitPassName" );
@@ -33,7 +33,7 @@ namespace ldmx {
         return;
     }
 
-    void CosmicMuonTrigger::produce(ldmx::Event& event) {
+    void MuonTrigger::produce(ldmx::Event& event) {
         
         //get hcal hits
         const TClonesArray *hcalHits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
@@ -48,7 +48,7 @@ namespace ldmx {
                 layersHit[ section ].insert( chit->getLayer() );
                 stripsHit[ section ].insert( chit->getStrip() );
             } else {
-                std::cerr << "WARNING [ CosmicMuonTrigger::produce ] : Unknown HcalSection!" << std::endl;
+                std::cerr << "WARNING [ MuonTrigger::produce ] : Unknown HcalSection!" << std::endl;
             }
         } //add each hit information to set
 
@@ -81,7 +81,7 @@ namespace ldmx {
         return;
     }
     
-    int CosmicMuonTrigger::consecCount( const std::set<int> &numbers ) const {
+    int MuonTrigger::consecCount( const std::set<int> &numbers ) const {
         
         int maxConsec(0);
         
@@ -113,4 +113,4 @@ namespace ldmx {
     }   
 }
 
-DECLARE_PRODUCER_NS(ldmx, CosmicMuonTrigger);
+DECLARE_PRODUCER_NS(ldmx, MuonTrigger);
