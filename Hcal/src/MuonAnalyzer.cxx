@@ -1,19 +1,19 @@
 /**
- * @file CosmicMuonAnalyzer.cxx
- * @brief Implementation file for CosmicMuonAnalyzer class.
+ * @file MuonAnalyzer.cxx
+ * @brief Implementation file for MuonAnalyzer class.
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/CosmicMuonAnalyzer.h"
+#include "Hcal/MuonAnalyzer.h"
 
 namespace ldmx {
 
-    void CosmicMuonAnalyzer::configure(const ldmx::ParameterSet& ps) {
+    void MuonAnalyzer::configure(const ldmx::ParameterSet& ps) {
 
         return;
     }
 
-    void CosmicMuonAnalyzer::analyze(const ldmx::Event& event) {
+    void MuonAnalyzer::analyze(const ldmx::Event& event) {
         
         //one set for each orientation
         std::set<int> layersHit[5], stripsHit[5];
@@ -48,7 +48,7 @@ namespace ldmx {
         return;
     }
 
-    void CosmicMuonAnalyzer::onProcessStart() {
+    void MuonAnalyzer::onProcessStart() {
         
         getHistoDirectory();
         
@@ -75,7 +75,7 @@ namespace ldmx {
         return;
     }
     
-    int CosmicMuonAnalyzer::consecutiveCount( const std::set<int> &list ) const {
+    int MuonAnalyzer::consecutiveCount( const std::set<int> &list ) const {
         
         int consec(0), maxConsec(0);
         
@@ -106,4 +106,4 @@ namespace ldmx {
     }
 }
 
-DECLARE_ANALYZER_NS(ldmx, CosmicMuonAnalyzer);
+DECLARE_ANALYZER_NS(ldmx, MuonAnalyzer);

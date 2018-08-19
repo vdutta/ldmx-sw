@@ -1,11 +1,11 @@
 /**
- * @file CosmicMuonAnalyzer.h
- * @brief Header file for CosmicMuonAnalyzer class.
+ * @file MuonAnalyzer.h
+ * @brief Header file for MuonAnalyzer class.
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef HCAL_COSMICMUONANALYZER_H
-#define HCAL_COSMICMUONANALYZER_H
+#ifndef HCAL_MUONANALYZER_H
+#define HCAL_MUONANALYZER_H
 
 //STL
 #include <set>
@@ -23,13 +23,13 @@
 namespace ldmx {
     
     /**
-     * @class CosmicMuonAnalyzer
-     * @brief Class to study the behavior of cosmic muons passing through the back Hcal
+     * @class MuonAnalyzer
+     * @brief Class to study the behavior of  muons passing through the back Hcal
      */
-    class CosmicMuonAnalyzer : public ldmx::Analyzer {
+    class MuonAnalyzer : public ldmx::Analyzer {
         public:
 
-            CosmicMuonAnalyzer(const std::string& name, ldmx::Process& process) : ldmx::Analyzer(name, process) {}
+            MuonAnalyzer(const std::string& name, ldmx::Process& process) : ldmx::Analyzer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
 
@@ -54,4 +54,4 @@ namespace ldmx {
     };
 }
 
-#endif /* HCAL_COSMICMUONANALYZER_H */
+#endif /* HCAL_MUONANALYZER_H */
