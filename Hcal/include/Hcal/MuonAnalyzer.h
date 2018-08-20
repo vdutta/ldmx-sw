@@ -9,6 +9,7 @@
 
 //ROOT
 #include "TH1.h"
+#include "TH2.h"
 
 //LDMX Framework
 #include "Event/Event.h"
@@ -45,6 +46,15 @@ namespace ldmx {
             //One set of histograms for each section
             TH1F *hNumConsecLayers_[5];
             TH1F *hNumConsecStrips_[5];
+
+            //Rough uncertainty measurement for all muons
+            TH1F *hUncertainPathLength_;
+
+            //Rough Uncertainty compared to num consec layers
+            TH2F *hUncertainVConsecLayers_;
+
+            //Rough Uncertainty compared to num consec strips
+            TH2F *hUncertainVConsecStrips_;
     };
 }
 

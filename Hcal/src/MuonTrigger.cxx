@@ -41,12 +41,26 @@ namespace ldmx {
         //sort layers hit and strips hit into sections
         std::set<int> layersHit[5], stripsHit[5];
         int nHits = hcalHits->GetEntriesFast();
+        const HcalHit *first(nullptr), *last(nullptr);
         for ( int iH = 0; iH < nHits; iH++ ) {
             const HcalHit *chit = (const HcalHit *)(hcalHits->At(iH));
             int section = chit->getSection();
             if ( section >= 0 and section < 5 ) {
                 layersHit[ section ].insert( chit->getLayer() );
                 stripsHit[ section ].insert( chit->getStrip() );
+
+                if ( !first or 
+                     first->getLayer() < chit->getLayer() or
+                     (first->getLayer() == chit->getLayer() and first->getStrip() > chit->getStrip())
+                   )
+                    first = chit;
+
+                if ( !last or
+                     last->getLayer() < last->getLayer() or
+                     (last->getLayer() == chit->getLayer() and last->getStrip() < chit->getStrip())
+                   )
+                    last = chit;
+
             } else {
                 std::cerr << "WARNING [ MuonTrigger::produce ] : Unknown HcalSection!" << std::endl;
             }
@@ -66,6 +80,18 @@ namespace ldmx {
             } //if any section passes
 
         } //check each section
+        
+        double pathUnc(-1);
+        if ( first != last ) {
+            double dx = last->getX() - first->getX();
+            double dy = last->getY() - first->getY();
+            double dz = last->getZ() - first->getZ();
+            double scint_width = 100.0;
+            double scint_thick = 30.0;
+            double pathXUnc = (dx*scint_thick)/(sqrt(6)*dz*dz)*sqrt( (scint_thick*scint_thick*dx*dx+scint_width*scint_width*dz*dz)/(dx*dx+dz*dz) );
+            double pathYUnc = (dy*scint_thick)/(sqrt(6)*dz*dz)*sqrt( (scint_thick*scint_thick*dy*dy+scint_width*scint_width*dz*dz)/(dy*dy+dz*dz) );
+            pathUnc = sqrt( pathXUnc*pathXUnc + pathYUnc*pathYUnc );
+        }
 
         //build result object
         result_.set( triggerObjectName_ , pass , 20 );
@@ -75,6 +101,7 @@ namespace ldmx {
             result_.setAlgoVar( 4*s+2 , consecLayersHit[s] );
             result_.setAlgoVar( 4*s+3 , consecStripsHit[s] );
         }
+        result_.setAlgoVar( 4*5 , pathUnc );
 
         event.addToCollection( "Trigger" , result_ );
 

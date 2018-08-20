@@ -9,6 +9,8 @@
 
 //STL
 #include <set> //sorting layers and strips
+#include <iterator> //prev
+#include <cmath>
 
 //LDMX Framework
 #include "Event/Event.h"

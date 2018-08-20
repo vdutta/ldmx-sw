@@ -99,11 +99,19 @@ namespace ldmx {
                 int dstrip = ( (finishPt_->second).strip - startStrip );
                 int dlayer = ( (finishPt_->second).layer - startLayer );
                 
+                //rough estimate of uncertainty in track direction
+                // we want a lower uncertainty in track direction so that our
+                // calculation of the path length through a given bar is more certain.
+                // A more certain path length leads to better calibration.
+                double roughUncertain;
+
                 if ( shouldUseLayers and abs(dlayer) > 0 ) {
                     //layer is independent variable for muons
                     
                     //calculate slope
                     float slope = static_cast<float>(dstrip)/static_cast<float>(dlayer);
+                    
+                    roughUncertain = (double)(dlayer);
                     
                     //count hits in this orientation that are in the cylinder
                     std::set<int> countedLayers; //layers that already have been counted
@@ -149,8 +157,8 @@ namespace ldmx {
                 
                 } //steep/shallow slope
                 //skips end points if -1 <= dlayer <= 1 and -1 <= dstrip <= 1
-
-                if ( hitcnt > longtracklen ) {
+                
+                                if ( hitcnt > longtracklen ) {
                     //good track found
                     longtracklen = hitcnt;
                 } 
