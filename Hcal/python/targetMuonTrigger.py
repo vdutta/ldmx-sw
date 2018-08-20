@@ -3,28 +3,28 @@
 # we need the ldmx configuration package to construct the object
 from LDMX.Framework import ldmxcfg
 
-hcalMuonTrigger = ldmxcfg.Producer( "hcalMuonTrigger" , "ldmx::MuonTrigger" )
+targetMuonTrigger = ldmxcfg.Producer( "targetMuonTrigger" , "ldmx::MuonTrigger" )
 
 # name of collection that contains the hcal hits 
-hcalMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
-hcalMuonTrigger.parameters["HcalHitPassName"] = "recon"
+targetMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
+targetMuonTrigger.parameters["HcalHitPassName"] = "recon"
 
 # Name of track collection to be added to event bus
-hcalMuonTrigger.parameters["TriggerObjectName"] = "targetMuonTrigger"
+targetMuonTrigger.parameters["TriggerObjectName"] = "targetMuonTrigger"
 
-# Cuts on number of consecutive layers, strips hit for each section
+# Cuts on number of Consecutiveutive layers, strips hit for each section
 # if any section passes the cuts, then the whole event passes
-hcalMuonTrigger.parameters["MinConsecLayersHitBackHcal"] = 40
-hcalMuonTrigger.parameters["MinConsecStripsHitBackHcal"] = 0
+targetMuonTrigger.parameters["MinConsecutiveLayersHitBackHcal"] = 40
+targetMuonTrigger.parameters["MinConsecutiveStripsHitBackHcal"] = 0
 
-hcalMuonTrigger.parameters["MinConsecLayersHitTopHcal"] = 10
-hcalMuonTrigger.parameters["MinConsecStripsHitTopHcal"] = 0
+targetMuonTrigger.parameters["MinConsecutiveLayersHitTopHcal"] = 10
+targetMuonTrigger.parameters["MinConsecutiveStripsHitTopHcal"] = 0
 
-hcalMuonTrigger.parameters["MinConsecLayersHitBottomHcal"] = 10
-hcalMuonTrigger.parameters["MinConsecStripsHitBottomHcal"] = 0
+targetMuonTrigger.parameters["MinConsecutiveLayersHitBottomHcal"] = 10
+targetMuonTrigger.parameters["MinConsecutiveStripsHitBottomHcal"] = 0
 
-hcalMuonTrigger.parameters["MinConsecLayersHitLeftHcal"] = 10
-hcalMuonTrigger.parameters["MinConsecStripsHitLeftHcal"] = 0
+targetMuonTrigger.parameters["MinConsecutiveLayersHitLeftHcal"] = 10
+targetMuonTrigger.parameters["MinConsecutiveStripsHitLeftHcal"] = 0
 
-hcalMuonTrigger.parameters["MinConsecLayersHitRightHcal"] = 10
-hcalMuonTrigger.parameters["MinConsecStripsHitRightHcal"] = 0
+targetMuonTrigger.parameters["MinConsecutiveLayersHitRightHcal"] = 10
+targetMuonTrigger.parameters["MinConsecutiveStripsHitRightHcal"] = 0
