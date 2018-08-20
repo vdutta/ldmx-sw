@@ -7,11 +7,15 @@
 #ifndef HCAL_MUONTRIGGER_H
 #define HCAL_MUONTRIGGER_H
 
+//STL
+#include <set> //sorting layers and strips
+
 //LDMX Framework
 #include "Event/Event.h"
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/TriggerResult.h" //Store trigger result in event bus
+#include "Event/HcalHit.h" //get raw hits
 
 namespace ldmx {
     
@@ -52,7 +56,7 @@ namespace ldmx {
             /**
              * Counts the number of consecutive numbers in the input STL set.
              */
-            int consecCount( const std::set &numbers ) const;
+            int consecCount( const std::set<int> &numbers ) const;
 
             /** Collection name of HcalHits to look in */
             std::string hcalHitCollName_;

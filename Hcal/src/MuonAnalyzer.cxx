@@ -24,7 +24,8 @@ namespace ldmx {
 
         const TriggerResult *muonTrigger;
         int nTriggers = triggers->GetEntriesFast();
-        for ( int iT = 0; iT < nTriggers; iT++ ) {
+        int iT;
+        for ( iT = 0; iT < nTriggers; iT++ ) {
             muonTrigger = (const TriggerResult *)(triggers->At(iT));
             if ( muonTrigger->getName() == triggerObjectName_ )
                 break;
@@ -36,8 +37,8 @@ namespace ldmx {
     
             //fill histograms for each section
             for ( int s = 0; s < 5; s++ ) {
-                hNumConsecLayers_[s]->Fill( muonTrigger->getAlgoVar( 4*s+2 );
-                hNumConsecStrips_[s]->Fill( muonTrigger->getAlgoVar( 4*s+3 );
+                hNumConsecLayers_[s]->Fill( muonTrigger->getAlgoVar( 4*s+2 ) );
+                hNumConsecStrips_[s]->Fill( muonTrigger->getAlgoVar( 4*s+3 ) );
             }
 
         } //check if found trigger

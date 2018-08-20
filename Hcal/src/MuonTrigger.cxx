@@ -39,7 +39,7 @@ namespace ldmx {
         const TClonesArray *hcalHits = event.getCollection( hcalHitCollName_ , hcalHitPassName_ );
 
         //sort layers hit and strips hit into sections
-        std::set layersHit[5], stripsHit[5];
+        std::set<int> layersHit[5], stripsHit[5];
         int nHits = hcalHits->GetEntriesFast();
         for ( int iH = 0; iH < nHits; iH++ ) {
             const HcalHit *chit = (const HcalHit *)(hcalHits->At(iH));
