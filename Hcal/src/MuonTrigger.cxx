@@ -44,7 +44,7 @@ namespace ldmx {
         for ( int iH = 0; iH < nHits; iH++ ) {
             const HcalHit *chit = (const HcalHit *)(hcalHits->At(iH));
             int section = chit->getSection();
-            if ( section > 0 and section < 5 ) {
+            if ( section >= 0 and section < 5 ) {
                 layersHit[ section ].insert( chit->getLayer() );
                 stripsHit[ section ].insert( chit->getStrip() );
             } else {

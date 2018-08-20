@@ -6,8 +6,8 @@ from LDMX.Framework import ldmxcfg
 triggerStudy = ldmxcfg.Analyzer("triggerStudy", "ldmx::TriggerAnalyzer")
 
 # name of hcal  trigger to analyze
-triggerStudy.parameters[ "HcalTriggerObjectName" ] = "hcalMipTrigger"
+triggerStudy.parameters[ "TriggerObjectName" ] = "hcalMipTrigger"
 
 # name of pass that create hcal  trigger
-triggerStudy.parameters[ "HcalTriggerPassName" ] = "recon"
+triggerStudy.parameters[ "TriggerPassName" ] = "recon"
 
