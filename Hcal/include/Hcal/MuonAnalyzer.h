@@ -7,10 +7,6 @@
 #ifndef HCAL_MUONANALYZER_H
 #define HCAL_MUONANALYZER_H
 
-//STL
-#include <set>
-#include <iterator> //prev
-
 //ROOT
 #include "TH1.h"
 
@@ -18,13 +14,14 @@
 #include "Event/Event.h"
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
-#include "Event/HcalHit.h"
+#include "Event/TriggerResult.h"
 
 namespace ldmx {
     
     /**
      * @class MuonAnalyzer
-     * @brief Class to study the behavior of  muons passing through the back Hcal
+     * @brief Class to study the behavior of muons passing through the Hcal and the trigger trying to 
+     *  pick them out.
      */
     class MuonAnalyzer : public ldmx::Analyzer {
         public:
@@ -38,17 +35,14 @@ namespace ldmx {
             virtual void onProcessStart(); 
 
         private:
-            /**
-             * Counts consecutive numbers in list.
-             * Returns the maximum number of consecutives.
-             */
-            int consecutiveCount( const std::set<int> &list ) const;
             
+            /** Trigger Object Name */
+            std::string triggerObjectName_;
+
+            /** Pass that created trigger */
+            std::string triggerPassName_;
+
             //One set of histograms for each section
-            TH1F *hMinStrip_[5];
-            TH1F *hMaxStrip_[5];
-            TH1F *hMinLayer_[5];
-            TH1F *hMaxLayer_[5];
             TH1F *hNumConsecLayers_[5];
             TH1F *hNumConsecStrips_[5];
     };
