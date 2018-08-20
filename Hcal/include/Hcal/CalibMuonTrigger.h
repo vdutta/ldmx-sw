@@ -1,11 +1,11 @@
 /**
- * @file HcalMuonTriggerProducer.h
- * @brief Header file for HcalMuonTriggerProducer
+ * @file CalibMuonTrigger.h
+ * @brief Header file for CalibMuonTrigger
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef HCAL_HCALMUONTRIGGERPRODUCER_H
-#define HCAL_HCALMUONTRIGGERPRODUCER_H
+#ifndef HCAL_CALIBMUONTRIGGER_H
+#define HCAL_CALIBMUONTRIGGER_H
 
 //STL
 #include <cmath> //abs value
@@ -24,7 +24,7 @@
 namespace ldmx {
     
     /**
-     * @class HcalMuonTriggerProducer
+     * @class CalibMuonTrigger
      * @brief Constructs Trigger Result depending on Section, Layer, Strip, PE, and 
      *  Energy information of hits in the Hcal.
      *
@@ -36,10 +36,10 @@ namespace ldmx {
      * No attempt at combining these tracks is made, if a track is found anywhere, the event
      * passes this trigger.
      */
-    class HcalMuonTriggerProducer : public ldmx::Producer {
+    class CalibMuonTrigger : public ldmx::Producer {
         public:
 
-            HcalMuonTriggerProducer(const std::string& name, ldmx::Process& process) 
+            CalibMuonTrigger(const std::string& name, ldmx::Process& process) 
                 : ldmx::Producer(name, process) {}
 
             virtual void configure(const ldmx::ParameterSet& ps);
@@ -149,4 +149,4 @@ namespace ldmx {
     };
 }
 
-#endif /* HCAL_HCALMUONTRIGGERPRODUCER_H */
+#endif /* HCAL_CALIBMUONTRIGGER_H */

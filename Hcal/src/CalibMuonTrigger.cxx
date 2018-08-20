@@ -1,14 +1,14 @@
 /**
- * @file HcalMuonTriggerProducer.cxx
- * @brief Implementaiton of HcalMuonTriggerProducer class
+ * @file CalibMuonTrigger.cxx
+ * @brief Implementaiton of CalibMuonTrigger class
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#include "Hcal/HcalMuonTriggerProducer.h"
+#include "Hcal/CalibMuonTrigger.h"
 
 namespace ldmx {
 
-    void HcalMuonTriggerProducer::configure(const ldmx::ParameterSet& ps) {
+    void CalibMuonTrigger::configure(const ldmx::ParameterSet& ps) {
         
         hitCollName_ = ps.getString( "HcalHitCollectionName" );
         hitPassName_ = ps.getString( "HcalHitPassName" );
@@ -44,7 +44,7 @@ namespace ldmx {
         return;
     }
 
-    void HcalMuonTriggerProducer::produce(ldmx::Event& event) {
+    void CalibMuonTrigger::produce(ldmx::Event& event) {
         
         //initialize event containers
         for ( int iO = 0; iO < 6; iO++ ) {
@@ -187,11 +187,11 @@ namespace ldmx {
         return;
     }
     
-    void HcalMuonTriggerProducer::onProcessEnd() {
+    void CalibMuonTrigger::onProcessEnd() {
         
         printf( "\n" );
         printf( " ============================================\n" );
-        printf( " | HcalMuonTriggerProducer | %14s |\n" , muonOrigin_.c_str() );
+        printf( " | CalibMuonTrigger | %14s |\n" , muonOrigin_.c_str() );
         printf( " |==========================================|\n" );
         printf( " |          Num Passed : %-19d|\n" , numPass_ );
         printf( " |==========================================|\n" );
@@ -204,11 +204,11 @@ namespace ldmx {
         return;
     }
 
-    bool HcalMuonTriggerProducer::isPlausibleMip( ldmx::HcalHit* hit ) const {
+    bool CalibMuonTrigger::isPlausibleMip( ldmx::HcalHit* hit ) const {
         return ( hit->getPE() > minPE_ and hit->getEnergy() < maxEnergy_ );
     }
 
-    bool HcalMuonTriggerProducer::findEndPoints( int orientation ) {
+    bool CalibMuonTrigger::findEndPoints( int orientation ) {
         
         startPt_ = hitLog_[ orientation ].end();
         finishPt_ = hitLog_[ orientation ].end();
@@ -249,4 +249,4 @@ namespace ldmx {
 
 }
 
-DECLARE_PRODUCER_NS( ldmx , HcalMuonTriggerProducer );
+DECLARE_PRODUCER_NS( ldmx , CalibMuonTrigger );
