@@ -51,11 +51,11 @@ namespace ldmx {
                 if ( consecStrips > maxconsecStrips )
                     maxconsecStrips = consecStrips;
             }
-
             double pathUnc = muonTrigger->getAlgoVar( 20 );
-            if ( pathUnc < 0.0 ) {
-                if ( pathUnc > 100.0 )
-                    pathUnc = 100.0;
+
+            if ( pathUnc > 0.0 ) {
+                if ( pathUnc > 10.0 )
+                    pathUnc = 10.0;
                 hUncertainPathLength_->Fill( pathUnc );
                 hUncertainVConsecLayers_->Fill( maxconsecLayers , pathUnc );
                 hUncertainVConsecStrips_->Fill( maxconsecStrips , pathUnc );
@@ -81,15 +81,15 @@ namespace ldmx {
         }
 
         hUncertainPathLength_ = new TH1F( "hUncertainPathLength_" , "Uncertainty in Path Length" ,
-            100 , 0.0 , 100.0 );
+            100 , 0.0 , 10.0 );
 
         hUncertainVConsecLayers_ = new TH2F( "hUncertainVConsecLayers_" , "Uncertainty in Path Length vs N Consecutive Layers" ,
             150 , 0.0 , 150.0 , 
-            100 , 0.0 , 100.0 );
+            100 , 0.0 , 10.0 );
 
         hUncertainVConsecStrips_ = new TH2F( "hUncertainVConsecStrips_" , "Uncertainty in Path Length vs N Consecutive Strips" ,
             150 , 0.0 , 70.0 , 
-            100 , 0.0 , 100.0 );
+            100 , 0.0 , 10.0 );
        
         return;
     }

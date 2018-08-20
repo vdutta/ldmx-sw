@@ -56,7 +56,7 @@ namespace ldmx {
                     first = chit;
 
                 if ( !last or
-                     last->getLayer() < last->getLayer() or
+                     last->getLayer() > last->getLayer() or
                      (last->getLayer() == chit->getLayer() and last->getStrip() < chit->getStrip())
                    )
                     last = chit;
@@ -94,7 +94,7 @@ namespace ldmx {
         }
 
         //build result object
-        result_.set( triggerObjectName_ , pass , 20 );
+        result_.set( triggerObjectName_ , pass , 21 );
         for ( int s = 0; s < 5; s++ ) {
             result_.setAlgoVar( 4*s   , minConsecLayersHit_[s] );
             result_.setAlgoVar( 4*s+1 , minConsecStripsHit_[s] );
