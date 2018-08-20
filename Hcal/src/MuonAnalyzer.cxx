@@ -53,9 +53,9 @@ namespace ldmx {
 
             std::string sect = std::to_string(s);
 
-            hNumConsecStrips_[s] = new TH1F( ("hNumConsecStrips_"+sect).c_str() , ("Num Consecutive Strips in Hcal Section "+sect).c_str() ,
+            hNumConsecStrips_[s] = new TH1F( ("hNumConsecStrips_"+triggerObjectName_+sect).c_str() , ("Num Consecutive Strips in Hcal Section "+sect).c_str() ,
                 40 , 0.0 , 40.0 );
-            hNumConsecLayers_[s] = new TH1F( ("hNumConsecLayers_"+sect).c_str() , ("Num Consecutive Layers in Hcal Section "+sect).c_str() ,
+            hNumConsecLayers_[s] = new TH1F( ("hNumConsecLayers_"+triggerObjectName_+sect).c_str() , ("Num Consecutive Layers in Hcal Section "+sect).c_str() ,
                 150 , 0.0 , 150.0 );
         }
         
