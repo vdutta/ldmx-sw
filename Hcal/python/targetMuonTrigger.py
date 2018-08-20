@@ -10,7 +10,7 @@ hcalMuonTrigger.parameters["HcalHitCollectionName"] = "hcalDigis"
 hcalMuonTrigger.parameters["HcalHitPassName"] = "recon"
 
 # Name of track collection to be added to event bus
-hcalMuonTrigger.parameters["HcalMuonTriggerObjectName"] = "hcalMuonTrigger"
+hcalMuonTrigger.parameters["TriggerObjectName"] = "targetMuonTrigger"
 
 # Cuts on number of consecutive layers, strips hit for each section
 # if any section passes the cuts, then the whole event passes
