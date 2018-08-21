@@ -48,13 +48,10 @@ namespace ldmx {
             TH1F *hNumConsecStrips_[5];
 
             //Rough uncertainty measurement for all muons
-            TH1F *hUncertainPathLength_;
-
-            //Rough Uncertainty compared to num consec layers
-            TH2F *hUncertainVConsecLayers_;
-
-            //Rough Uncertainty compared to num consec strips
-            TH2F *hUncertainVConsecStrips_;
+            TH1F *hPathLengthUnc_;
+            
+            //Rough uncertainty measurement for passed muons
+            TH1F *hPathLengthUncPassed_;
     };
 }
 

@@ -14,7 +14,7 @@ targetMuonTrigger.parameters["TriggerObjectName"] = "targetMuonTrigger"
 
 # Cuts on number of Consecutiveutive layers, strips hit for each section
 # if any section passes the cuts, then the whole event passes
-targetMuonTrigger.parameters["MinConsecutiveLayersHitBackHcal"] = 40
+targetMuonTrigger.parameters["MinConsecutiveLayersHitBackHcal"] = 60
 targetMuonTrigger.parameters["MinConsecutiveStripsHitBackHcal"] = 0
 
 targetMuonTrigger.parameters["MinConsecutiveLayersHitTopHcal"] = 10

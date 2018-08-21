@@ -14,8 +14,8 @@ cosmicMuonTrigger.parameters["TriggerObjectName"] = "cosmicMuonTrigger"
 
 # Cuts on number of Consecutiveutive layers, strips hit for each section
 # if any section passes the cuts, then the whole event passes
-cosmicMuonTrigger.parameters["MinConsecutiveLayersHitBackHcal"] = 20
-cosmicMuonTrigger.parameters["MinConsecutiveStripsHitBackHcal"] = 10
+cosmicMuonTrigger.parameters["MinConsecutiveLayersHitBackHcal"] = 2
+cosmicMuonTrigger.parameters["MinConsecutiveStripsHitBackHcal"] = 20
 
 cosmicMuonTrigger.parameters["MinConsecutiveLayersHitTopHcal"] = 10
 cosmicMuonTrigger.parameters["MinConsecutiveStripsHitTopHcal"] = 0
