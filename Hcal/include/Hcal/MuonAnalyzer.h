@@ -50,15 +50,18 @@ namespace ldmx {
             /** Pass that created HcalHits */
             std::string hcalHitPassName_;
 
-            //One set of histograms for each section
+            //One set of histograms for back and side
             TH1F *hNumConsecLayers_[5];
             TH1F *hNumConsecStrips_[5];
+            TH2F *hConsecLayersVPathLengthUnc_[2];
+            TH2F *hConsecStripsVPathLengthUnc_[2];
 
             //Rough uncertainty measurement for all muons
             TH1F *hPathLengthUnc_;
             
             //Rough uncertainty measurement for passed muons
             TH1F *hPathLengthUncPassed_;
+            
     };
 }
 
