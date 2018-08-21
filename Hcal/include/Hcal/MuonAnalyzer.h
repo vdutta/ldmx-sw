@@ -15,7 +15,8 @@
 #include "Event/Event.h"
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
-#include "Event/TriggerResult.h"
+#include "Event/TriggerResult.h" //testing trigger
+#include "Event/HcalHit.h" //Need for path length uncertainty calculation
 
 namespace ldmx {
     
@@ -42,6 +43,12 @@ namespace ldmx {
 
             /** Pass that created trigger */
             std::string triggerPassName_;
+
+            /** HcalHit collection name */
+            std::string hcalHitCollName_;
+
+            /** Pass that created HcalHits */
+            std::string hcalHitPassName_;
 
             //One set of histograms for each section
             TH1F *hNumConsecLayers_[5];
