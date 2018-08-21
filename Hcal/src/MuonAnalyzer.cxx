@@ -106,7 +106,7 @@ namespace ldmx {
                 double w2 = scint_width*scint_width;
                 double t2 = scint_thick*scint_thick;
                     
-                if ( first->getSection() == 0 or last->getSection() == 0 ) {
+                if ( first->getSection() == 0 and last->getSection() == 0 ) {
                     //back - layers along z
                     double path = sqrt( t2*( 2 + dx2/dz2 + dy2/dz2 ) );
                     pathUnc = sqrt( ( t2*(dx2+dy2)*(t2*(dx2+dy2)+w2*dz2) )/( sqrt(3)*dz2*dz2*(dx2+dy2+2*dz2) ) );
