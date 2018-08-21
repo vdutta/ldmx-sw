@@ -42,7 +42,6 @@ namespace ldmx {
             for ( int s = 0; s < 5; s++ ) {
                 int consecLayers = muonTrigger->getAlgoVar( 4*s+2 );
                 int consecStrips = muonTrigger->getAlgoVar( 4*s+3 );
-                double pathUnc = muonTrigger->getAlgoVar( 4*5 );
                 
                 hNumConsecLayers_[s]->Fill( consecLayers );
                 hNumConsecStrips_[s]->Fill( consecStrips );
