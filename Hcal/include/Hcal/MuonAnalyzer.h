@@ -10,6 +10,7 @@
 //ROOT
 #include "TH1.h"
 #include "TH2.h"
+#include "TEfficiency.h"
 
 //LDMX Framework
 #include "Event/Event.h"
@@ -35,6 +36,8 @@ namespace ldmx {
             virtual void analyze(const ldmx::Event& event);
 
             virtual void onProcessStart(); 
+
+            virtual void onProcessEnd();
 
         private:
             
@@ -62,6 +65,8 @@ namespace ldmx {
             //Rough uncertainty measurement for passed muons
             TH1F *hPathLengthUncPassed_;
             
+            //Trigger efficiency plot
+            TEfficiency *hTriggerEfficiency_;
     };
 }
 

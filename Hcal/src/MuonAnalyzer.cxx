@@ -126,10 +126,11 @@ namespace ldmx {
     
             if ( pathUnc > 0.0 ) {
                 hPathLengthUnc_->Fill( pathUnc );
-    
+                 
                 if ( muonTrigger->passed() )
                     hPathLengthUncPassed_->Fill( pathUnc );
-    
+                
+                hTriggerEfficiency_->Fill( muonTrigger->passed() , pathUnc );
             }
             
             //fill histograms for each section
@@ -204,9 +205,18 @@ namespace ldmx {
 
         hPathLengthUncPassed_ = new TH1F( "hPathLengthUncPassed_" , "Passed Muons" ,
             200 , 0.0 , 1.0 );
-        hPathLengthUnc_->SetXTitle( "Normalized Uncertainty in Path Length through Strip" );
+        hPathLengthUncPassed_->SetXTitle( "Normalized Uncertainty in Path Length through Strip" );
+        hPathLengthUncPassed_->SetTitle( triggerObjectName_.c_str() );
+        
+        hTriggerEfficiency_ = new TEfficiency( "hTriggerEfficiency_" , ";Normalized Uncertainty in Path Length through Strip;Efficiency" ,
+            200 , 0.0 , 1.0 );
+        hTriggerEfficiency_->SetTitle( triggerObjectName_.c_str() );
 
         return;
+    }
+
+    void MuonAnalyzer::onProcessEnd() {
+
     }
 }
 
