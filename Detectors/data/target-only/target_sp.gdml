@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+    <define>
+        <!-- Define the identity matrix -->
+        <rotation name="identity" x="0" y="0" z="0"/>
+
+        <!-- Dimension of world box side -->
+        <constant name="world_dim" value="2.5*m"/>
+        
+        <!-- Dimensions of the scoring planes -->
+        <constant name="sp_thickness" value="0.1*mm"/>
+
+        <!-- Dimensions of target box -->
+        <variable name="target_box_x" value="3.5*cm" />
+        <variable name="target_box_y" value="9.5*cm" />
+
+        <!-- Surround the target with scoring planes. -->
+        <constant name="target_z" value="0.0*mm"/>
+        <constant name="target_thickness" value="0.3504*mm"/>
+        <variable name="sp_target_up_z" value="target_z - (target_thickness/2)" /> 
+        <variable name="sp_target_down_z" value="target_z + (target_thickness/2)" /> 
+        <variable name="sp_target_top_y" value="target_box_y/2" /> 
+        <variable name="sp_target_bot_y" value="-target_box_y/2" /> 
+        
+        <position name="sp_target_up_pos" x="0.0" y="0.0" z="sp_target_up_z - (sp_thickness/2)" />
+        <position name="sp_target_down_pos" x="0.0" y="0.0" z="sp_target_down_z + (sp_thickness/2)" />
+        <position name="sp_target_top_pos" x="0.0" y="sp_target_top_y + (sp_thickness/2)" z="0.0" />
+        <position name="sp_target_bot_pos" x="0.0" y="sp_target_bot_y - (sp_thickness/2)" z="0.0" />
+
+    </define>
+
+    <materials>
+        <material name="Vacuum" Z="1" state="gas">
+            <D unit="g/cm3" value="1e-12"/>
+            <atom unit="g/mole" value="1" />
+        </material>
+    </materials>
+
+    <solids>
+        <box name="world_box" x="world_dim" y="world_dim" z="world_dim"/>
+        
+        <box name="sp_target_up_box"    x="target_box_x" y="target_box_y" z="sp_thickness" />
+        <box name="sp_target_down_box"  x="target_box_x" y="target_box_y" z="sp_thickness" />
+        <box name="sp_target_top_box"    x="target_box_x" y="sp_thickness" z="target_thickness" />
+        <box name="sp_target_bot_box"    x="target_box_x" y="sp_thickness" z="target_thickness" />
+    
+    </solids>
+
+    <structure>
+
+
+        <volume name="sp_target_up">
+            <materialref ref="Vacuum" />
+            <solidref ref="sp_target_up_box" />
+            <auxiliary auxtype="SensDet" auxvalue="ScoringPlaneSD1" />
+            <auxiliary auxtype="VisAttributes" auxvalue="SpVis"/>
+        </volume> 
+        <volume name="sp_target_down">
+            <materialref ref="Vacuum" />
+            <solidref ref="sp_target_down_box" />
+            <auxiliary auxtype="SensDet" auxvalue="ScoringPlaneSD1" />
+            <auxiliary auxtype="VisAttributes" auxvalue="SpVis"/>
+        </volume>
+        <volume name="sp_target_top">
+            <materialref ref="Vacuum" />
+            <solidref ref="sp_target_top_box" />
+            <auxiliary auxtype="SensDet" auxvalue="ScoringPlaneSD1" />
+            <auxiliary auxtype="VisAttributes" auxvalue="SpVis"/>
+        </volume>
+        <volume name="sp_target_bot">
+            <materialref ref="Vacuum" />
+            <solidref ref="sp_target_bot_box" />
+            <auxiliary auxtype="SensDet" auxvalue="ScoringPlaneSD1" />
+            <auxiliary auxtype="VisAttributes" auxvalue="SpVis"/>
+        </volume>
+
+        <volume name="SP_World">
+            <materialref ref="Vacuum" />
+            <solidref ref="world_box" />
+           
+            <physvol copynumber="1">
+                <volumeref ref="sp_target_up" />
+                <positionref ref="sp_target_up_pos" />
+                <rotationref ref="identity" />
+            </physvol>
+            <physvol copynumber="2">
+                <volumeref ref="sp_target_down" />
+                <positionref ref="sp_target_down_pos" />
+                <rotationref ref="identity" />
+            </physvol> 
+            <physvol copynumber="3">
+                <volumeref ref="sp_target_top" />
+                <positionref ref="sp_target_top_pos" />
+                <rotationref ref="identity" />
+            </physvol> 
+            <physvol copynumber="4">
+                <volumeref ref="sp_target_bot" />
+                <positionref ref="sp_target_bot_pos" />
+                <rotationref ref="identity" />
+            </physvol> 
+            
+        </volume>
+    </structure>
+
+    <userinfo>
+        <auxiliary auxtype="SensDet" auxvalue="ScoringPlaneSD1" >
+            <auxiliary auxtype="SensDetType"    auxvalue="ScoringPlaneSD" />
+            <auxiliary auxtype="HitsCollection" auxvalue="TargetScoringPlaneHits" />
+            <auxiliary auxtype="SubdetID"       auxvalue="8" />
+            <auxiliary auxtype="Verbose"        auxvalue="0" />
+        </auxiliary>
+        
+        <auxiliary auxtype="VisAttributes" auxvalue="SpVis">
+            <auxiliary auxtype="R" auxvalue="0.0"/>
+            <auxiliary auxtype="G" auxvalue="0.0"/>
+            <auxiliary auxtype="B" auxvalue="1.0"/>
+            <auxiliary auxtype="A" auxvalue="1.0"/>
+            <auxiliary auxtype="Style" auxvalue="wireframe"/>
+            <auxiliary auxtype="DaughtersInvisible" auxvalue="false"/>
+            <auxiliary auxtype="Visible" auxvalue="true"/>
+            <auxiliary auxtype="LineWidth" auxvalue="2.0"/>
+        </auxiliary>
+    </userinfo>
+
+    <setup name="Default" version="1.0">
+        <world ref="SP_World" />
+    </setup>
+</gdml>
