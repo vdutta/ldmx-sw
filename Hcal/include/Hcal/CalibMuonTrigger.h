@@ -29,7 +29,7 @@ namespace ldmx {
      *  Energy information of hits in the Hcal.
      *
      * In the interest of speed (and at the expense of accuracy), this producer looks for
-     * tracks in each orientation of the Hcal (i.e. layers in the Hcal that are orientated
+     * tracks in each orientation of the Hcal separately (i.e. layers in the Hcal that are orientated
      * the same way). This means if there is one track through the back Hcal, this producer
      * may count that as two tracks: one through the horizontal layers and one through the
      * vertical layers. Additionally, the sections in the side Hcal are isolated similarly.
@@ -45,12 +45,6 @@ namespace ldmx {
             virtual void configure(const ldmx::ParameterSet& ps);
 
             virtual void produce(ldmx::Event& event);
-
-            virtual void onFileOpen() { }
-
-            virtual void onFileClose() { }
-
-            virtual void onProcessStart() { } 
 
             /**
              * Prints performance trackers
