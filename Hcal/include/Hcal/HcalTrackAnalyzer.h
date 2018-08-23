@@ -38,10 +38,6 @@ namespace ldmx {
 
             virtual void analyze(const ldmx::Event& event);
 
-            virtual void onFileOpen() {}
-
-            virtual void onFileClose() {}
-
             virtual void onProcessStart(); 
 
             virtual void onProcessEnd();
@@ -62,9 +58,6 @@ namespace ldmx {
 
             /** Number of clusters per track */
             TH1F* hClustersPerTrack_;
-
-            /** Strips numbers that are in tracks */
-            TH1F* hStripsInTracks_;
     };
 }
 

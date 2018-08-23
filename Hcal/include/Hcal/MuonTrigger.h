@@ -33,8 +33,6 @@ namespace ldmx {
      * One loop through the hits is to sort them by section, layer, strip information.
      * Another checks for consecutive strips (split according to section).
      * And finally the last loop checks for consecutive layers (split according to section).
-     * This is an upper bound estimate because if layers and strips are not counted more than once when
-     * sorting the hits, so any overlap decreases the number of loops in the analysis.
      */
     class MuonTrigger : public ldmx::Producer {
         public:
@@ -44,14 +42,6 @@ namespace ldmx {
             virtual void configure(const ldmx::ParameterSet& ps);
 
             virtual void produce(ldmx::Event& event);
-
-            virtual void onFileOpen() { }
-
-            virtual void onFileClose() { }
-
-            virtual void onProcessStart() { } 
-
-            virtual void onProcessEnd() { }
 
         private:
             

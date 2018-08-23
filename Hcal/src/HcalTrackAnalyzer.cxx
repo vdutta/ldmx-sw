@@ -27,7 +27,7 @@ namespace ldmx {
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
        
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
-        const TClonesArray* tracks = event.getCollection( hcalMipTracksCollName_ , hcalMipTracksPassName_ );
+        const TClonesArray *tracks = event.getCollection( hcalMipTracksCollName_ , hcalMipTracksPassName_ );
         
         int nmuons = 0;
         for ( int iP = 0; iP < simparticles->GetEntriesFast(); iP++ ) {
@@ -42,15 +42,6 @@ namespace ldmx {
         for( int iT = 0; iT < ntracks; iT++ ) {
             HcalMipTrack *track = (HcalMipTrack *)( tracks->At( iT ));
             hClustersPerTrack_->Fill( track->getNClusters() );
-            
-            if ( track->isEmpty() or track->isBroken() ) {
-                std::cerr << "Lost the HcalHits" << std::endl;
-            } else {
-                for ( int iH = 0; iH < track->getNHits(); iH++ ) {
-                    HcalHit* chit = track->getHit( iH );
-                    hStripsInTracks_->Fill( chit->getStrip() );
-                } //hits in track (iH)
-            }
         } //tracks in event (iT)
         
         numTracks_[ nmuons ][ ntracks ] ++;
@@ -74,9 +65,6 @@ namespace ldmx {
         
         hClustersPerTrack_ = new TH1F( "hClustersPerTrack_" , "MIP Clusters Per Track" ,
             100 , 0.0 , 200.0 );
-
-        hStripsInTracks_ = new TH1F( "hStripsInTracks_" , "Strips In Each Track" ,
-            50 , 0.0 , 50.0 );
 
         return;
     }
