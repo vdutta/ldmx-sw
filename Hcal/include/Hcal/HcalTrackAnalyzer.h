@@ -10,7 +10,6 @@
 //Standard Libraries
 #include <iostream> //Checks to std::cout for development purposes
 #include <string> //names of histograms
-#include <set> //std::set of hitkeys from tracks
 
 //ROOT
 #include "TH1.h" //One Dimensional Histograms
@@ -21,7 +20,8 @@
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
 #include "Event/Event.h" //Study event by event
 #include "Event/HcalMipTrack.h" //Study hcal tracks
-#include "Event/SimParticle.h"
+#include "Event/SimParticle.h" //check actual number of muons
+#include "Event/HcalHit.h" //check if enough hcal hits to reconstruct
 
 namespace ldmx {
     
@@ -49,6 +49,9 @@ namespace ldmx {
 
             /** Names of the pass that created the HcalMipTracks */
             std::string hcalMipTracksPassName_;
+            
+            /** Minimum number of non-noise HcalHits for a real track to be findable */
+            int minHcalHits_;
 
             /** Counters for track */
             unsigned int numTracks_[4][4];
@@ -58,6 +61,7 @@ namespace ldmx {
 
             /** Number of clusters per track */
             TH1F* hClustersPerTrack_;
+
     };
 }
 

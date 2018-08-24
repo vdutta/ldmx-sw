@@ -15,6 +15,8 @@ namespace ldmx {
         hcalMipTracksCollName_ = ps.getString( "HcalMipTracksCollectionName" );
         hcalMipTracksPassName_ = ps.getString( "HcalMipTracksPassName" );
         
+        minHcalHits_ = ps.getInteger( "MinHcalHits" );
+
         for ( int actual = 0; actual < 4; actual++ ) {
             for ( int pred = 0; pred < 4; pred++ ) {
                 numTracks_[actual][pred] = 0;
@@ -27,8 +29,8 @@ namespace ldmx {
     void HcalTrackAnalyzer::analyze(const ldmx::Event& event) {
        
         const TClonesArray *simparticles = event.getCollection( "SimParticles" , "sim" );
-        const TClonesArray *tracks = event.getCollection( hcalMipTracksCollName_ , hcalMipTracksPassName_ );
         
+        //count the number of real muons
         int nmuons = 0;
         for ( int iP = 0; iP < simparticles->GetEntriesFast(); iP++ ) {
             SimParticle *simp = (SimParticle *)(simparticles->At(iP));
@@ -36,22 +38,42 @@ namespace ldmx {
                 nmuons++;
             }
         }
-
-        int ntracks = tracks->GetEntriesFast();
-        hTracksPerEvent_->Fill( ntracks );
-        for( int iT = 0; iT < ntracks; iT++ ) {
-            HcalMipTrack *track = (HcalMipTrack *)( tracks->At( iT ));
-            hClustersPerTrack_->Fill( track->getNClusters() );
-        } //tracks in event (iT)
         
-        numTracks_[ nmuons ][ ntracks ] ++;
+        bool findable = true;
+        if ( nmuons > 0 ) {
+            //if there are tracks to be found
+            const TClonesArray *hcalHits = event.getCollection( "hcalDigis" , "recon" );
+            int nNonNoise = 0;
+            int nHits = hcalHits->GetEntriesFast();
+            for ( int iH = 0; iH < nHits; iH++ ) {
+                HcalHit *chit = (HcalHit *)(hcalHits->At(iH));
+                if ( !chit->getNoise() ) 
+                    nNonNoise++;
+            }
 
-        //Drop non-interesting events
-        if ( ntracks != nmuons ) {
-            setStorageHint( hint_mustKeep );
-        } else {
-            setStorageHint( hint_mustDrop );
+            if ( nNonNoise < minHcalHits_ )
+                findable = false;
         }
+        
+        if ( findable ) {
+            //tracks COULD be reconstructed, check if they were
+            const TClonesArray *tracks = event.getCollection( hcalMipTracksCollName_ , hcalMipTracksPassName_ );
+            int ntracks = tracks->GetEntriesFast();
+            hTracksPerEvent_->Fill( ntracks );
+            for( int iT = 0; iT < ntracks; iT++ ) {
+                HcalMipTrack *track = (HcalMipTrack *)( tracks->At( iT ));
+                hClustersPerTrack_->Fill( track->getNClusters() );
+            } //tracks in event (iT)
+            
+            numTracks_[ nmuons ][ ntracks ] ++;
+    
+            //Drop non-interesting events
+            if ( ntracks != nmuons ) {
+                setStorageHint( hint_mustKeep );
+            } else {
+                setStorageHint( hint_mustDrop );
+            }
+        }//findable track 
         
         return;
     }
