@@ -108,19 +108,34 @@ namespace ldmx {
                     
                 if ( first->getSection() == 0 and last->getSection() == 0 ) {
                     //back - layers along z
-                    double path = sqrt( t2*( 2 + dx2/dz2 + dy2/dz2 ) );
-                    pathUnc = sqrt( ( t2*(dx2+dy2)*(t2*(dx2+dy2)+w2*dz2) )/( sqrt(3)*dz2*dz2*(dx2+dy2+2*dz2) ) );
-                    pathUnc /= path;
+                    if ( dz > 0.0 ) {
+                        double path = sqrt( t2*( 2 + dx2/dz2 + dy2/dz2 ) );
+                        pathUnc = sqrt( ( t2*(dx2+dy2)*(t2*(dx2+dy2)+w2*dz2) )/( sqrt(3)*dz2*dz2*(dx2+dy2+2*dz2) ) );
+                        pathUnc /= path;
+                    }
                 } else if ( first->getSection() < 3 and last->getSection() < 3 ) {
                     //Top and/or bottom - layers along y
-                    double path = sqrt( t2*( 2 + dx2/dy2 + dz2/dy2 ) );
-                    pathUnc = sqrt( ( t2*(dx2+dz2)*(t2*(dx2+dz2)+w2*dy2) )/( sqrt(3)*dy2*dy2*(dx2+dz2+2*dy2) ) );
-                    pathUnc /= path;
+                    if ( dy > 0.0 ) {
+                        double path = sqrt( t2*( 2 + dx2/dy2 + dz2/dy2 ) );
+                        pathUnc = sqrt( ( t2*(dx2+dz2)*(t2*(dx2+dz2)+w2*dy2) )/( sqrt(3)*dy2*dy2*(dx2+dz2+2*dy2) ) );
+                        pathUnc /= path;
+                    }
                 } else if ( first->getSection() > 2 and last->getSection() > 2 ) {
                     //Left and/or right - layers along x
-                    double path = sqrt( t2*( 2 + dz2/dx2 + dy2/dx2 ) );
-                    pathUnc = sqrt( ( t2*(dz2+dy2)*(t2*(dz2+dy2)+w2*dx2) )/( sqrt(3)*dx2*dx2*(dz2+dy2+2*dx2) ) );
-                    pathUnc /= path;
+                    if ( dx > 0.0 ) {
+                        double path = sqrt( t2*( 2 + dz2/dx2 + dy2/dx2 ) );
+                        pathUnc = sqrt( ( t2*(dz2+dy2)*(t2*(dz2+dy2)+w2*dx2) )/( sqrt(3)*dx2*dx2*(dz2+dy2+2*dx2) ) );
+                        pathUnc /= path;
+                    }
+                }
+                
+                if ( pathUnc >= 0.91 and pathUnc <= 0.92 ) {
+                    printf("%7.6f\t%d\t%d\t%4d\t(%f,%f,%f)\n" , pathUnc , first->getSection() , last->getSection() , nHits ,
+                        dx , dy , dz );
+                    hDX_->Fill(dx);
+                    hDY_->Fill(dy);
+                    hDZ_->Fill(dz);
+                    setStorageHint(hint_shouldKeep);
                 }
             }
     
@@ -131,6 +146,8 @@ namespace ldmx {
                     hPathLengthUncPassed_->Fill( pathUnc );
                 
                 hTriggerEfficiency_->Fill( muonTrigger->passed() , pathUnc );
+
+                
             }
             
             //fill histograms for each section
@@ -211,6 +228,18 @@ namespace ldmx {
         hTriggerEfficiency_ = new TEfficiency( "hTriggerEfficiency_" , ";Normalized Uncertainty in Path Length through Strip;Efficiency" ,
             200 , 0.0 , 1.0 );
         hTriggerEfficiency_->SetTitle( triggerObjectName_.c_str() );
+
+        hDX_ = new TH1F( "hDX_" , "End Point X Difference for Paths in 0.91-0.92 bin" ,
+            2000 , 0.0 , 2000.0 );
+        hDX_->SetXTitle( "X Difference [mm]" );
+
+        hDY_ = new TH1F( "hDY_" , "End Point Y Difference for Paths in 0.91-0.92 bin" ,
+            2000 , 0.0 , 2000.0 );
+        hDY_->SetYTitle( "Y Difference [mm]" );
+
+        hDZ_ = new TH1F( "hDZ_" , "End Point Z Difference for Paths in 0.91-0.92 bin" ,
+            2000 , 0.0 , 2000.0 );
+        hDZ_->SetZTitle( "Z Difference [mm]" );
 
         return;
     }

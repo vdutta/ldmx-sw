@@ -64,6 +64,11 @@ namespace ldmx {
             
             //Rough uncertainty measurement for passed muons
             TH1F *hPathLengthUncPassed_;
+
+            //Endpoint distance distributions for muons in 0.91-0.92 bin
+            TH1F *hDX_;
+            TH1F *hDY_;
+            TH1F *hDZ_;
             
             //Trigger efficiency plot
             TEfficiency *hTriggerEfficiency_;
