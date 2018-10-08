@@ -41,8 +41,7 @@ namespace ldmx {
         return pa2 > pb2;
     }
 
-    static bool compSims(const SimTrackerHit* a, const SimTrackerHit* b) {
-
+    static bool compSims(const SimTrackerHit* a, const SimTrackerHit* b) { 
         if (a->getSimParticle() == b->getSimParticle()) {
             return compSimsP(a,b);
         } else {
@@ -176,30 +175,21 @@ namespace ldmx {
             digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, hitVec[i]->getZ());
 
             TEveBox* hcalDigiHit = 0;
-            //TEveBox* hcalDigiHit2 = 0;
-            //hcalDigiHit2 = drawer_->drawBox(hitVec[i]->getX(), hitVec[i]->getY(), hitVec[i]->getZ()-15, 30, 30, hitVec[i]->getZ()+15, 0, color, 0, digiName);
-            if (section == 0) {
-                if (layer % 2 == 0) {
-                    //horizontal
-                    hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
-                } else {
-                    //vertical, once alternating bar orientation in the back is implemented, uncomment
-                    //hcalDigiHit = drawer_->drawBox((bar_width*(0.5-bar)-hcal_y_width/2), hitVec[i]->getY(), (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, bar_width, 150, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
-                    hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, 150, bar_width, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
-                }
-            } else if (section == 1) {hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), hcal_ecal_xy/2+hcal_layer_thick*layer, ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 3) {hcalDigiHit = drawer_->drawBox((hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 2) {hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), -(hcal_ecal_xy/2+hcal_layer_thick*layer), ecal_front_z+bar*bar_width, 150, scint_thick, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            } else if (section == 4) {hcalDigiHit = drawer_->drawBox(-(hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+bar*bar_width, scint_thick, 150, ecal_front_z+(bar+1)*bar_width, 0, color, 0, digiName);
-            }
+            
+            std::vector<double> boxCenter, boxMin , boxMax;
+            HitBox box = HCAL_DETECTOR_GEOMETRY.transformDet2Real( hitVec[i] );
+            boxCenter = box.getOrigin();
+            boxMin = box.getMin();
+            boxMax = box.getMax();
+
+            hcalDigiHit = drawer_->drawBox( boxCenter[0] , boxCenter[1] , boxMin[2] ,
+                boxMax[0]-boxMin[0] , boxMax[1]-boxMin[1] , boxMax[2] ,
+                0 , color , 0 , digiName );
 
             if (hcalDigiHit != 0) {
                 if (isNoise) { hcalDigiHit->SetRnrSelf(0); }
                 hcalHits_->AddElement(hcalDigiHit);
             }
-            //if (hcalDigiHit2 != 0) {
-            //    hcalHits_->AddElement(hcalDigiHit2);
-            //}
 
         }
 
@@ -302,7 +292,6 @@ namespace ldmx {
         recoObjs_->AddElement(ecalClusters_);
     }
 
-    
     void EventObjects::drawECALSimParticles(TClonesArray* ecalSimParticles) {
 
         ldmx::SimTrackerHit* ecalSPP;
