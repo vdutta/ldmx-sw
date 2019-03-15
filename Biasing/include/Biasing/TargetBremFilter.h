@@ -6,8 +6,8 @@
  * @author Omar Moreno, SLAC National Accelerator Laboratory
  */
 
-#ifndef BIASING_TARGETBREMFILTER_H_
-#define BIASING_TARGETBREMFILTER_H_
+#ifndef _BIASING_TARGET_BREM_FILTER_H_
+#define _BIASING_TARGET_BREM_FILTER_H_
 
 //----------------//
 //   C++ StdLib   //
@@ -34,47 +34,35 @@ namespace ldmx {
 
         public:
 
-            /**
-             * Class constructor.
-             */
+            /** Class constructor. */
             TargetBremFilter();
 
-            /**
-             * Class destructor.
-             */
+            /** Class destructor. */
             ~TargetBremFilter();
 
             /**
              * Get the name of the plugin.
              * @return The name of the plugin.
              */
-            virtual std::string getName() {
-                return "TargetBremFilter";
-            }
+            inline std::string getName() { return "TargetBremFilter"; }
 
             /**
              * Get whether this plugin implements the event action.
              * @return True if the plugin implements the event action.
              */
-            virtual bool hasEventAction() { 
-                return true;
-            }
+            inline bool hasEventAction() { return true; }
 
             /**
              * Get whether this plugin implements the stepping action.
              * @return True to indicate this plugin implements the stepping action.
              */
-            bool hasSteppingAction() {
-                return true;
-            }
+            inline bool hasSteppingAction() { return true; }
 
             /**
              * Get whether this plugin implements the stacking aciton.
              * @return True to indicate this plugin implements the stacking action.
              */
-            bool hasStackingAction() { 
-                return true;
-            }
+            inline bool hasStackingAction() { return true; }
 
             /**
              * Implement the stepping action which performs the target volume biasing.
@@ -84,8 +72,9 @@ namespace ldmx {
 
             /**
              * End of event action.
+             * @param event The Geant4 event.
              */
-            virtual void endEvent(const G4Event*);
+            void endEvent(const G4Event* event);
 
             /**
              * Classify a new track which postpones track processing.
@@ -152,6 +141,11 @@ namespace ldmx {
             /** Flag indicating if the recoil electron track should be killed. */
             bool killRecoilElectron_{false};
 
+            /** Flag denoting that an event has a brem candidate. */
+            bool hasBremCandidate_{true};
+
+            /** Verbosity level. */
+            bool verbose_{0};  
 
     }; // TargetBremFilter
 }
