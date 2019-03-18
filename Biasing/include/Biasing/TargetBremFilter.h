@@ -142,7 +142,7 @@ namespace ldmx {
             bool killRecoilElectron_{false};
 
             /** Flag denoting that an event has a brem candidate. */
-            bool hasBremCandidate_{true};
+            bool hasBremCandidate_{false};
 
             /** Verbosity level. */
             bool verbose_{0};  
