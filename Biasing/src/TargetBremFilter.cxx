@@ -23,13 +23,16 @@ namespace ldmx {
     TargetBremFilter::~TargetBremFilter() {
     }
 
+
     G4ClassificationOfNewTrack TargetBremFilter::stackingClassifyNewTrack(
             const G4Track* track, 
             const G4ClassificationOfNewTrack& currentTrackClass) {
 
-        /*std::cout << "********************************" << std::endl;*/ 
-        /*std::cout << "*   Track pushed to the stack  *" << std::endl;*/
-        /*std::cout << "********************************" << std::endl;*/
+        if (verbose_ > 0) { 
+            std::cout << "********************************" << std::endl; 
+            std::cout << "*   Track pushed to the stack  *" << std::endl;
+            std::cout << "********************************" << std::endl;
+        }
 
         // get the PDGID of the track.
         G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
@@ -37,17 +40,22 @@ namespace ldmx {
         // Get the particle type.
         G4String particleName = track->GetParticleDefinition()->GetParticleName();
 
-        /*std::cout << "[ TargetBremFilter ]: " << "\n" 
-                    << "\tParticle " << particleName << " ( PDG ID: " << pdgID << " ) : " << "\n"
-                    << "\tTrack ID: " << track->GetTrackID() << "\n" 
-                    << std::endl;*/
+        if (verbose_ > 0) { 
+            std::cout << "[ TargetBremFilter ]: " << "\n" 
+                      << "\tParticle " << particleName << " ( PDG ID: " << pdgID << " ) : " << "\n"
+                      << "\tTrack ID: " << track->GetTrackID() << "\n"
+                      << "\tEnergy: " << track->GetKineticEnergy()  
+                      << std::endl;
+        }
 
 
         // Use current classification by default so values from other plugins are not overridden.
         G4ClassificationOfNewTrack classification = currentTrackClass;
 
         if (track->GetTrackID() == 1 && pdgID == 11) {
-            ///*std::cout << "[ TargetBremFilter ]: Pushing track to waiting stack." << std::endl;*/
+            if (verbose_ > 0) {
+                std::cout << "[ TargetBremFilter ]: Pushing track to waiting stack." << std::endl;
+            }
             return fWaiting; 
         }
 
@@ -107,13 +115,20 @@ namespace ldmx {
            
             const G4Track* secondary_track = (*secondaries)[0]; 
             G4String processName = secondary_track->GetCreatorProcess()->GetProcessName();
+            if (verbose_ > 0) { 
+                std::cout << "[ TargetBremFilter ]: Secondary created with process: " 
+                          << processName << std::endl;
+            }
+            
             if (processName.compareTo("eBrem") == 0 
                         && secondary_track->GetKineticEnergy() > bremEnergyThreshold_) {
                     
                     if (verbose_ > 0) { 
                         std::cout << "[ TargetBremFilter ]: " 
-                                  << "Tagging brem as a candidate." << std::endl;
+                                  << "Tagging brem as a candidate with energy " 
+                                  << secondary_track->GetKineticEnergy() << std::endl;
                     }
+
                     
                     if (!secondary_track->GetUserInformation()) {
                         auto trackInfo{new UserTrackInformation()}; 
@@ -171,7 +186,9 @@ namespace ldmx {
                 }
 
                 track->SetTrackStatus(fStopAndKill);
-            } else track->SetTrackStatus(fSuspend);  
+            } 
+            
+            track->SetTrackStatus(fSuspend);  
 
              
         } else if (step->GetPostStepPoint()->GetKineticEnergy() == 0) { 
