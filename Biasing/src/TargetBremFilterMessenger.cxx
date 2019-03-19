@@ -5,41 +5,47 @@
  */
 
 #include "Biasing/TargetBremFilterMessenger.h"
+
+//------------//
+//   Geant4   //
+//------------//
+#include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcmdWithAString.hh"
+
+//----------------//
+//   C++ StdLib   //
+//----------------//
 #include <iostream>
+
+//-------------//
+//   ldmx-sw   //
+//-------------//
+#include "Biasing/TargetBremFilter.h"
 
 namespace ldmx { 
     
     TargetBremFilterMessenger::TargetBremFilterMessenger(TargetBremFilter* filter) :
         UserActionPluginMessenger(filter), filter_(filter) {
 
-            bremEnergyThresholdCmd_ = new G4UIcmdWithAString{std::string(getPath() + "brem_threshold").c_str(), this};
+            bremEnergyThresholdCmd_ 
+                = std::make_unique<G4UIcmdWithAString>(std::string(getPath() + "brem_threshold").c_str(), this);
             bremEnergyThresholdCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit,
                                               G4ApplicationState::G4State_Idle);
             bremEnergyThresholdCmd_->SetGuidance("Minium energy that the brem electron should have."); 
 
             killRecoilCmd_ 
-                = new G4UIcmdWithoutParameter{std::string(getPath() + "kill_recoil").c_str(), this};
+                = std::make_unique<G4UIcmdWithoutParameter>(std::string(getPath() + "kill_recoil").c_str(), this);
             killRecoilCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit,
                     G4ApplicationState::G4State_Idle);
             killRecoilCmd_->SetGuidance("Enable killing of the electron track that produces the brem."); 
 
-
-            recoilEnergyThresholdCmd_ = new G4UIcmdWithAString{std::string(getPath() + "recoil_threshold").c_str(), this};
-            recoilEnergyThresholdCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit,
-                                              G4ApplicationState::G4State_Idle);
-            recoilEnergyThresholdCmd_->SetGuidance("Energy threshold that the recoil electron must not exceed."); 
-
-            volumeCmd_ = new G4UIcmdWithAString{std::string(getPath() + "volume").c_str(), this};
+            volumeCmd_ = std::make_unique<G4UIcmdWithAString>(std::string(getPath() + "volume").c_str(), this);
             volumeCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit,
                                            G4ApplicationState::G4State_Idle);
             volumeCmd_->SetGuidance("Volume to apply the filter to.");     
     }
 
     TargetBremFilterMessenger::~TargetBremFilterMessenger() {
-        delete bremEnergyThresholdCmd_;
-        delete killRecoilCmd_;
-        delete recoilEnergyThresholdCmd_;
-        delete volumeCmd_; 
     }
 
     void TargetBremFilterMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
@@ -47,13 +53,11 @@ namespace ldmx {
         // Handles verbose command.
         UserActionPluginMessenger::SetNewValue(command, newValue);
 
-        if (command == killRecoilCmd_) { 
+        if (command == killRecoilCmd_.get()) { 
             filter_->setKillRecoilElectron(true); 
-        } else if (command == volumeCmd_) {
+        } else if (command == volumeCmd_.get()) {
             filter_->setVolume(newValue);
-        } else if (command == recoilEnergyThresholdCmd_)  {
-            filter_->setRecoilEnergyThreshold(G4UIcommand::ConvertToDouble(newValue));
-        } else if (command == bremEnergyThresholdCmd_) {
+        } else if (command == bremEnergyThresholdCmd_.get()) {
             filter_->setBremEnergyThreshold(G4UIcommand::ConvertToDouble(newValue));
         }
     }
