@@ -14,17 +14,10 @@
 //----------------//
 #include <algorithm>
 
-//------------//
-//   Geant4   //
-//------------//
-#include "G4RunManager.hh"
-
-//----------//
-//   LDMX   //
-//----------//
+//-------------//
+//   ldmx-sw   //
+//-------------//
 #include "SimPlugins/UserActionPlugin.h"
-#include "Biasing/BiasingMessenger.h"
-#include "Biasing/TargetBremFilterMessenger.h"
 
 namespace ldmx {
 
@@ -85,11 +78,6 @@ namespace ldmx {
             G4ClassificationOfNewTrack stackingClassifyNewTrack(const G4Track* aTrack, 
                     const G4ClassificationOfNewTrack& currentTrackClass);
 
-            /**
-             *
-             */
-            static std::vector<G4Track*> getBremGammaList() { return bremGammaTracks_; }
-
             /** 
              * Enable/disable killing of the recoil electron track.  If the 
              * recoil track is killed, only the brem gamma is propagated.
@@ -104,36 +92,19 @@ namespace ldmx {
             void setVolume(std::string volumeName) { volumeName_ = volumeName; }; 
 
             /**
-             * Set the energy threshold that the recoil electron must exceed.
-             */
-            void setRecoilEnergyThreshold(double recoilEnergyThreshold) { 
-                recoilEnergyThreshold_ = recoilEnergyThreshold; 
-            }
-
-            /**
              * Set the minimum energy that the brem gamma must have.
              */
             void setBremEnergyThreshold(double bremEnergyThreshold) { 
                 bremEnergyThreshold_ = bremEnergyThreshold; 
             }
 
-            /**
-             *
-             */
-            static void removeBremFromList(G4Track* track);
-
         private:
             
             /** Messenger used to pass arguments to this class. */
             TargetBremFilterMessenger* messenger_{nullptr};
 
-            static std::vector<G4Track*> bremGammaTracks_; 
-
             /** The volume that the filter will be applied to. */
             G4String volumeName_{"target_PV"};
-
-            /** Recoil electron threshold. */
-            double recoilEnergyThreshold_{1500}; // MeV
 
             /** Brem gamma energy treshold. */
             double bremEnergyThreshold_{0}; 
