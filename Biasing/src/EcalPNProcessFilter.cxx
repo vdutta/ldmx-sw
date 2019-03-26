@@ -140,16 +140,13 @@ namespace ldmx {
                 
                 bool interesting = false;
                 G4double gammaEnergy = step->GetPreStepPoint()->GetKineticEnergy();
-                std::cout << "Incident gamma KE was " << gammaEnergy << " GeV" << std::endl;
                 double totalNeutronEnergy = 0.0;
-                //for (unsigned int isec = 0; isec < secondaries->size(); isec++) {
                 for (auto& iSec : *secondaries) {
-                    G4int pdg = iSec->GetParticleDefinition()->GetPDGEncoding();
+                    G4int pdg = abs(iSec->GetParticleDefinition()->GetPDGEncoding());
                     if (pdg != 2112 && pdg != 130 && pdg != 310 && pdg != 321) {
                         continue;
                     } else {
                         totalNeutronEnergy += iSec->GetKineticEnergy();
-                        std::cout << "Found '" << pdg << "' with KE = " << iSec->GetKineticEnergy() << " GeV" << std::endl;
                         if (totalNeutronEnergy / gammaEnergy > neutronEnergyFraction_) {
                             interesting = true;
                             break;
