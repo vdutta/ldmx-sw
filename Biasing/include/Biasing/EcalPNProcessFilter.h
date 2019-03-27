@@ -106,6 +106,13 @@ namespace ldmx {
              */
             void addBoundingVolume(std::string volume);
 
+            /**
+             * Add the fraction KE threshold for daughter neutrons and kaons.
+             *
+             * @param KE fraction threshold
+             */
+            void setEnergyFractionThreshold(double energyFractionThreshold);
+
         private:
 
             /** Messenger used to pass arguments to this class. */
@@ -120,8 +127,8 @@ namespace ldmx {
             /** List of volumes to bound the particle to. */
             std::vector<std::string> boundVolumes_;
 
-            /** Total energy of PN neutrons threshold */
-            double neutronEnergyFraction_{0.5}; // MeV
+            /** KE fraction threshold for PN neutron and kaon daughters */
+            double energyFractionThreshold_{0.5}; // MeV
 
             /** PNProcess gamma parent ID. */
             double photonGammaID_{-1}; 
@@ -129,4 +136,4 @@ namespace ldmx {
     }; // EcalPNProcessFilter 
 }
 
-#endif // BIASING_ECALPNPROCESSFILTER_H__
+#endif // BIASING_ECALPNPROCESSFILTER_H

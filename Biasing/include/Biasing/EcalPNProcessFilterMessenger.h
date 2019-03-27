@@ -60,8 +60,14 @@ namespace ldmx {
              */
             G4UIcmdWithAString* boundCmd_{nullptr};
 
+            /**
+             * Command allowing a user to specifiy what fraction of the
+             * incident pn gamma KE must be carried away by neutrons
+             * and kaons.
+             */
+            G4UIcmdWithAString* energyFractionThresholdCmd_{nullptr};
 
     }; // EcalPNProcessFilterMessenger
 }
 
-#endif // BIASING_ECALPNProcessFILTERMESSENGER_H
+#endif // BIASING_ECALPNPROCESSFILTERMESSENGER_H

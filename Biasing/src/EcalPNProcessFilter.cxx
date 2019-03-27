@@ -140,14 +140,14 @@ namespace ldmx {
                 
                 bool interesting = false;
                 G4double gammaEnergy = step->GetPreStepPoint()->GetKineticEnergy();
-                double totalNeutronEnergy = 0.0;
+                double neutronKaonEnergy = 0.0;
                 for (auto& iSec : *secondaries) {
                     G4int pdg = abs(iSec->GetParticleDefinition()->GetPDGEncoding());
                     if (pdg != 2112 && pdg != 130 && pdg != 310 && pdg != 321) {
                         continue;
                     } else {
-                        totalNeutronEnergy += iSec->GetKineticEnergy();
-                        if (totalNeutronEnergy / gammaEnergy > neutronEnergyFraction_) {
+                        neutronKaonEnergy += iSec->GetKineticEnergy();
+                        if (neutronKaonEnergy / gammaEnergy > energyFractionThreshold_) {
                             interesting = true;
                             break;
                         }
@@ -200,4 +200,10 @@ namespace ldmx {
         std::cout << "[ EcalPNProcessFilter ]: Bounding particle to volume " << volume << std::endl;
         boundVolumes_.push_back(volume);
     }        
+
+    void EcalPNProcessFilter::setEnergyFractionThreshold(double energyFractionThreshold) {
+
+        std::cout << "[ EcalPNProcessFilter ]: Setting KE fraction threshold for neutrons and kaons to " << energyFractionThreshold << std::endl;
+        energyFractionThreshold_ = energyFractionThreshold;
+    }
 }

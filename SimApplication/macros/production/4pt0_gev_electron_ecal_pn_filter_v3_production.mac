@@ -45,7 +45,8 @@
 # reaction in the target.  In this case, the filter is being applied
 # to the Ecal.
 /ldmx/plugins/load EcalPNProcessFilter libBiasing.so
-/ldmx/plugins/filter/volume ecal
+/ldmx/plugins/EcalPNProcessFilter/volume ecal
+/ldmx/plugins/EcalPNProcessFilter/energyFractionThreshold 0.8
 
 # Print a status every 1000 events.
 /ldmx/plugins/EventPrintPlugin/modulus 1
