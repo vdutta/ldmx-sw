@@ -118,7 +118,7 @@ namespace ldmx {
             /**
              * Activate the stacking new stage hook of registered plugins.
              */
-            void stackingNewStage();
+            void NewStage();
 
             /**
              * Activate the prepare new event stacking hook of registered plugins.

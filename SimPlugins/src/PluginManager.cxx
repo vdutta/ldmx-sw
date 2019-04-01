@@ -94,7 +94,7 @@ namespace ldmx {
         return currentTrackClass;
     }
 
-    void PluginManager::stackingNewStage() {
+    void PluginManager::NewStage() {
         for (PluginVec::iterator it = plugins_.begin(); it != plugins_.end(); it++) {
             if ((*it)->hasEventAction()) {
                 (*it)->stackingNewStage();

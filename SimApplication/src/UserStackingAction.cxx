@@ -9,7 +9,7 @@ namespace ldmx {
     }
 
     void UserStackingAction::NewStage() {
-        pluginManager_->stackingNewStage();
+        pluginManager_->NewStage();
     }
 
     void UserStackingAction::PrepareNewEvent() {
