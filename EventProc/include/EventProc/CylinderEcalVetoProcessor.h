@@ -1,7 +1,9 @@
 /**
  * @file CylinderEcalVetoProcessor.h
- * @brief Class that computes feature vars for multi electron PN discrimination
- * @author Andrew Whitbeck, FNAL
+ * @brief Class that computes 'cylinder' features and determines if an event 
+ *        can be vetoed based on the results of a BDT classifier.
+ * @author Omar Moreno, SLAC National Accelerator Laboratory
+ * @author Andrew Whitbeck, Texas Tech
  */
 
 #ifndef EVENTPROC_MULTIELECTRONVETO_H_
