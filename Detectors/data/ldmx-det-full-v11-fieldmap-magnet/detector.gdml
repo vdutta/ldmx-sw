@@ -61,7 +61,7 @@
     <position name="target_pos" x="0.0" y="0.0" z="target_z"/>
     <position name="trigger_pad_down_pos" x="0.0" y="0.0" z="trigger_pad_down_z"/>
     <position name="trigger_pad_up_pos"   x="0.0" y="0.0" z="trigger_pad_up_z"/>
-    <position name="trigger_pad_tag_pos" x="-42.14" y="0.0" z="trigger_pad_tag_z"/>
+    <position name="trigger_pad_tag_pos" x="0.0" y="0.0" z="trigger_pad_tag_z"/>
     <position name="recoil_pos" x="0.0" y="0.0" z="recoil_pos_z"/>
     <position name="em_calorimeter_pos" x="0.0" y="0.0" z="em_calorimeter_pos_z"/>
     <position name="hadron_calorimeter_pos" x="0.0" y="0.0" z="hadron_calorimeter_pos_z"/>
@@ -179,12 +179,12 @@
       <loop for="x" to="number_of_bars" step="1">
       	<physvol copynumber="x">
       	  <volumeref ref="trigger_pad_tag_bar_volume"/>
-      	  <position name="trigger_pad_tag_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_tag_z-dz/2-gap/2"/>
+      	  <position name="trigger_pad_tag_bar_layer1_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_tag_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
       	<physvol copynumber="x+40">
       	  <volumeref ref="trigger_pad_tag_bar_volume"/>
-      	  <position name="trigger_pad_tag_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_tag_z+dz/2+gap/2"/>
+      	  <position name="trigger_pad_tag_bar_layer2_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_tag_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
       </loop>
