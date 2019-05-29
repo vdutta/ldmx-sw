@@ -177,12 +177,12 @@
       </physvol>
 
       <loop for="x" to="number_of_bars" step="1">
-      	<physvol copynumber="x">
+      	<physvol copynumber="2*x">
       	  <volumeref ref="trigger_pad_tag_bar_volume"/>
       	  <position name="trigger_pad_tag_bar_layer1_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_tag_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      	<physvol copynumber="x+40">
+      	<physvol copynumber="2*x+1">
       	  <volumeref ref="trigger_pad_tag_bar_volume"/>
       	  <position name="trigger_pad_tag_bar_layer2_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_tag_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
@@ -191,12 +191,12 @@
 
 
       <loop for="xxx" to="number_of_bars" step="1">
-      	<physvol copynumber="xxx+80">
+      	<physvol copynumber="2*xxx">
       	  <volumeref ref="trigger_pad_up_bar_volume"/>
       	  <position name="trigger_pad_up_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(xxx-0.5)+gap*(xxx-1)" z="trigger_pad_up_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      	<physvol copynumber="xxx+120">
+      	<physvol copynumber="2*xxx+1">
       	  <volumeref ref="trigger_pad_up_bar_volume"/>
       	  <position name="trigger_pad_up_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*xxx+gap*(xxx-1)" z="trigger_pad_up_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
@@ -210,12 +210,12 @@
       </physvol>
 
       <loop for="xx" to="number_of_bars" step="1">
-      	<physvol copynumber="xx+160">
+      	<physvol copynumber="2*xx">
       	  <volumeref ref="trigger_pad_dn_bar_volume"/>
       	  <position name="trigger_pad_dn_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(xx-0.5)+gap*(xx-1)" z="trigger_pad_down_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      	<physvol copynumber="xx+200">
+      	<physvol copynumber="2*xx+1">
       	  <volumeref ref="trigger_pad_dn_bar_volume"/>
       	  <position name="trigger_pad_dn_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*xx+gap*(xx-1)" z="trigger_pad_down_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
