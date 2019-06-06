@@ -24,7 +24,7 @@ namespace ldmx {
                                            G4ApplicationState::G4State_Idle);
             stackThresholdCmd_->SetGuidance("Particles below this energy threshold are sent to the stack until particles above threshold are processed. Defaults to 0.");     
 
-            verboseCmd_ = new G4UIcmdWithAString{std::string(getPath() + "verbose").c_str(), this};
+            verboseCmd_ = new G4UIcmdWithAString{std::string(getPath() + "verbosity").c_str(), this};
             verboseCmd_->AvailableForStates(G4ApplicationState::G4State_PreInit,
                                            G4ApplicationState::G4State_Idle);
             verboseCmd_->SetGuidance("Set verbose output level by passing positive value or \"true\". Defaults to false.");     //TODO: default to false
@@ -50,8 +50,8 @@ namespace ldmx {
         delete killThresholdCmd_; 
         delete stackThresholdCmd_; 
         delete verboseCmd_; 
-	delete volumeCmd_;
-	delete boundCmd_;
+	//	delete volumeCmd_;
+	//	delete boundCmd_;
  }
 
     void HighPassFilterMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {

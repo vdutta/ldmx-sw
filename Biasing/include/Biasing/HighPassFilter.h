@@ -58,7 +58,7 @@ namespace ldmx {
              * @return True to indicate this plugin implements the stepping action.
              */
             bool hasSteppingAction() {
-                return true;
+	      return false; //true;
             }
 
             /**
@@ -70,23 +70,30 @@ namespace ldmx {
             }
 
             /**
-             * Get whether this plugin implements the stacking aciton.
+             * Get whether this plugin implements the stacking action.
              * @return True to indicate this plugin implements the stacking action.
              */
             bool hasStackingAction() { 
                 return true;
             }
 
-            void stepping(const G4Step* step);
+	    //            void stepping(const G4Step* step);
+
+            /**
+             * Pre-tracking action.
+             */
+	    //            void preTracking( const G4Track*); 
+            void PreTracking( G4Track*); 
 
             /**
              * Post-tracking action.
              */
-            void postTracking(const G4Track*); 
+	    void postTracking( const G4Track*); 
+            void PostTracking( G4Track*); 
 
             /**
              * Classify a new track which postpones track processing.
-             * Track processing resumes normally if an energy threshold is reached.
+             * Track processing resumes normally after all PN daughters particles above threshold have been processed.
              * @param aTrack The Geant4 track.
              * @param currentTrackClass The current track classification.
              */
@@ -140,6 +147,12 @@ namespace ldmx {
 
             /** List of volumes to bound the particle to. */
             std::vector<std::string> boundVolumes_;
+
+
+            /** control which generation of particles we care to check */
+	    //            std::vector< int > listOfPushedTrackIDs_; 
+	    G4int firstWaitingParent_{1000000};
+	    bool stopStacking{false};
 
             /** Filter action energy thresholds */
             double stackEnergyThreshold_{0.}; // MeV

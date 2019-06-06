@@ -23,6 +23,7 @@ namespace ldmx {
 
 
   HighPassFilter::~HighPassFilter() {
+    delete messenger_;
   }
 
   // ----------------------------------------------------------------------------------------
@@ -33,305 +34,233 @@ namespace ldmx {
 									 const G4Track* track, 
 									 const G4ClassificationOfNewTrack& currentTrackClass) {
 
-    if (verboseRun) {
+    //    G4int tID = track->GetTrackID();
+    // Use current classification by default so values from other plugins are not overridden.                                                                                                                
+    G4ClassificationOfNewTrack classification = currentTrackClass;
+
+    //don't send incoming electron to the waiting stack...
+    if ( track->GetTrackID() < 2 ) {
+      //take this opportunity to reset the parent id book keeping. so this has to be done in the first if!!
+      firstWaitingParent_=1000000;
+      stopStacking=false;
+      return classification;
+    }
+
+    if ( stopStacking )
+      return classification;
+
+    if ( track->GetParentID() > firstWaitingParent_ ) { 
+      //the parent of this track has already been pushed to stack so let's assume the important stack sorting, and killing, happened in the previous step
+      if (verboseRun) {
+	std::cout << "The parent (ID: " << track->GetParentID() << ") of track " << track->GetTrackID() << " has already been classified before; won't touch" << std::endl;
+      }
+      stopStacking=true; //this is set the first time we get downstream of the stacked generation
+      return classification;
+
+    }
+
+
+    // get the PDGID of the track.                                                                                                                            
+    G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
+    
+    // filter on kinetic energy for p and n (since they're stable particles), total otherwise
+    G4double E = (pdgID == 2212 || pdgID == 2112) ? track->GetKineticEnergy() : track->GetTotalEnergy() ;
+
+
+    if (verboseRun && classification != 1) {
       std::cout << "********************************" << std::endl;
       std::cout << "*   Track pushed to the stack  *" << std::endl;
       std::cout << "********************************" << std::endl;
 
-      // get the PDGID of the track.
-      G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
-      // Get the particle type.
+      // Get the particle type and momentum.
       G4String particleName = track->GetParticleDefinition()->GetParticleName();
-      //      std::cout << "[ TargetBremFilter ]: " << "\n" 
-      std::cout << "[ HighPassFilter ]: " << "\n" 
-		<< "\tParticle " << particleName << " ( PDG ID: " << pdgID << " ) : " << "\n"
-		<< "\tTrack ID: " << track->GetTrackID() << "\n" 
-		<< std::endl;
+      G4ThreeVector pvec = track->GetMomentum();
+      std::cout << "[ HighPassFilter ]: Decision on " //track with \n"
+		<< " Particle " << particleName << " (PDG ID: " << pdgID << ")" //<< "\n"
+		<< "\tstack class: " << currentTrackClass
+		<< "\tTrack ID: " << track->GetTrackID()
+		<< "\tStep #: " << track->GetCurrentStepNumber()
+		<< "\tParent ID: " << track->GetParentID() //<< "\n"                                                                                        
+		<< "\tp = (" << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << "):\t" ; //<< std::endl;
     }
 
-    if (track == currentTrack_) {
-      currentTrack_ = nullptr; 
+
+    //TODO: could use    processName.contains(BiasingMessenger::getProcess())
+    //parent id is 1 for the incoming electron, (at least) 2 for the brem gamma
+    if ( track->GetParentID() > 1 && (track->GetCreatorProcess()->GetProcessName()).contains("photonNuclear") ){
+
+      if ( E < killEnergyThreshold_ ) {
+	// remove track and daughters if energy is below threshold
+	if (verboseRun) {
+	  
+	  if (classification == 1) { //just to make sure... perhaps some which were waiting are getting killed
+	    std::cout << "********************************" << std::endl;
+	    std::cout << "*   Killing track  *" << std::endl;
+	    std::cout << "********************************" << std::endl;
+	    
+	    // Get the particle type and momentum.                                                                                                                                                                 
+	    G4String particleName = track->GetParticleDefinition()->GetParticleName();
+	    G4ThreeVector pvec = track->GetMomentum();
+	    std::cout << "[ HighPassFilter ]: Decision on " //track with \n"                                                                                                                                       
+		      << " Particle " << particleName << " (PDG ID: " << pdgID << "), " //<< "\n" 
+		      << "\t stack class: " << currentTrackClass
+		      << "\tTrack ID: " << track->GetTrackID()
+		      << "\tStep #: " << track->GetCurrentStepNumber()
+		      << "\tParent ID: " << track->GetParentID() //<< "\n"                                                                                                                                         
+		      << "\t p = ( " << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << " ) :\t" ; //<< std::endl;                                                                                                
+	  } //if classification = 1 (fWaiting)
+
+
+	  std::cout  << " --- kill (kill threshold)"  << std::endl;
+	  std::cout << "[ HighPassFilter ]: " << "\n"
+		    << "\tfound sth photo sth "
+		    << std::endl;
+	
+	}
+
+	return fKill;
+      } // if below thr                                                                                                                                         
+
+    } //if brem gamma parent                                                   
+
+
+    //if we don't want to kill it, and it's already waiting, leave it at that
+    if ( classification == 1 ) {
+      //      if (verboseRun) std::cout  << "\t------ waiting (already set)"  << std::endl;
       return fWaiting; 
     }
 
-    // Use current classification by default so values from other plugins are not overridden.
-    G4ClassificationOfNewTrack classification = currentTrackClass;
-        
+    //if we don't want to kill it, could still want to put it on waiting stack
+    if ( E < stackEnergyThreshold_ ) {
+      if (verboseRun) std::cout  << " --- waiting (stacking threshold)"  << std::endl;
+
+      firstWaitingParent_=track->GetParentID();
+      return fWaiting;
+    }
+
+
+    // return current classification by default so values from other plugins are not overridden.
+    // probably we rarely get this far
+    if (verboseRun) {
+      if ( classification == 0 ) std::cout  << " --- urgent (unchanged) "  << std::endl;
+      else std::cout  << " --- " << classification << " (unchanged) "  << std::endl;
+
+      if (track->GetParentID() > 0 ) //don't ask this for the incoming electron, which doesn't have a process that created it
+	std::cout << "[ HighPassFilter ]: " << "\n"
+		  << "\tWhat I found wasn't sth photo sth , it was "
+		  << track->GetCreatorProcess()->GetProcessName()	
+		  << std::endl;
+    }
+
     return classification;
   }
 
 
+
+
   // ----------------------------------------------------------------------------------------
 
 
-  
-  void HighPassFilter::stepping(const G4Step* step) { 
+
+  //void HighPassFilter::preTracking(const G4Track* track) { 
+    void HighPassFilter::PreTracking( G4Track* track) { 
     
-    if (! verboseRun) {
-      std::cout << "*** verboseRun not set ********" << std::endl;
-    }
-    
-    //akip events with no interaction in the target 
-    // TODO: make more general and remove this requirement?
-    if (TargetBremFilter::getBremGammaList().empty()) { 
-      return;
-    } 
-    
-    // Get the track associated with this step.
-    G4Track* track = step->GetTrack();
-    
-    // Only process tracks whose parent is the primary particle
-    if (track->GetParentID() != 1) return; 
     
     // get the PDGID of the track.
     G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
-    
-    // Make sure that the particle being processed is an electron. ????? electron is 11. gamma?
-    // TODO: At some point all particle types should be allowed.
-    if (pdgID != 22) {
+
+    // kinetic energy for p and n, total otherwise)
+    G4double E = (pdgID == 2212 || pdgID == 2112) ? track->GetKineticEnergy() : track->GetTotalEnergy() ;
+    // remove track and daughters if energy is below threshold
+    if ( E < stackEnergyThreshold_ ) {
+      track->SetTrackStatus(fSuspend); //fWaiting); //
+   
       if (verboseRun) {
-	std::cout << "[ HighPassFilter ]: " << "\n"
-		  << "\tSkipping particle with wrong PDG ID: " <<  pdgID 
-		  << std::endl;
-      }
-      return; 
-    }
-
-    // Get the volume the particle is in.
-    G4VPhysicalVolume* volume = track->GetVolume();
-    G4String volumeName = volume->GetName();
-
-    if (verboseRun) {
-  
-      std::cout << "*******************************" << std::endl; 
-      std::cout << "*   Step " << track->GetCurrentStepNumber() << std::endl;
-      std::cout << "********************************" << std::endl;
-    }
-
-
-    if (verboseRun) {
-      // Get the particle type.
-      G4String particleName = track->GetParticleDefinition()->GetParticleName();
-      // Get the kinetic energy of the particle.
-      double incidentParticleEnergy = step->GetPreStepPoint()->GetTotalEnergy();
-
-      std::cout << "[ HighPassFilter ]:\n" 
-		<< "\tTotal energy of " << particleName  << ": " << incidentParticleEnergy << " MeV"
-		<< "\tPDG ID: " << pdgID 
-		<< "\tTrack ID: " << track->GetTrackID() 
-		<< "\tStep #: " << track->GetCurrentStepNumber()
-		<< "\tParent ID: " << track->GetParentID()   << std::endl;
-      //		<< "\tParticle currently in " << volumeName   << std::endl;
-    }
-
-    // If the particle isn't in the specified volume, stop processing the 
-    // event.
-    std::vector<G4Track*> bremGammaList = TargetBremFilter::getBremGammaList();
-    if (std::find(std::begin(volumes_), std::end(volumes_), volumeName) == std::end(volumes_)) {
-
-      if (verboseRun) {
-	std::cout << "[ HighPassFilter ]: "
-		  << "Brem is in " << volumeName  << std::endl;
-      }
-	  
-      // If secondaries were produced outside of the volume of interest, 
-      // and there aren't additional brems to process, abort the 
-      // event.  Otherwise, suspend the track and move on to the next 
-      // brem.
-      if (step->GetSecondary()->size() != 0 
-	  && (std::find(bremGammaList.begin(), bremGammaList.end(), track) != bremGammaList.end())) { 
-	
-	if (verboseRun) {
-	  std::cout << "[ HighPassFilter ]: "
-		    << "Reaction occured outside volume of interest " ; //--> Aborting event." 
-	    //	    << std::endl;
-	}
-	
-	if (bremGammaList.size() == 1) { 
-	  track->SetTrackStatus(fKillTrackAndSecondaries);
-	  G4RunManager::GetRunManager()->AbortEvent();
-	  currentTrack_ = nullptr;
-	  if (verboseRun) {
-	    std::cout << "--> Aborting event."
-                    << std::endl;
-	  }
-	  return;
-	} else {
-
-	  currentTrack_ = track; 
-	  track->SetTrackStatus(fSuspend);
-	  TargetBremFilter::removeBremFromList(track);
-	  if (verboseRun) {
-	    std::cout << "--> Removing brem with track ID " << track->GetTrackID() << " from list."
-		      << std::endl;
-          }
-	  return;
-	}
-      }
-      return;
-    }
-    else
-      if (verboseRun) {
-
-	std::cout << "[ HighPassFilter ]: "
-		  << "No suitable volume match for track with "
-		  << "\tPDG ID: " << pdgID
-		  << "\tTrack ID: " << track->GetTrackID() << std::endl;
-      }
-    // The list of brems will only contain a given track/particle if it 
-    // originates from the target.  If the gamma originates elsewhere, 
-    // suspend it and move on to the next gamma.
-    // TODO: At some point, this needs to be modified to include brems 
-    // from downstream of the target.
-    if (std::find(bremGammaList.begin(), bremGammaList.end(), track) == bremGammaList.end()) { 
-           
-      if (verboseRun) {
- 
-	std::cout << "[ HighPassFilter ]: "
-		  << "Brem list doesn't contain track." << std::endl;
-      }
-            
-      currentTrack_ = track; 
-      track->SetTrackStatus(fSuspend);
-      return;
-    }
- 
-    // Get the particles daughters.
-    const G4TrackVector* secondaries = step->GetSecondary();
-
-
-    // If the particle doesn't interact, then move on to the next step.
-    if (secondaries->size() == 0) { 
-            
-      if (verboseRun) {
-	std::cout << "[ HighPassFilter ]: "
-		  << "Brem photon did not interact --> Continue propagating track."
-		  << std::endl;
-      }
-        
-      // If the particle is exiting the bounding volume, kill it.
-      if (!boundVolumes_.empty() && step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary) {
-	if (std::find(std::begin(boundVolumes_), std::end(boundVolumes_), volumeName) != std::end(boundVolumes_)) {
-
-           
-	  if (verboseRun) {
-	    std::cout << "[ HighPassFilter ]: "
-		      << "Brem photon is exiting the volume --> particle will be killed or suspended."
-		      << std::endl;
-	  }
-                    
-	  if (bremGammaList.size() == 1) { 
-	    track->SetTrackStatus(fKillTrackAndSecondaries);
-	    G4RunManager::GetRunManager()->AbortEvent();
-	    currentTrack_ = nullptr;
-	    if (verboseRun) {
-	      std::cout << "[ HighPassFilter ]: " 
-			<< " Brem list is empty --> Killing all tracks!"
-			<< std::endl;
-	    }
-	    return;
-	  } else { 
-	    currentTrack_ = track; 
-	    track->SetTrackStatus(fSuspend);
-	    TargetBremFilter::removeBremFromList(track);
-	    if (verboseRun) {
-	      std::cout << "[ HighPassFilter ]: " 
-			<< " Other tracks still need to be processed --> Suspending track!"
-			<< std::endl;
-	    }
-	    return;
-	  }
-	}
-      }
-	    
-    } else {
-
-      // If the brem gamma interacts and produces secondaries, get the 
-      // process used to create them. 
-      G4String processName = secondaries->at(0)->GetCreatorProcess()->GetProcessName(); 
-            
-
-      if (verboseRun) {
-	std::cout << "[ HighPassFilter ]: "
-		  << "Brem photon produced " << secondaries->size() 
-		  << " particles via " << processName << " process." 
-		  << std::endl;
-      }
-
-      // Only record the process that is being biased
-      if (!processName.contains(BiasingMessenger::getProcess())) {
-
-	if (verboseRun) {
-	  std::cout << "[ HighPassFilter ]: "
-		    << "Process was not " << BiasingMessenger::getProcess() 
-		    << std::endl;
-	}
-                
-	if (bremGammaList.size() == 1) { 
-	  track->SetTrackStatus(fKillTrackAndSecondaries);
-	  G4RunManager::GetRunManager()->AbortEvent();
-	  currentTrack_ = nullptr;
-	  if (verboseRun) {
-	    std::cout << "[ HighPassFilter ]: " 
-		      << " Brem list is empty --> Killing all tracks!"
-		      << std::endl;
-	  }
-	  return;
-	} else { 
-	  currentTrack_ = track; 
-	  track->SetTrackStatus(fSuspend);
-	  TargetBremFilter::removeBremFromList(track);
-	  if (verboseRun) {
-	    std::cout << "[ HighPassFilter ]: " 
-		      << " Other tracks still need to be processed --> Suspending track!"
-		      << std::endl;
-	  }
-	  return;
-	}
-      }
-
-      //not returned yet -- means we are looking at the process of interest. so keep it            
-      std::cout << "[ HighPassFilter ]: "
-		<< "Brem photon produced " << secondaries->size() 
-		<< " particles via " << processName << " process." 
-		<< std::endl;
-      std::cout << "Track ID: " << track->GetTrackID() << "\tEvent weight: " << track->GetWeight() << std::endl;
-
-      TargetBremFilter::removeBremFromList(track);
-      BiasingMessenger::setEventWeight(track->GetWeight());
-      photonGammaID_ = track->GetTrackID(); 
-    } 
-  }
-
-
-  // ----------------------------------------------------------------------------------------
-
-
-
-  void HighPassFilter::postTracking(const G4Track* track) { 
-    
-    if (! verboseRun) {
-      std::cout << "*** verboseRun not set ********" << std::endl;
-    }
-    
-    //parent id is 1 for the incoming electron, 2 for the brem gamma       
-    if (track->GetParentID() == photonGammaID_) { 
-      UserTrackInformation* userInfo 
-	= dynamic_cast<UserTrackInformation*>(track->GetUserInformation());
-      userInfo->setSaveFlag(true); 
-      G4ThreeVector pvec = track->GetMomentum();
-      if (verboseRun) {
-	// get the PDGID of the track.
-	G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
-	std::cout << "[ HighPassFilter ]:\n" 
+	G4ThreeVector pvec = track->GetMomentum();
+	std::cout << "[ HighPassFilter ]: Sent track to waiting stack: \n" 
 		  << "\tPDG ID: " << pdgID 
 		  << "\tTrack ID: " << track->GetTrackID() 
 		  << "\tStep #: " << track->GetCurrentStepNumber()
 		  << "\tParent ID: " << track->GetParentID() //<< "\n"
 		  << "\t p: [ " << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << " ]" << std::endl;
-      }
-    }
+      } //if verbose
+
+      return;
+	
+    } // if below thr
+    //    else {
+      if (verboseRun) {
+	G4ThreeVector pvec = track->GetMomentum();
+	std::cout << "[ HighPassFilter ]: Not sent track to waiting stack: \n" 
+		  << "\tPDG ID: " << pdgID 
+		  << "\tTrack ID: " << track->GetTrackID() 
+		  << "\tStep #: " << track->GetCurrentStepNumber()
+		  << "\tParent ID: " << track->GetParentID() //<< "\n"
+		  << "\t p: [ " << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << " ]" << std::endl;
+      } //if verbose
+	
+      //  }// above threshold
   }
+
+
+
+    // ----------------------------------------------------------------------------------------
+
+     void HighPassFilter::postTracking(const G4Track* track) { 
+
+
+       //       listOfPushedTrackIDs_.clear();
+       // listOfPushedTrackIDs_.resize(0);
+
+
+     }
+
+    // ----------------------------------------------------------------------------------------
+
+
+      void HighPassFilter::PostTracking( G4Track* track) { 
+    
+    
+      //parent id is 1 for the incoming electron, 2 for the brem gamma       
+      if ( track->GetCreatorProcess()->GetProcessName().compare("photo") == 0 ){
+
+	//    if (track->GetParentID() == photonGammaID_) { 
+
+	// get the PDGID of the track.
+	G4int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
+
+	// kinetic energy for p and n, total otherwise)
+	G4double E = (pdgID == 2212 || pdgID == 2112) ? track->GetKineticEnergy() : track->GetTotalEnergy() ;
+	// remove track and daughters if energy is below threshold
+	if ( E < killEnergyThreshold_ ) {
+	  track->SetTrackStatus(fKillTrackAndSecondaries);
+   
+	  if (verboseRun) {
+	    G4ThreeVector pvec = track->GetMomentum();
+	    std::cout << "[ HighPassFilter ]: Killed track with \n" 
+		      << "\tPDG ID: " << pdgID 
+		      << "\tTrack ID: " << track->GetTrackID() 
+		      << "\tStep #: " << track->GetCurrentStepNumber()
+		      << "\tParent ID: " << track->GetParentID() //<< "\n"
+		      << "\t p: [ " << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << " ]" << std::endl;
+	  } //if verbose
+
+	} // if below thr
+	else { 
+	  if (verboseRun) {
+	    G4ThreeVector pvec = track->GetMomentum();
+	    std::cout << "[ HighPassFilter ]: Didn't kill track with \n" 
+		      << "\tPDG ID: " << pdgID 
+		      << "\tTrack ID: " << track->GetTrackID() 
+		      << "\tStep #: " << track->GetCurrentStepNumber()
+		      << "\tParent ID: " << track->GetParentID() //<< "\n"
+		      << "\t p: [ " << pvec[0] << ", " << pvec[1] << ", " << pvec[2] << " ]" << std::endl;
+	  } //if verbose
+	} //if above threshold
+
+      } //if brem gamma parent
+
+    }
 
 
   // ----------------------------------------------------------------------------------------
@@ -371,10 +300,6 @@ namespace ldmx {
 
 
   void HighPassFilter::addVolume(std::string volume) {
-
-    if (! verboseRun) {
-      std::cout << "*** verboseRun not set ********" << std::endl;
-    }
 
     std::cout << "[ HighPassFilter ]: Applying filter to volume " << volume << std::endl;
     if (volume.compare("ecal") == 0) {
