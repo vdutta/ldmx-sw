@@ -31,6 +31,7 @@
 #include "SimApplication/RunManager.h"
 #include "SimApplication/TrackerSD.h"
 #include "SimApplication/ScoringPlaneSD.h"
+#include "SimApplication/TriggerPadSD.h"
 
 //------------//
 //   Geant4   //
@@ -274,6 +275,33 @@ namespace ldmx {
         }
     }
 
+
+  void RootPersistencyManager::writeTriggerPadHitsCollection(G4TriggerPadHitsCollection* hc, TClonesArray* outputColl) {
+    int nHits = hc->GetSize();
+    for (int iHit = 0; iHit < nHits; iHit++) {
+      G4TriggerPadHit* g4hit = (G4TriggerPadHit*) hc->GetHit(iHit);
+      SimTriggerPadHit* simTriggerPadHit = (SimTriggerPadHit*) outputColl->ConstructedAt(outputColl->GetEntries());
+      simTriggerPadHit->setID(g4hit->getID());
+      simTriggerPadHit->setLayerID(g4hit->getLayerID());
+      simTriggerPadHit->setPadID(g4hit->getPadID());
+      simTriggerPadHit->setStripID(g4hit->getStripID());
+      simTriggerPadHit->setEdep(g4hit->getEdep());
+      const G4ThreeVector& momentum = g4hit->getMomentum();
+      simTriggerPadHit->setMomentum(momentum.x(), momentum.y(), momentum.z());
+      const G4ThreeVector& position = g4hit->getPosition();
+      simTriggerPadHit->setEnergy( g4hit->getEnergy() );
+      simTriggerPadHit->setPosition(position.x(), position.y(), position.z());
+      simTriggerPadHit->setTrackID(g4hit->getTrackID());
+      simTriggerPadHit->setPdgID(g4hit->getPdgID());
+      simTriggerPadHit->setTime(g4hit->getTime());
+      SimParticle* simParticle = simParticleBuilder_.findSimParticle(g4hit->getTrackID());
+      simTriggerPadHit->setSimParticle(simParticle);
+    }
+  }
+
+
+
+
     void RootPersistencyManager::writeCalorimeterHitsCollection(G4CalorimeterHitsCollection* hc, TClonesArray* outputColl) {
         int nHits = hc->GetSize();
         for (int iHit = 0; iHit < nHits; iHit++) {
@@ -350,12 +378,20 @@ namespace ldmx {
                 if (m_verbose > 1) {
                     std::cout << "[ RootPersistencyManager ]: Created SimTrackerHit HC " << hcName << std::endl;
                 }
+            } else if (dynamic_cast<TriggerPadSD*>(sd)) {
+	      outputHitsCollections_[hcName] = new TClonesArray(EventConstants::SIM_TRIGGERPAD_HIT.c_str(), 50);
+	      if (m_verbose > 1) {
+		std::cout << "[ RootPersistencyManager ]: Created SimTriggerPadHit HC " << hcName << std::endl;
+	      }
             } else if (dynamic_cast<ScoringPlaneSD*>(sd)) { 
                 outputHitsCollections_[hcName] = new TClonesArray(EventConstants::SIM_TRACKER_HIT.c_str(), 500);
                 if (m_verbose > 1) {
                     std::cout << "[ RootPersistencyManager ]: Created ScoringPlaneHit HC " << hcName << std::endl;
                 }
             }
+	    else { 
+	      std::cerr << "[ RootPersistencyManager ]: Failed to find SD type to match hit collection " << hcName << std::endl;
+	    }
         }
     }
 } // namespace sim

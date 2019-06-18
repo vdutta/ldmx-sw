@@ -3,8 +3,6 @@
       
   <define>
     <variable name="x" value="1"/>
-    <variable name="xx" value="1"/>
-    <variable name="xxx" value="1"/>
     <variable name="dx" value="40"/>
     <variable name="dy" value="3"/>		
     <variable name="dz" value="2"/>		
@@ -128,9 +126,7 @@
   <solids>
     <box lunit="mm" name="world_box" x="world_dim" y="world_dim" z="world_dim"/>
     <box lunit="mm" name="target_box" x="target_dim_x" y="target_dim_y" z="target_thickness"/>
-    <box lunit="mm" name="trigger_pad_down_box" x="trigger_pad_dim_x" y="trigger_pad_dim_y" z="trigger_pad_thickness"/>
-    <box lunit="mm" name="trigger_pad_up_box"   x="trigger_pad_dim_x" y="trigger_pad_dim_y" z="trigger_pad_thickness"/>
-    <box lunit="mm" name="trigger_pad_tag_box"   x="trigger_pad_dim_x" y="trigger_pad_dim_y" z="trigger_pad_thickness"/>
+    <box lunit="mm" name="trigger_pad_box"   x="trigger_pad_dim_x" y="trigger_pad_dim_y" z="trigger_pad_thickness"/>
     <box lunit="mm" name="trigger_bar_box" x="dx" y="dy" z="dz"/>
   </solids>
 
@@ -143,26 +139,11 @@
       <auxiliary auxtype="DetElem" auxvalue="Target"/>
     </volume>
     <!-- Name is passed to the DetElem. -->
-    <volume name="trigger_pad_up_bar_volume">
-      <materialref ref="Polyvinyltoluene"/>
-      <solidref ref="trigger_bar_box"/>
-      <auxiliary auxtype="SensDet" auxvalue="TriggerPadUpSD"/>
-      <auxiliary auxtype="VisAttributes" auxvalue="TriggerPadVis"/>
-      <auxiliary auxtype="DetElem" auxvalue="TriggerPad"/>
-    </volume>
 
-    <volume name="trigger_pad_dn_bar_volume">
+    <volume name="trigger_pad_bar_volume">
       <materialref ref="Polyvinyltoluene"/>
       <solidref ref="trigger_bar_box"/>
-      <auxiliary auxtype="SensDet" auxvalue="TriggerPadDownSD"/>
-      <auxiliary auxtype="VisAttributes" auxvalue="TriggerPadVis"/>
-      <auxiliary auxtype="DetElem" auxvalue="TriggerPad"/>
-    </volume>
-
-    <volume name="trigger_pad_tag_bar_volume">
-      <materialref ref="Polyvinyltoluene"/>
-      <solidref ref="trigger_bar_box"/>
-      <auxiliary auxtype="SensDet" auxvalue="TriggerPadTaggerSD"/>
+      <auxiliary auxtype="SensDet" auxvalue="TriggerPadSD"/>
       <auxiliary auxtype="VisAttributes" auxvalue="TriggerPadVis"/>
       <auxiliary auxtype="DetElem" auxvalue="TriggerPad"/>
     </volume>
@@ -177,31 +158,40 @@
       </physvol>
 
       <loop for="x" to="number_of_bars" step="1">
-      	<physvol copynumber="2*x">
-      	  <volumeref ref="trigger_pad_tag_bar_volume"/>
+      	<physvol copynumber="100+2*x-1">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
       	  <position name="trigger_pad_tag_bar_layer1_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_tag_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      	<physvol copynumber="2*x+1">
-      	  <volumeref ref="trigger_pad_tag_bar_volume"/>
+      	<physvol copynumber="100+2*x">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
       	  <position name="trigger_pad_tag_bar_layer2_pos" unit="mm" x="-28.06" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_tag_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      </loop>
 
-
-      <loop for="xxx" to="number_of_bars" step="1">
-      	<physvol copynumber="2*xxx">
-      	  <volumeref ref="trigger_pad_up_bar_volume"/>
-      	  <position name="trigger_pad_up_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(xxx-0.5)+gap*(xxx-1)" z="trigger_pad_up_z-dz/2-gap/2"/>
+      	<physvol copynumber="200+2*x-1">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
+      	  <position name="trigger_pad_up_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_up_z-dz/2-gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
-      	<physvol copynumber="2*xxx+1">
-      	  <volumeref ref="trigger_pad_up_bar_volume"/>
-      	  <position name="trigger_pad_up_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*xxx+gap*(xxx-1)" z="trigger_pad_up_z+dz/2+gap/2"/>
+      	<physvol copynumber="200+2*x">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
+      	  <position name="trigger_pad_up_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_up_z+dz/2+gap/2"/>
+          <rotationref ref="identity"/>
+      	</physvol>
+
+      	<physvol copynumber="300+2*x-1">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
+      	  <position name="trigger_pad_down_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(x-0.5)+gap*(x-1)" z="trigger_pad_down_z-dz/2-gap/2"/>
+          <rotationref ref="identity"/>
+      	</physvol>
+      	<physvol copynumber="300+2*x">
+      	  <volumeref ref="trigger_pad_bar_volume"/>
+      	  <position name="trigger_pad_down_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*x+gap*(x-1)" z="trigger_pad_down_z+dz/2+gap/2"/>
           <rotationref ref="identity"/>
       	</physvol>
       </loop>
+
 
       <physvol copynumber="3">
         <volumeref ref="target"/>
@@ -209,18 +199,6 @@
         <rotationref ref="identity"/>
       </physvol>
 
-      <loop for="xx" to="number_of_bars" step="1">
-      	<physvol copynumber="2*xx">
-      	  <volumeref ref="trigger_pad_dn_bar_volume"/>
-      	  <position name="trigger_pad_dn_bar_layer1_pos" unit="mm" x="0" y="-target_dim_y/2+dy*(xx-0.5)+gap*(xx-1)" z="trigger_pad_down_z-dz/2-gap/2"/>
-          <rotationref ref="identity"/>
-      	</physvol>
-      	<physvol copynumber="2*xx+1">
-      	  <volumeref ref="trigger_pad_dn_bar_volume"/>
-      	  <position name="trigger_pad_dn_bar_layer2_pos" unit="mm" x="0" y="-target_dim_y/2+dy*xx+gap*(xx-1)" z="trigger_pad_down_z+dz/2+gap/2"/>
-          <rotationref ref="identity"/>
-      	</physvol>
-      </loop>
 
       <physvol copynumber="5">
         <file name="recoil.gdml"/>
@@ -263,13 +241,14 @@
       <auxiliary auxtype="SubdetID" auxvalue="1"/>
       <auxiliary auxtype="Verbose" auxvalue="0"/>
     </auxiliary>
-    <auxiliary auxtype="SensDet" auxvalue="TriggerPadUpSD">
-      <auxiliary auxtype="SensDetType" auxvalue="CalorimeterSD"/>
-      <auxiliary auxtype="HitsCollection" auxvalue="TriggerPadUpSimHits"/>
+    <auxiliary auxtype="SensDet" auxvalue="TriggerPadSD">
+      <auxiliary auxtype="SensDetType" auxvalue="TriggerPadSD"/>
+      <auxiliary auxtype="HitsCollection" auxvalue="TriggerPadSimHits"/>
       <auxiliary auxtype="SubdetID" auxvalue="2"/>
       <auxiliary auxtype="LayerDepth" auxvalue="1"/>
       <auxiliary auxtype="Verbose" auxvalue="0"/>
     </auxiliary>    
+<!--
     <auxiliary auxtype="SensDet" auxvalue="TriggerPadTaggerSD">
       <auxiliary auxtype="SensDetType" auxvalue="CalorimeterSD"/>
       <auxiliary auxtype="HitsCollection" auxvalue="TriggerPadTaggerSimHits"/>
@@ -277,6 +256,7 @@
       <auxiliary auxtype="LayerDepth" auxvalue="1"/>
       <auxiliary auxtype="Verbose" auxvalue="0"/>
     </auxiliary>    
+-->
     <auxiliary auxtype="SensDet" auxvalue="TargetSD">
       <auxiliary auxtype="SensDetType" auxvalue="CalorimeterSD"/>
       <auxiliary auxtype="HitsCollection" auxvalue="TargetSimHits"/>
@@ -284,13 +264,14 @@
       <auxiliary auxtype="LayerDepth" auxvalue="1"/>
       <auxiliary auxtype="Verbose" auxvalue="0"/>
     </auxiliary>    
-    <auxiliary auxtype="SensDet" auxvalue="TriggerPadDownSD">
+<!--    <auxiliary auxtype="SensDet" auxvalue="TriggerPadDownSD">
       <auxiliary auxtype="SensDetType" auxvalue="CalorimeterSD"/>
       <auxiliary auxtype="HitsCollection" auxvalue="TriggerPadDownSimHits"/>
       <auxiliary auxtype="SubdetID" auxvalue="2"/>
       <auxiliary auxtype="LayerDepth" auxvalue="1"/>
       <auxiliary auxtype="Verbose" auxvalue="0"/>
     </auxiliary>
+-->
     <auxiliary auxtype="SensDet" auxvalue="RecoilSD">
       <auxiliary auxtype="SensDetType" auxvalue="TrackerSD"/>
       <auxiliary auxtype="HitsCollection" auxvalue="RecoilSimHits"/>

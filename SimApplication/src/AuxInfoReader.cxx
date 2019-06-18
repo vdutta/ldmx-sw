@@ -14,6 +14,9 @@
 #include "DetDescr/DefaultDetectorID.h"
 #include "DetDescr/EcalDetectorID.h"
 
+#include "SimApplication/TriggerPadSD.h"
+
+
 // Geant4
 #include "G4LogicalVolumeStore.hh"
 #include "G4SDManager.hh"
@@ -141,6 +144,8 @@ namespace ldmx {
             sd = new CalorimeterSD(theSensDetName, hcName, subdetID, detID);
         } else if (sdType == "ScoringPlaneSD") { 
             sd = new ScoringPlaneSD(theSensDetName, hcName, subdetID, detID); 
+        } else if (sdType == "TriggerPadSD") { 
+            sd = new TriggerPadSD(theSensDetName, hcName, subdetID, detID); 
         } else {
             std::cerr << "Unknown SensitiveDetector type: " << sdType << std::endl;
             G4Exception("", "", FatalException, "Unknown SensitiveDetector type in aux info.");

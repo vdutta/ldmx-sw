@@ -20,6 +20,7 @@
 #include "SimApplication/EcalHitIO.h"
 #include "SimApplication/G4CalorimeterHit.h"
 #include "SimApplication/G4TrackerHit.h"
+#include "SimApplication/G4TriggerPadHit.h"
 #include "SimApplication/SimParticleBuilder.h"
 
 // Forward declarations
@@ -193,6 +194,14 @@ namespace ldmx {
              * @param outputColl The output collection of SimTrackerHits.
              */
             void writeTrackerHitsCollection(G4TrackerHitsCollection* hc, TClonesArray* outputColl);
+
+
+            /**
+             * Write a collection of triggerpad hits to an output collection.
+             * @param hc The collection of G4TriggerPadHits.
+             * @param outputColl The output collection of SimTriggerPadHits.
+             */
+            void writeTriggerPadHitsCollection(G4TriggerPadHitsCollection* hc, TClonesArray* outputColl);
 
             /**
              * Write a collection of tracker hits to an output collection.
