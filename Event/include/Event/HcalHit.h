@@ -86,12 +86,12 @@ namespace ldmx {
             }
 
             /** Decode the section associated with the hit from the ID. */
-            int getSection() const {
-                return (getID() & 0x7000) >> 12;
-            }
+            virtual int getSection() const {
+	      return (getID() & 0x7000) >> 12;
+	    }
 
             /** Decode the strip associated with the hit from the ID. */
-            int getStrip() const {
+            virtual int getStrip() const {
                 return (getID() & 0x7F8000) >> 15;
             }
 

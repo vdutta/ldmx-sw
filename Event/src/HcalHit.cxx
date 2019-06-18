@@ -18,4 +18,5 @@ namespace ldmx {
                 << "ns, amplitude: " << getAmplitude() << ", pe: " << getPE() << "}" << std::endl;
 
     }
+
 }
