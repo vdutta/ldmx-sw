@@ -92,6 +92,7 @@ namespace ldmx {
             Ypos[detIDraw]      = Ypos[detIDraw] / Edep[detIDraw];
             Zpos[detIDraw]      = Zpos[detIDraw] / Edep[detIDraw];
             double meanPE       = depEnergy / mev_per_mip_ * pe_per_mip_;
+	    cellPEs[detIDraw]   = random_->Poisson(meanPE);
 
 	    //  dropping readout threshold for now... AJW
             //if( cellPEs[detIDraw] >= readoutThreshold_ ){ // > or >= ?
