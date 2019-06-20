@@ -36,7 +36,7 @@ namespace ldmx {
         std::vector<SimTrackerHit*> filteredSimVec;//Sim particles are organized from highest to lowest momentum
     
         for (TIter next(scoringPlaneHits); ecalSPP = (ldmx::SimTrackerHit*)next();) {
-                simVec.push_back(ecalSPP);
+            simVec.push_back(ecalSPP);
         }
     
         std::sort(simVec.begin(), simVec.end(), compSims);
@@ -44,9 +44,9 @@ namespace ldmx {
         SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
         for (int j = 0; j < simVec.size(); j++) {
             SimParticle* sP = simVec[j]->getSimParticle();
-        if (sP == lastP) continue;
-                lastP = sP;
-                filteredSimVec.push_back(simVec[j]);
+            if (sP == lastP) continue;
+            lastP = sP;
+            filteredSimVec.push_back(simVec[j]);
         }
     
         std::sort(filteredSimVec.begin(), filteredSimVec.end(), compSimsP);
@@ -136,13 +136,13 @@ namespace ldmx {
             const ldmx::HcalHit* hCalhit = (const ldmx::HcalHit*)(hCalhits[i]);
             for(int j=0; j<filteredSimVec.size(); j++) { //Iterate over all sim particles and match one to an Hcal hit
                 SimParticle* sP = filteredSimVec[j]->getSimParticle();
-                        pdgID = sP->getPdgID();
+                pdgID = sP->getPdgID();
                 
                 std::vector<double> simStart = sP->getVertex();
-                            std::vector<double> simEnd = sP->getEndPoint();
+                std::vector<double> simEnd = sP->getEndPoint();
     
                 TVector3 simStartT = TVector3(simStart[0], simStart[1], simStart[2]);
-                            TVector3 simEndT = TVector3(simEnd[0], simEnd[1], simEnd[2]);
+                TVector3 simEndT = TVector3(simEnd[0], simEnd[1], simEnd[2]);
                 TVector3 hCalPoint = TVector3(hCalhits[i]->getX(), hCalhits[i]->getY(), hCalhits[i]->getZ());
                 
                 new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
