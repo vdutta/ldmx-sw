@@ -1,6 +1,6 @@
 # Declare "Tools" module
 module(
   NAME Tools
-  DEPENDENCIES Event  
+  DEPENDENCIES Event DetDescr
   EXTERNAL_DEPENDENCIES ROOT
 )
