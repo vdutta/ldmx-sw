@@ -35,8 +35,10 @@ namespace ldmx {
         std::vector<SimTrackerHit*> simVec;
         std::vector<SimTrackerHit*> filteredSimVec;//Sim particles are organized from highest to lowest momentum
     
-        for (TIter next(scoringPlaneHits); ecalSPP = (ldmx::SimTrackerHit*)next();) {
-            simVec.push_back(ecalSPP);
+        if (scoringPlaneHits->GetEntriesFast() > 0 ) {
+            for (TIter next(scoringPlaneHits); ecalSPP = (ldmx::SimTrackerHit*)next();) {
+                simVec.push_back(ecalSPP);
+            }
         }
     
         std::sort(simVec.begin(), simVec.end(), compSims);
@@ -60,8 +62,10 @@ namespace ldmx {
         std::vector<SimTrackerHit*> simVec_h;
         std::vector<SimTrackerHit*> filteredSimVec_h;//Sim particles are organized from highest to lowest momentum
     
-        for (TIter next(scoringPlaneHits_h); hcalSPP = (ldmx::SimTrackerHit*)next();) {
+        if ( scoringPlaneHits_h->GetEntriesFast() > 0 ) {
+            for (TIter next(scoringPlaneHits_h); hcalSPP = (ldmx::SimTrackerHit*)next();) {
                 simVec_h.push_back(hcalSPP);
+            }
         }
     
         std::sort(simVec_h.begin(), simVec_h.end(), compSims);
