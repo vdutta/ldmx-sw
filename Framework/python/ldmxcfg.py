@@ -1,12 +1,22 @@
 #!/usr/bin/python
 
+import histogram as h
+
 class Producer:
     def __init__(self, instanceName, className):
+        
         self.instanceName=instanceName
         self.className=className
         self.parameters=dict()
+        self.histograms=[]
+
+    def build1DHistogram(self, name, xlabel, bins, xmin, xmax):
+        self.histograms.append(h.histogram1D(name, xlabel, bins, xmin, xmax))
+        return self
+
     def printMe(self):
         printMe(self,"")
+
     def printMe(self,prex):
         print "%sProducer(%s of class %s)"%(prex,self.instanceName,self.className)
         if len(self.parameters)>0:
@@ -14,19 +24,37 @@ class Producer:
             for k, v in self.parameters.items():
                 print prex,"  ",k," : ",v
 
+        if self.histograms:
+            print "Creating the following histograms:" 
+            for histo in self.histograms: 
+                histo.Print()
+
 class Analyzer:
     def __init__(self, instanceName, className):
+    
         self.instanceName=instanceName
         self.className=className
         self.parameters=dict()
+        self.histograms=[]
+   
+    def build1DHistogram(self, name, xlabel, bins, xmin, xmax):
+        self.histograms.append(h.histogram1D(name, xlabel, bins, xmin, xmax))
+        return self
+
     def printMe(self):
         printMe(self,"")
+    
     def printMe(self,prex):
         print "%sAnalyzer(%s of class %s)"%(prex,self.instanceName,self.className)        
         if len(self.parameters)>0:
             print "%s Parameters:"%(prex)
             for k, v in self.parameters.items():
                 print prex,"  ",k," : ",v
+        
+        if self.histograms:
+            print "%sHistograms:" % prex
+            for histo in self.histograms: 
+                histo.Print()
                 
 class Process:
     lastProcess=None
@@ -42,7 +70,6 @@ class Process:
         self.libraries=[]
         self.skimDefaultIsKeep=True
         self.skimRules=[]
-        self.willPause=False
         Process.lastProcess=self
 
     def skimDefaultIsSave(self):
@@ -96,7 +123,5 @@ class Process:
             print "Shared libraries to load:"
             for afile in self.libraries:
                 print "   %s"%(afile)
-        if self.willPause :
-            print "Pres [Enter] to continue, ctrl+C to exit."
-            raw_input()
+
     

@@ -9,14 +9,5 @@
 /bin
 /lib
 /data
-
-# any compil directories
-/build
-/build.*
-/install
-/.*install.*
-/ldmx-sw-install
-
-# magnetic field map file
-BmapCorrected3D_13k_unfolded_scaled_1.15384615385.dat
-
+/build*
+/install*

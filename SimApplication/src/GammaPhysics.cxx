@@ -52,7 +52,7 @@ namespace ldmx {
                 }
 
                 // Add the gamma -> mumu to the physics list.
-//                pmanager->AddDiscreteProcess(&gammaConvProcess);
+                pmanager->AddDiscreteProcess(&gammaConvProcess);
             }
         }
     }
