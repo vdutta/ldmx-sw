@@ -72,7 +72,7 @@ namespace ldmx {
             /**
              * Calculate the distance between the line segment from v to w and the point p.
              */
-    	    static double point_line_distance(TVector3 v, TVector3 w, TVector3 p);
+    	    double point_line_distance(TVector3 v, TVector3 w, TVector3 p);
     
     	    virtual void onFileOpen() { }
 
