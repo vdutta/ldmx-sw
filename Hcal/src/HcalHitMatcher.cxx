@@ -108,10 +108,10 @@ namespace ldmx {
         else ecal_sumESD = 1;//shouldn't ever get here
         
         //Bin event information
-        h_E_cal_summed_energy->Fill(e_cal_sum_energy);
+        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
         h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
     
-        h_total_particles->Fill(filteredSimVec.size());
+        h_total_particles_SD[9]->Fill(filteredSimVec.size());
         h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
         
         //----This section matches HCal hits to sim particles and records results----->
@@ -140,7 +140,7 @@ namespace ldmx {
                     
                     new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
                     
-                    h_ParticleHit_Distance->Fill(new_dist);
+                    h_ParticleHit_Distance_SD[9]->Fill(new_dist);
                     h_ParticleHit_Distance_SD[ecal_sumESD]->Fill(new_dist);
         
                     if(simStart[2]<10.0 && sP->getEnergy()>3000.0);
@@ -161,10 +161,10 @@ namespace ldmx {
                 if(abs(hCalhit_radialdist2) > 1e-5) //check to avoid a floating point error
                     hCalhit_radialdist = sqrt(hCalhit_radialdist2);
                 
-                h_HCalhit_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist);
-                h_ZdepthofHCalHit->Fill(hCalhit->getZ());
-                h_hcal_hit_time_all->Fill(hCalhit->getTime());
-                h_hcal_hits_all_PEs->Fill(hCalhit->getPE());
+                h_HCalhit_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                h_ZdepthofHCalHit_SD[9]->Fill(hCalhit->getZ());
+                h_hcal_hit_time_all_SD[9]->Fill(hCalhit->getTime());
+                h_hcal_hits_all_PEs_SD[9]->Fill(hCalhit->getPE());
                 
                 h_HCalhit_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                 h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill(hCalhit->getZ());
@@ -172,14 +172,14 @@ namespace ldmx {
                 h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hCalhit->getPE());
                 
                 if(hCalhit->getTime() < 15.0)  {
-                    h_hCalhit_time_less15_PE->Fill(hCalhit->getPE());
+                    h_hCalhit_time_less15_PE_SD[9]->Fill(hCalhit->getPE());
                     h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hCalhit->getPE());
-                    h_hCalhit_time_less15_position->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                    h_hCalhit_time_less15_position_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                 } else if(hCalhit->getTime() > 40.0)  {
-                    h_hCalhit_time_great40_PE->Fill(hCalhit->getPE());
+                    h_hCalhit_time_great40_PE_SD[9]->Fill(hCalhit->getPE());
                     h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hCalhit->getPE());
-                    h_hCalhit_time_great40_position->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                    h_hCalhit_time_great40_position_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                 }
                 
@@ -187,7 +187,7 @@ namespace ldmx {
                     max_PE_of_event=hCalhit->getPE();
         
                 if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
-                    h_HCalhit_getTime->Fill(hCalhit->getTime());
+                    h_HCalhit_getTime_SD[9]->Fill(hCalhit->getTime());
                     h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hCalhit->getTime());
                     
                     double part_hCalhit_timeDiff = (hCalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
@@ -195,20 +195,20 @@ namespace ldmx {
                     h_hit_time_creation_time_diff->Fill(part_hCalhit_timeDiff);
                     h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hCalhit_timeDiff);
                     if(part_hCalhit_timeDiff < 15.0)  {
-                        h_part_hCalhit_tdif_less15_PE->Fill(hCalhit->getPE());
+                        h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hCalhit->getPE());
                         h_part_hCalhit_tdif_less15_PE_SD[ecal_sumESD]->Fill(hCalhit->getPE());
-                        h_part_hCalhit_tdif_less15_position->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                        h_part_hCalhit_tdif_less15_position_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                         h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     } else if(part_hCalhit_timeDiff > 40.0)  {
-                        h_part_hCalhit_tdif_great40_PE->Fill(hCalhit->getPE());
+                        h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hCalhit->getPE());
                         h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hCalhit->getPE());
                                         h_part_hCalhit_tdif_great40_position->Fill(hCalhit->getZ(), hCalhit_radialdist);
                         h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     }
         
                     if(pdgID==2112 || pdgID==2212) { 
-                        h_HCalhit_getTime_nucleons->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                        h_HCalhit_nucleon_time_vs_energy->Fill(
+                        h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+                        h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
                                 filteredSimVec[simPartNum]->getSimParticle()->getTime(),
                                 filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                         h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
@@ -217,30 +217,30 @@ namespace ldmx {
                                 filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                     }
                     
-                    h_PDGIDs->Fill(pdgID);
+                    h_PDGIDs_SD[9]->Fill(pdgID);
                     h_PDGIDs_SD[ecal_sumESD]->Fill(pdgID);
         
-                    h_particle_energy->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                    h_particle_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                     h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
         
                     switch(pdgID) {
-                        case 11:h_HCalhit_electron_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist); 
+                        case 11:h_HCalhit_electron_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                             h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                             break;
-                        case 22:h_HCalhit_photon_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist); 
+                        case 22:h_HCalhit_photon_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                             h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
-                            h_HCalhit_photon_energy->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                            h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                             h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                             break;
                         case 2112:h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
-                              h_HCalhit_neutron_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist); 
+                              h_HCalhit_neutron_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                               break;
-                        default:h_HCalhit_other_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist); 
+                        default:h_HCalhit_other_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                             h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist); 
                             break;
                     }
                 } else {
-                    h_HCalhit_unmatched_zbyr->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                    h_HCalhit_unmatched_zbyr_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                 } //matched or unmatched
     
@@ -249,7 +249,7 @@ namespace ldmx {
         }//End loop over hCalhits array
 
         // maximum PE in hcal hits for the event
-        h_hcal_hits_max_PE_of_event->Fill(max_PE_of_event);
+        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
         h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
 
     } //analyze
@@ -299,309 +299,87 @@ namespace ldmx {
     }
 
     void HcalHitMatcher::onProcessStart() {
-        std::cout << "HcalHitMatcher: Starting processing!" << std::endl;
+        
         getHistoDirectory();
         
-        //All events (without parsing by energy SD region)
-        h_PDGIDs=new TH1F("PDG_IDs","PDG_IDs",10000,-5000,5000);
-        h_ZdepthofHCalHit=new TH1F("Z depth of HCal hits(10mm bins)", "Z depth of HCal hits(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance=new TH1F("Distance between sim particle and HCal hits(5mm bins)", "Distance between sim particle and HCal hits(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr=new TH2D("HCal hit locations", "HCal hit locations;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr=new TH2D("HCal photon hit locations", "HCal photon hit locations;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr=new TH2D("HCal electron hit locations", "HCal electron hit locations;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr=new TH2D("HCal neutron hit locations", "HCal neutron hit locations;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr=new TH2D("HCal other particle hit locations", "HCal other particle hit locations;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr=new TH2D("HCal unmatched hit locations", "HCal unmatched hit locations;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy=new TH1F("HCal Photon hit Energies", "HCal Photon hit Energies;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime=new TH1F("Creation time of particles causing HCal hits", "Creation time of particles causing HCal hits;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons=new TH1F("Creation time of nucleons causing HCal hits", "nucleons causing HCal hits;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy=new TH2D("Nucleon time vs energy", "Nucleon time vs energy;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy=new TH1F("E_cal_summed_energy","E_cal_summed_energy;Energy(MeV)(10MeV bin width);Count",800,0,8000);
-        h_total_particles=new TH1F("total_particles","total_particles;Number of particles per event;Count",50,0,50);
-        h_particle_energy=new TH1F("matched_particle_energy","matched_particle_energy;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all=new TH1F("HCal_hit_time_all","HCal_hit_time_all;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff=new TH1F("hit_time_creation_time_diff","hit_time_creation_time_diff;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE=new TH1F("part_hCalhit_tdif_less15_PE","part_hCalhit_tdif_less15_PE;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position=new TH2D("part_hCalhit_tdif_less15_position","part_hCalhit_tdif_less15_position;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE=new TH1F("part_hCalhit_tdif_great40_PE","part_hCalhit_tdif_great40_PE;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position=new TH2D("part_hCalhit_tdif_great40_position","part_hCalhit_tdif_great40_position",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE=new TH1F("hCalhit_time_less15_PE","hCalhit_time_less15_PE;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position=new TH2D("hCalhit_time_less15_position","hCalhit_time_less15_position",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE=new TH1F("hCalhit_time_great40_PE","hCalhit_time_great40_PE;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position=new TH2D("hCalhit_time_great40_position","hCalhit_time_great40_position",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs=new TH1F("hcal_hits_all_PEs","hcal_hits_all_PEs;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event=new TH1F("h_hcal_hits_max_PE_of_event","h_hcal_hits_max_PE_of_event;Photoelectrons(PEs);Count",500,0,500);
+        std::vector<std::string> range_names(10);
+        range_names[0] = "(-1,+1)";
+        range_names[1] = "[+1,+2)";
+        range_names[2] = "(-2,-1)";
+        range_names[3] = "[+2,+inf)";
+        range_names[4] = "(-3,-2]";
+        range_names[5] = "(-4,-3]";
+        range_names[6] = "(-5,-4]";
+        range_names[7] = "(-6,-5]";
+        range_names[8] = "(-inf,-6]";
+        range_names[9] = "(-inf,+inf)";
     
-        //SD region 1  (normal range, within ~1SD)
-        h_PDGIDs_SD[0]=new TH1F("PDG_IDs_SD1","PDG_IDs_SD1",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[0]=new TH1F("Z depth of HCal hits_SD1(10mm bins)", "Z depth of HCal hits_SD1(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[0]=new TH1F("Distance between sim particle and HCal hits_SD1(5mm bins)", "Distance between sim particle and HCal hits_SD1(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[0]=new TH2D("HCal hit locations_SD1", "HCal hit locations_SD1;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[0]=new TH2D("HCal photon hit locations_SD1", "HCal photon hit locations_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[0]=new TH2D("HCal electron hit locations_SD1", "HCal electron hit locations_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[0]=new TH2D("HCal neutron hit locations_SD1", "HCal neutron hit locations_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[0]=new TH2D("HCal other particle hit locations_SD1", "HCal other particle hit locations_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[0]=new TH2D("HCal unmatched hit locations_SD1", "HCal unmatched hit locations_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[0]=new TH1F("HCal Photon hit Energies_SD1", "HCal Photon hit Energies_SD1;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[0]=new TH1F("Creation time of particles causing HCal hits_SD1", "Creation time of particles causing HCal hits_SD1;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[0]=new TH1F("Creation time of nucleons causing HCal hits_SD1", "nucleons causing HCal hits_SD1;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[0]=new TH2D("Nucleon time vs energy_SD1", "Nucleon time vs energy_SD1;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[0]=new TH1F("E_cal_summed_energy_SD1","E_cal_summed_energy_SD1;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[0]=new TH1F("total_particles_SD1","total_particles_SD1;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[0]=new TH1F("matched_particle_energy_SD1","matched_particle_energy_SD1;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[0]=new TH1F("HCal_hit_time_all_SD1","HCal_hit_time_all_SD1;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[0]=new TH1F("hit_time_creation_time_diff_SD1","hit_time_creation_time_diff_SD1;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[0]=new TH1F("part_hCalhit_tdif_less15_PE_SD1","part_hCalhit_tdif_less15_PE_SD1;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[0]=new TH2D("part_hCalhit_tdif_less15_position_SD1","part_hCalhit_tdif_less15_position_SD1;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[0]=new TH1F("part_hCalhit_tdif_great40_PE_SD1","part_hCalhit_tdif_great40_PE_SD1;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[0]=new TH2D("part_hCalhit_tdif_great40_position_SD1","part_hCalhit_tdif_great40_position_SD1",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[0]=new TH1F("hCalhit_time_less15_PE_SD1","hCalhit_time_less15_PE_SD1;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[0]=new TH2D("hCalhit_time_less15_position_SD1","hCalhit_time_less15_position_SD1",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[0]=new TH1F("hCalhit_time_great40_PE_SD1","hCalhit_time_great40_PE_SD1;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[0]=new TH2D("hCalhit_time_great40_position_SD1","hCalhit_time_great40_position_SD1",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[0]=new TH1F("hcal_hits_all_PEs_SD1","hcal_hits_all_PEs_SD1;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[0]=new TH1F("h_hcal_hits_max_PE_of_event_SD1","h_hcal_hits_max_PE_of_event_SD1;Photoelectrons(PEs);Count",500,0,500);
+        for ( int i = 0; i < range_names.size(); i++ ) {
+            std::string range_name = range_names.at(i);
+            h_PDGIDs_SD[i]=new TH1F("PDG_IDs_SD_"+range_name,
+                    "PDG_IDs_SD1",10000,-5000,5000);
+            h_ZdepthofHCalHit_SD[i]=new TH1F("Z depth of HCal hits_SD_"+range_name, 
+                    "Z depth of HCal hits_SD"+range_name+" (10mm bins)", 320, 0, 3200);
+            h_ParticleHit_Distance_SD[0]=new TH1F("Distance between sim particle and HCal hits_SD_"+range_name, 
+                    "Distance between sim particle and HCal hits_SD_"+range_name+" (5mm bins)", 400, 0, 2000);
+            h_HCalhit_zbyr_SD[i]=new TH2D("HCal hit locations_SD_"+range_name, 
+                    "HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_photon_zbyr_SD[i]=new TH2D("HCal photon hit locations_SD_"+range_name, 
+                    "HCal photon hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_electron_zbyr_SD[i]=new TH2D("HCal electron hit locations_SD_"+range_name, 
+                    "HCal electron hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_neutron_zbyr_SD[i]=new TH2D("HCal neutron hit locations_SD_"+range_name, 
+                    "HCal neutron hit locations_SD"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_other_zbyr_SD[i]=new TH2D("HCal other particle hit locations_SD_"+range_name, 
+                    "HCal other particle hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_unmatched_zbyr_SD[i]=new TH2D("HCal unmatched hit locations_SD_"+range_name, 
+                    "HCal unmatched hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+                    80,0,3200,112,0,4500);
+            h_HCalhit_photon_energy_SD[i]=new TH1F("HCal Photon hit Energies_SD_"+range_name,
+                    "HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count", 4000, 0, 4000);
+            h_HCalhit_getTime_SD[i]=new TH1F("Creation time of particles causing HCal hits_SD_"+range_name, 
+                    "Creation time of particles causing HCal hits_SD_"+range_name+";Time(ns);Number of particles created", 500, 0, 500);
+            h_HCalhit_getTime_nucleons_SD[i]=new TH1F("Creation time of nucleons causing HCal hits_SD_"+range_name,
+                    "nucleons causing HCal hits_SD_"+range_name+";Time(ns);Number of Nucleons created", 500, 0, 500);
+            h_HCalhit_nucleon_time_vs_energy_SD[i]=new TH2D("Nucleon time vs energy_SD_"+range_name, 
+                    "Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
+            h_E_cal_summed_energy_SD[i]=new TH1F("E_cal_summed_energy_SD_"+range_name,
+                    "E_cal_summed_energy_SD_"+range_name+";Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
+            h_total_particles_SD[i]=new TH1F("total_particles_SD_"+range_name,
+                    "total_particles_SD_+"range_name+";Number of particles per event;Count",50,0,50);
+            h_particle_energy_SD[i]=new TH1F("matched_particle_energy_SD_"+range_name,
+                    "matched_particle_energy_SD_"+range_name+";Energy(MeV)(5MeV bin width);Count",800,0,4000);
+            h_hcal_hit_time_all_SD[i]=new TH1F("HCal_hit_time_all_SD_"+range_name,
+                    "HCal_hit_time_all_SD_"+range_name+";time(ns)(5ns bin width);Count",100,0,500);
+            h_hit_time_creation_time_diff_SD[i]=new TH1F("hit_time_creation_time_diff_SD_"+range_name,
+                    "hit_time_creation_time_diff_SD_"+range_name+";time(ns)(2ns bin width);Count",100,0,200);
+            h_part_hCalhit_tdif_less15_PE_SD[i]=new TH1F("part_hCalhit_tdif_less15_PE_SD_"+range_name,
+                    "part_hCalhit_tdif_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
+            h_part_hCalhit_tdif_less15_position_SD[i]=new TH2D("part_hCalhit_tdif_less15_position_SD_"+range_name,
+                    "part_hCalhit_tdif_less15_position_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
+            h_part_hCalhit_tdif_great40_PE_SD[i]=new TH1F("part_hCalhit_tdif_great40_PE_SD_"+range_name,
+                    "part_hCalhit_tdif_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
+            h_part_hCalhit_tdif_great40_position_SD[i]=new TH2D("part_hCalhit_tdif_great40_position_SD_"+range_name,
+                    "part_hCalhit_tdif_great40_position_SD_"+range_name,80,0,3200,112,0,4500);
+            h_hCalhit_time_less15_PE_SD[i]=new TH1F("hCalhit_time_less15_PE_SD_"+range_name,
+                    "hCalhit_time_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
+            h_hCalhit_time_less15_position_SD[i]=new TH2D("hCalhit_time_less15_position_SD_"+range_name,
+                    "hCalhit_time_less15_position_SD_"+range_name,80,0,3200,112,0,4500);
+            h_hCalhit_time_great40_PE_SD[i]=new TH1F("hCalhit_time_great40_PE_SD_"+range_name,
+                    "hCalhit_time_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
+            h_hCalhit_time_great40_position_SD[i]=new TH2D("hCalhit_time_great40_position_SD_"+range_name,
+                    "hCalhit_time_great40_position_SD_"+range_name,80,0,3200,112,0,4500);
+            h_hcal_hits_all_PEs_SD[i]=new TH1F("hcal_hits_all_PEs_SD_"+range_name,
+                    "hcal_hits_all_PEs_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
+            h_hcal_hits_max_PE_of_event_SD[i]=new TH1F("h_hcal_hits_max_PE_of_event_SD_"+range_name,
+                    "h_hcal_hits_max_PE_of_event_SD_"+range_name+";Photoelectrons(PEs);Count",500,0,500);
+        } //iterate over range_names
     
-        //SD region 2 (high range, within than +1SD to +2SD)
-        h_PDGIDs_SD[1]=new TH1F("PDG_IDs_SD2","PDG_IDs_SD2",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[1]=new TH1F("Z depth of HCal hits_SD2(10mm bins)", "Z depth of HCal hits_SD2(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[1]=new TH1F("Distance between sim particle and HCal hits_SD2(5mm bins)", "Distance between sim particle and HCal hits_SD2(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[1]=new TH2D("HCal hit locations_SD2", "HCal hit locations_SD2;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[1]=new TH2D("HCal photon hit locations_SD2", "HCal photon hit locations_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[1]=new TH2D("HCal electron hit locations_SD2", "HCal electron hit locations_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[1]=new TH2D("HCal neutron hit locations_SD2", "HCal neutron hit locations_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[1]=new TH2D("HCal other particle hit locations_SD2", "HCal other particle hit locations_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[1]=new TH2D("HCal unmatched hit locations_SD2", "HCal unmatched hit locations_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[1]=new TH1F("HCal Photon hit Energies_SD2", "HCal Photon hit Energies_SD2;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[1]=new TH1F("Creation time of particles causing HCal hits_SD2", "Creation time of particles causing HCal hits_SD2;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[1]=new TH1F("Creation time of nucleons causing HCal hits_SD2", "nucleons causing HCal hits_SD2;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[1]=new TH2D("Nucleon time vs energy_SD2", "Nucleon time vs energy_SD2;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[1]=new TH1F("E_cal_summed_energy_SD2","E_cal_summed_energy_SD2;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[1]=new TH1F("total_particles_SD2","total_particles_SD2;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[1]=new TH1F("matched_particle_energy_SD2","matched_particle_energy_SD2;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[1]=new TH1F("HCal_hit_time_all_SD2","HCal_hit_time_all_SD2;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[1]=new TH1F("hit_time_creation_time_diff_SD2","hit_time_creation_time_diff_SD2;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[1]=new TH1F("part_hCalhit_tdif_less15_PE_SD2","part_hCalhit_tdif_less15_PE_SD2;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[1]=new TH2D("part_hCalhit_tdif_less15_position_SD2","part_hCalhit_tdif_less15_position_SD2;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[1]=new TH1F("part_hCalhit_tdif_great40_PE_SD2","part_hCalhit_tdif_great40_PE_SD2;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[1]=new TH2D("part_hCalhit_tdif_great40_position_SD2","part_hCalhit_tdif_great40_position_SD2",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[1]=new TH1F("hCalhit_time_less15_PE_SD2","hCalhit_time_less15_PE_SD2;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[1]=new TH2D("hCalhit_time_less15_position_SD2","hCalhit_time_less15_position_SD2",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[1]=new TH1F("hCalhit_time_great40_PE_SD2","hCalhit_time_great40_PE_SD2;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[1]=new TH2D("hCalhit_time_great40_position_SD2","hCalhit_time_great40_position_SD2",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[1]=new TH1F("hcal_hits_all_PEs_SD2","hcal_hits_all_PEs_SD2;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[1]=new TH1F("h_hcal_hits_max_PE_of_event_SD2","h_hcal_hits_max_PE_of_event_SD2;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 3 (low range, within -1SD to -2SD)
-        h_PDGIDs_SD[2]=new TH1F("PDG_IDs_SD3","PDG_IDs_SD3",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[2]=new TH1F("Z depth of HCal hits_SD3(10mm bins)", "Z depth of HCal hits_SD3(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[2]=new TH1F("Distance between sim particle and HCal hits_SD3(5mm bins)", "Distance between sim particle and HCal hits_SD3(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[2]=new TH2D("HCal hit locations_SD3", "HCal hit locations_SD3;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[2]=new TH2D("HCal photon hit locations_SD3", "HCal photon hit locations_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[2]=new TH2D("HCal electron hit locations_SD3", "HCal electron hit locations_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[2]=new TH2D("HCal neutron hit locations_SD3", "HCal neutron hit locations_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[2]=new TH2D("HCal other particle hit locations_SD3", "HCal other particle hit locations_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[2]=new TH2D("HCal unmatched hit locations_SD3", "HCal unmatched hit locations_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[2]=new TH1F("HCal Photon hit Energies_SD3", "HCal Photon hit Energies_SD3;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[2]=new TH1F("Creation time of particles causing HCal hits_SD3", "Creation time of particles causing HCal hits_SD3;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[2]=new TH1F("Creation time of nucleons causing HCal hits_SD3", "nucleons causing HCal hits_SD3;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[2]=new TH2D("Nucleon time vs energy_SD3", "Nucleon time vs energy_SD3;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[2]=new TH1F("E_cal_summed_energy_SD3","E_cal_summed_energy_SD3;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[2]=new TH1F("total_particles_SD3","total_particles_SD3;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[2]=new TH1F("matched_particle_energy_SD3","matched_particle_energy_SD3;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[2]=new TH1F("HCal_hit_time_all_SD3","HCal_hit_time_all_SD3;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[2]=new TH1F("hit_time_creation_time_diff_SD3","hit_time_creation_time_diff_SD3;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[2]=new TH1F("part_hCalhit_tdif_less15_PE_SD3","part_hCalhit_tdif_less15_PE_SD3;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[2]=new TH2D("part_hCalhit_tdif_less15_position_SD3","part_hCalhit_tdif_less15_position_SD3;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[2]=new TH1F("part_hCalhit_tdif_great40_PE_SD3","part_hCalhit_tdif_great40_PE_SD3;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[2]=new TH2D("part_hCalhit_tdif_great40_position_SD3","part_hCalhit_tdif_great40_position_SD3",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[2]=new TH1F("hCalhit_time_less15_PE_SD3","hCalhit_time_less15_PE_SD3;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[2]=new TH2D("hCalhit_time_less15_position_SD3","hCalhit_time_less15_position_SD3",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[2]=new TH1F("hCalhit_time_great40_PE_SD3","hCalhit_time_great40_PE_SD3;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[2]=new TH2D("hCalhit_time_great40_position_SD3","hCalhit_time_great40_position_SD3",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[2]=new TH1F("hcal_hits_all_PEs_SD3","hcal_hits_all_PEs_SD3;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[2]=new TH1F("h_hcal_hits_max_PE_of_event_SD3","h_hcal_hits_max_PE_of_event_SD3;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 4 (higher range, higher than 2SD)
-        h_PDGIDs_SD[3]=new TH1F("PDG_IDs_SD4","PDG_IDs_SD4",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[3]=new TH1F("Z depth of HCal hits_SD4(10mm bins)", "Z depth of HCal hits_SD4(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[3]=new TH1F("Distance between sim particle and HCal hits_SD4(5mm bins)", "Distance between sim particle and HCal hits_SD4(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[3]=new TH2D("HCal hit locations_SD4", "HCal hit locations_SD4;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[3]=new TH2D("HCal photon hit locations_SD4", "HCal photon hit locations_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[3]=new TH2D("HCal electron hit locations_SD4", "HCal electron hit locations_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[3]=new TH2D("HCal neutron hit locations_SD4", "HCal neutron hit locations_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[3]=new TH2D("HCal other particle hit locations_SD4", "HCal other particle hit locations_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[3]=new TH2D("HCal unmatched hit locations_SD4", "HCal unmatched hit locations_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[3]=new TH1F("HCal Photon hit Energies_SD4", "HCal Photon hit Energies_SD4;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[3]=new TH1F("Creation time of particles causing HCal hits_SD4", "Creation time of particles causing HCal hits_SD4;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[3]=new TH1F("Creation time of nucleons causing HCal hits_SD4", "nucleons causing HCal hits_SD4;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[3]=new TH2D("Nucleon time vs energy_SD4", "Nucleon time vs energy_SD4;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[3]=new TH1F("E_cal_summed_energy_SD4","E_cal_summed_energy_SD4;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[3]=new TH1F("total_particles_SD4","total_particles_SD4;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[3]=new TH1F("matched_particle_energy_SD4","matched_particle_energy_SD4;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[3]=new TH1F("HCal_hit_time_all_SD4","HCal_hit_time_all_SD4;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[3]=new TH1F("hit_time_creation_time_diff_SD4","hit_time_creation_time_diff_SD4;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[3]=new TH1F("part_hCalhit_tdif_less15_PE_SD4","part_hCalhit_tdif_less15_PE_SD4;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[3]=new TH2D("part_hCalhit_tdif_less15_position_SD4","part_hCalhit_tdif_less15_position_SD4;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[3]=new TH1F("part_hCalhit_tdif_great40_PE_SD4","part_hCalhit_tdif_great40_PE_SD4;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[3]=new TH2D("part_hCalhit_tdif_great40_position_SD4","part_hCalhit_tdif_great40_position_SD4",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[3]=new TH1F("hCalhit_time_less15_PE_SD4","hCalhit_time_less15_PE_SD4;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[3]=new TH2D("hCalhit_time_less15_position_SD4","hCalhit_time_less15_position_SD4",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[3]=new TH1F("hCalhit_time_great40_PE_SD4","hCalhit_time_great40_PE_SD4;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[3]=new TH2D("hCalhit_time_great40_position_SD4","hCalhit_time_great40_position_SD4",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[3]=new TH1F("hcal_hits_all_PEs_SD4","hcal_hits_all_PEs_SD4;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[3]=new TH1F("h_hcal_hits_max_PE_of_event_SD4","h_hcal_hits_max_PE_of_event_SD4;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 5 (lower range, within -2SD to -3SD)
-        h_PDGIDs_SD[4]=new TH1F("PDG_IDs_SD5","PDG_IDs_SD5",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[4]=new TH1F("Z depth of HCal hits_SD5(10mm bins)", "Z depth of HCal hits_SD5(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[4]=new TH1F("Distance between sim particle and HCal hits_SD5(5mm bins)", "Distance between sim particle and HCal hits_SD5(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[4]=new TH2D("HCal hit locations_SD5", "HCal hit locations_SD5;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[4]=new TH2D("HCal photon hit locations_SD5", "HCal photon hit locations_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[4]=new TH2D("HCal electron hit locations_SD5", "HCal electron hit locations_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[4]=new TH2D("HCal neutron hit locations_SD5", "HCal neutron hit locations_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[4]=new TH2D("HCal other particle hit locations_SD5", "HCal other particle hit locations_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[4]=new TH2D("HCal unmatched hit locations_SD5", "HCal unmatched hit locations_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[4]=new TH1F("HCal Photon hit Energies_SD5", "HCal Photon hit Energies_SD5;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[4]=new TH1F("Creation time of particles causing HCal hits_SD5", "Creation time of particles causing HCal hits_SD5;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[4]=new TH1F("Creation time of nucleons causing HCal hits_SD5", "nucleons causing HCal hits_SD5;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[4]=new TH2D("Nucleon time vs energy_SD5", "Nucleon time vs energy_SD5;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[4]=new TH1F("E_cal_summed_energy_SD5","E_cal_summed_energy_SD5;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[4]=new TH1F("total_particles_SD5","total_particles_SD5;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[4]=new TH1F("matched_particle_energy_SD5","matched_particle_energy_SD5;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[4]=new TH1F("HCal_hit_time_all_SD5","HCal_hit_time_all_SD5;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[4]=new TH1F("hit_time_creation_time_diff_SD5","hit_time_creation_time_diff_SD5;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[4]=new TH1F("part_hCalhit_tdif_less15_PE_SD5","part_hCalhit_tdif_less15_PE_SD5;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[4]=new TH2D("part_hCalhit_tdif_less15_position_SD5","part_hCalhit_tdif_less15_position_SD5;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[4]=new TH1F("part_hCalhit_tdif_great40_PE_SD5","part_hCalhit_tdif_great40_PE_SD5;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[4]=new TH2D("part_hCalhit_tdif_great40_position_SD5","part_hCalhit_tdif_great40_position_SD5",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[4]=new TH1F("hCalhit_time_less15_PE_SD5","hCalhit_time_less15_PE_SD5;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[4]=new TH2D("hCalhit_time_less15_position_SD5","hCalhit_time_less15_position_SD5",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[4]=new TH1F("hCalhit_time_great40_PE_SD5","hCalhit_time_great40_PE_SD5;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[4]=new TH2D("hCalhit_time_great40_position_SD5","hCalhit_time_great40_position_SD5",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[4]=new TH1F("hcal_hits_all_PEs_SD5","hcal_hits_all_PEs_SD5;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[4]=new TH1F("h_hcal_hits_max_PE_of_event_SD5","h_hcal_hits_max_PE_of_event_SD5;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 6 (very low range, within -3SD to -4SD)
-        h_PDGIDs_SD[5]=new TH1F("PDG_IDs_SD6","PDG_IDs_SD6",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[5]=new TH1F("Z depth of HCal hits_SD6(10mm bins)", "Z depth of HCal hits_SD6(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[5]=new TH1F("Distance between sim particle and HCal hits_SD6(5mm bins)", "Distance between sim particle and HCal hits_SD6(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[5]=new TH2D("HCal hit locations_SD6", "HCal hit locations_SD6;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[5]=new TH2D("HCal photon hit locations_SD6", "HCal photon hit locations_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[5]=new TH2D("HCal electron hit locations_SD6", "HCal electron hit locations_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[5]=new TH2D("HCal neutron hit locations_SD6", "HCal neutron hit locations_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[5]=new TH2D("HCal other particle hit locations_SD6", "HCal other particle hit locations_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[5]=new TH2D("HCal unmatched hit locations_SD6", "HCal unmatched hit locations_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[5]=new TH1F("HCal Photon hit Energies_SD6", "HCal Photon hit Energies_SD6;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[5]=new TH1F("Creation time of particles causing HCal hits_SD6", "Creation time of particles causing HCal hits_SD6;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[5]=new TH1F("Creation time of nucleons causing HCal hits_SD6", "nucleons causing HCal hits_SD6;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[5]=new TH2D("Nucleon time vs energy_SD6", "Nucleon time vs energy_SD6;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[5]=new TH1F("E_cal_summed_energy_SD6","E_cal_summed_energy_SD6;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[5]=new TH1F("total_particles_SD6","total_particles_SD6;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[5]=new TH1F("matched_particle_energy_SD6","matched_particle_energy_SD6;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[5]=new TH1F("HCal_hit_time_all_SD6","HCal_hit_time_all_SD6;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[5]=new TH1F("hit_time_creation_time_diff_SD6","hit_time_creation_time_diff_SD6;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[5]=new TH1F("part_hCalhit_tdif_less15_PE_SD6","part_hCalhit_tdif_less15_PE_SD6;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[5]=new TH2D("part_hCalhit_tdif_less15_position_SD6","part_hCalhit_tdif_less15_position_SD6;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[5]=new TH1F("part_hCalhit_tdif_great40_PE_SD6","part_hCalhit_tdif_great40_PE_SD6;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[5]=new TH2D("part_hCalhit_tdif_great40_position_SD6","part_hCalhit_tdif_great40_position_SD6",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[5]=new TH1F("hCalhit_time_less15_PE_SD6","hCalhit_time_less15_PE_SD6;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[5]=new TH2D("hCalhit_time_less15_position_SD6","hCalhit_time_less15_position_SD6",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[5]=new TH1F("hCalhit_time_great40_PE_SD6","hCalhit_time_great40_PE_SD6;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[5]=new TH2D("hCalhit_time_great40_position_SD6","hCalhit_time_great40_position_SD6",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[5]=new TH1F("hcal_hits_all_PEs_SD6","hcal_hits_all_PEs_SD6;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[5]=new TH1F("h_hcal_hits_max_PE_of_event_SD6","h_hcal_hits_max_PE_of_event_SD6;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 7 (extremely low range, within -4SD to -5SD)
-        h_PDGIDs_SD[6]=new TH1F("PDG_IDs_SD7","PDG_IDs_SD7",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[6]=new TH1F("Z depth of HCal hits_SD7(10mm bins)", "Z depth of HCal hits_SD7(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[6]=new TH1F("Distance between sim particle and HCal hits_SD7(5mm bins)", "Distance between sim particle and HCal hits_SD7(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[6]=new TH2D("HCal hit locations_SD7", "HCal hit locations_SD7;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[6]=new TH2D("HCal photon hit locations_SD7", "HCal photon hit locations_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[6]=new TH2D("HCal electron hit locations_SD7", "HCal electron hit locations_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[6]=new TH2D("HCal neutron hit locations_SD7", "HCal neutron hit locations_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[6]=new TH2D("HCal other particle hit locations_SD7", "HCal other particle hit locations_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[6]=new TH2D("HCal unmatched hit locations_SD7", "HCal unmatched hit locations_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[6]=new TH1F("HCal Photon hit Energies_SD7", "HCal Photon hit Energies_SD7;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[6]=new TH1F("Creation time of particles causing HCal hits_SD7", "Creation time of particles causing HCal hits_SD7;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[6]=new TH1F("Creation time of nucleons causing HCal hits_SD7", "nucleons causing HCal hits_SD7;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[6]=new TH2D("Nucleon time vs energy_SD7", "Nucleon time vs energy_SD7;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[6]=new TH1F("E_cal_summed_energy_SD7","E_cal_summed_energy_SD7;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[6]=new TH1F("total_particles_SD7","total_particles_SD7;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[6]=new TH1F("matched_particle_energy_SD7","matched_particle_energy_SD7;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[6]=new TH1F("HCal_hit_time_all_SD7","HCal_hit_time_all_SD7;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[6]=new TH1F("hit_time_creation_time_diff_SD7","hit_time_creation_time_diff_SD7;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[6]=new TH1F("part_hCalhit_tdif_less15_PE_SD7","part_hCalhit_tdif_less15_PE_SD7;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[6]=new TH2D("part_hCalhit_tdif_less15_position_SD7","part_hCalhit_tdif_less15_position_SD7;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[6]=new TH1F("part_hCalhit_tdif_great40_PE_SD7","part_hCalhit_tdif_great40_PE_SD7;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[6]=new TH2D("part_hCalhit_tdif_great40_position_SD7","part_hCalhit_tdif_great40_position_SD7",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[6]=new TH1F("hCalhit_time_less15_PE_SD7","hCalhit_time_less15_PE_SD7;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[6]=new TH2D("hCalhit_time_less15_position_SD7","hCalhit_time_less15_position_SD7",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[6]=new TH1F("hCalhit_time_great40_PE_SD7","hCalhit_time_great40_PE_SD7;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[6]=new TH2D("hCalhit_time_great40_position_SD7","hCalhit_time_great40_position_SD7",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[6]=new TH1F("hcal_hits_all_PEs_SD7","hcal_hits_all_PEs_SD7;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[6]=new TH1F("h_hcal_hits_max_PE_of_event_SD7","h_hcal_hits_max_PE_of_event_SD7;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 8 (super-duper low range, within -5SD to -6SD)
-        h_PDGIDs_SD[7]=new TH1F("PDG_IDs_SD8","PDG_IDs_SD8",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[7]=new TH1F("Z depth of HCal hits_SD8(10mm bins)", "Z depth of HCal hits_SD8(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[7]=new TH1F("Distance between sim particle and HCal hits_SD8(5mm bins)", "Distance between sim particle and HCal hits_SD8(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[7]=new TH2D("HCal hit locations_SD8", "HCal hit locations_SD8;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[7]=new TH2D("HCal photon hit locations_SD8", "HCal photon hit locations_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[7]=new TH2D("HCal electron hit locations_SD8", "HCal electron hit locations_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[7]=new TH2D("HCal neutron hit locations_SD8", "HCal neutron hit locations_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[7]=new TH2D("HCal other particle hit locations_SD8", "HCal other particle hit locations_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[7]=new TH2D("HCal unmatched hit locations_SD8", "HCal unmatched hit locations_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[7]=new TH1F("HCal Photon hit Energies_SD8", "HCal Photon hit Energies_SD8;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[7]=new TH1F("Creation time of particles causing HCal hits_SD8", "Creation time of particles causing HCal hits_SD8;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[7]=new TH1F("Creation time of nucleons causing HCal hits_SD8", "nucleons causing HCal hits_SD8;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[7]=new TH2D("Nucleon time vs energy_SD8", "Nucleon time vs energy_SD8;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[7]=new TH1F("E_cal_summed_energy_SD8","E_cal_summed_energy_SD8;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[7]=new TH1F("total_particles_SD8","total_particles_SD8;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[7]=new TH1F("matched_particle_energy_SD8","matched_particle_energy_SD8;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[7]=new TH1F("HCal_hit_time_all_SD8","HCal_hit_time_all_SD8;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[7]=new TH1F("hit_time_creation_time_diff_SD8","hit_time_creation_time_diff_SD8;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[7]=new TH1F("part_hCalhit_tdif_less15_PE_SD8","part_hCalhit_tdif_less15_PE_SD8;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[7]=new TH2D("part_hCalhit_tdif_less15_position_SD8","part_hCalhit_tdif_less15_position_SD8;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[7]=new TH1F("part_hCalhit_tdif_great40_PE_SD8","part_hCalhit_tdif_great40_PE_SD8;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[7]=new TH2D("part_hCalhit_tdif_great40_position_SD8","part_hCalhit_tdif_great40_position_SD8",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[7]=new TH1F("hCalhit_time_less15_PE_SD8","hCalhit_time_less15_PE_SD8;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[7]=new TH2D("hCalhit_time_less15_position_SD8","hCalhit_time_less15_position_SD8",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[7]=new TH1F("hCalhit_time_great40_PE_SD8","hCalhit_time_great40_PE_SD8;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[7]=new TH2D("hCalhit_time_great40_position_SD8","hCalhit_time_great40_position_SD8",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[7]=new TH1F("hcal_hits_all_PEs_SD8","hcal_hits_all_PEs_SD8;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[7]=new TH1F("h_hcal_hits_max_PE_of_event_SD8","h_hcal_hits_max_PE_of_event_SD8;Photoelectrons(PEs);Count",500,0,500);
-    
-        //SD region 9 (mega-ultra-super-duper low range, within -6SD to -7SD)
-        h_PDGIDs_SD[8]=new TH1F("PDG_IDs_SD9","PDG_IDs_SD9",10000,-5000,5000);
-        h_ZdepthofHCalHit_SD[8]=new TH1F("Z depth of HCal hits_SD9(10mm bins)", "Z depth of HCal hits_SD9(10mm bins)", 320, 0, 3200);
-        h_ParticleHit_Distance_SD[8]=new TH1F("Distance between sim particle and HCal hits_SD9(5mm bins)", "Distance between sim particle and HCal hits_SD9(5mm bins)", 400, 0, 2000);
-        h_HCalhit_zbyr_SD[8]=new TH2D("HCal hit locations_SD9", "HCal hit locations_SD9;Z depth (mm); radial distance from z-axis (mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_zbyr_SD[8]=new TH2D("HCal photon hit locations_SD9", "HCal photon hit locations_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_electron_zbyr_SD[8]=new TH2D("HCal electron hit locations_SD9", "HCal electron hit locations_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_neutron_zbyr_SD[8]=new TH2D("HCal neutron hit locations_SD9", "HCal neutron hit locations_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_other_zbyr_SD[8]=new TH2D("HCal other particle hit locations_SD9", "HCal other particle hit locations_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_unmatched_zbyr_SD[8]=new TH2D("HCal unmatched hit locations_SD9", "HCal unmatched hit locations_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_HCalhit_photon_energy_SD[8]=new TH1F("HCal Photon hit Energies_SD9", "HCal Photon hit Energies_SD9;Energy(MeV);Count", 4000, 0, 4000);
-        h_HCalhit_getTime_SD[8]=new TH1F("Creation time of particles causing HCal hits_SD9", "Creation time of particles causing HCal hits_SD9;Time(ns);Number of particles created", 500, 0, 500);
-        h_HCalhit_getTime_nucleons_SD[8]=new TH1F("Creation time of nucleons causing HCal hits_SD9", "nucleons causing HCal hits_SD9;Time(ns);Number of Nucleons created", 500, 0, 500);
-        h_HCalhit_nucleon_time_vs_energy_SD[8]=new TH2D("Nucleon time vs energy_SD9", "Nucleon time vs energy_SD9;Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-        h_E_cal_summed_energy_SD[8]=new TH1F("E_cal_summed_energy_SD9","E_cal_summed_energy_SD9;Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-        h_total_particles_SD[8]=new TH1F("total_particles_SD9","total_particles_SD9;Number of particles per event;Count",50,0,50);
-        h_particle_energy_SD[8]=new TH1F("matched_particle_energy_SD9","matched_particle_energy_SD9;Energy(MeV)(5MeV bin width);Count",800,0,4000);
-        h_hcal_hit_time_all_SD[8]=new TH1F("HCal_hit_time_all_SD9","HCal_hit_time_all_SD9;time(ns)(5ns bin width);Count",100,0,500);
-        h_hit_time_creation_time_diff_SD[8]=new TH1F("hit_time_creation_time_diff_SD9","hit_time_creation_time_diff_SD9;time(ns)(2ns bin width);Count",100,0,200);
-        h_part_hCalhit_tdif_less15_PE_SD[8]=new TH1F("part_hCalhit_tdif_less15_PE_SD9","part_hCalhit_tdif_less15_PE_SD9;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_less15_position_SD[8]=new TH2D("part_hCalhit_tdif_less15_position_SD9","part_hCalhit_tdif_less15_position_SD9;Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-        h_part_hCalhit_tdif_great40_PE_SD[8]=new TH1F("part_hCalhit_tdif_great40_PE_SD9","part_hCalhit_tdif_great40_PE_SD9;Photoelectrons(PEs);Count",200,0,200);
-        h_part_hCalhit_tdif_great40_position_SD[8]=new TH2D("part_hCalhit_tdif_great40_position_SD9","part_hCalhit_tdif_great40_position_SD9",80,0,3200,112,0,4500);
-        h_hCalhit_time_less15_PE_SD[8]=new TH1F("hCalhit_time_less15_PE_SD9","hCalhit_time_less15_PE_SD9;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_less15_position_SD[8]=new TH2D("hCalhit_time_less15_position_SD9","hCalhit_time_less15_position_SD9",80,0,3200,112,0,4500);
-        h_hCalhit_time_great40_PE_SD[8]=new TH1F("hCalhit_time_great40_PE_SD9","hCalhit_time_great40_PE_SD9;Photoelectrons(PEs);Count",200,0,200);
-        h_hCalhit_time_great40_position_SD[8]=new TH2D("hCalhit_time_great40_position_SD9","hCalhit_time_great40_position_SD9",80,0,3200,112,0,4500);
-        h_hcal_hits_all_PEs_SD[8]=new TH1F("hcal_hits_all_PEs_SD9","hcal_hits_all_PEs_SD9;Photoelectrons(PEs);Count",200,0,200);
-        h_hcal_hits_max_PE_of_event_SD[8]=new TH1F("h_hcal_hits_max_PE_of_event_SD9","h_hcal_hits_max_PE_of_event_SD9;Photoelectrons(PEs);Count",500,0,500);
-
         return;
     } //onProcessStart
     
