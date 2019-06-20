@@ -85,8 +85,8 @@ namespace ldmx {
         }
 
 
-        // Create a new hit. Use tracker hits for now
-        G4TrackerHit* hit = new G4TrackerHit();
+        // Create a new hit. 
+        G4TriggerPadHit* hit = new G4TriggerPadHit();
 
         // Set the edep.
         hit->setEdep(edep*birksFactor);
@@ -143,7 +143,7 @@ namespace ldmx {
   void TriggerPadSD::Initialize(G4HCofThisEvent* hce) {
 
     // Setup hits collection and the HC ID.                                                                                                                                               
-    hitsCollection_ = new G4TrackerHitsCollection(SensitiveDetectorName, collectionName[0]);
+    hitsCollection_ = new G4TriggerPadHitsCollection(SensitiveDetectorName, collectionName[0]);
     int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
     hce->AddHitsCollection(hcID, hitsCollection_);
   }

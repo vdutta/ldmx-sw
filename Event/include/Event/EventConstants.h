@@ -34,7 +34,7 @@ namespace ldmx {
             static const std::string SIM_PARTICLES;
             static const std::string TAGGER_SIM_HITS;
             static const std::string TARGET_SIM_HITS;
-            static const std::string TRIGGER_PAD_SIM_HITS;
+            static const std::string TRIGGERPAD_SIM_HITS;
             static const std::string TRIGGER_RESULT;
             static const std::string CLUSTER_ALGO_RESULT;
 

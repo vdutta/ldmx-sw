@@ -302,7 +302,7 @@ namespace ldmx {
             /**
              * The ROOT class definition.
              */
-            ClassDef(SimTriggerPadHit, 1);
+            ClassDef(SimTriggerPadHit, 3);
 
     }; // SimTriggerPadHit
 

@@ -16,6 +16,7 @@
 #include "Event/RunHeader.h"
 #include "Event/SimCalorimeterHit.h"
 #include "Event/SimTrackerHit.h"
+#include "Event/SimTriggerPadHit.h"
 #include "Event/SimParticle.h"
 #include "Event/TriggerResult.h"
 #include "Event/TrackerVetoResult.h"

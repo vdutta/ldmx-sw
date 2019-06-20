@@ -11,7 +11,8 @@
 #include "SimApplication/CalorimeterSD.h"
 //#include "DetDescr/DetectorID.h"
 #include "DetDescr/TriggerPadID.h"
-#include "SimApplication/G4TrackerHit.h"
+//#include "SimApplication/G4TrackerHit.h"
+#include "SimApplication/G4TriggerPadHit.h"
 
 namespace ldmx {
 
@@ -41,7 +42,7 @@ namespace ldmx {
 	  /**                                                                                                                                                                               
 	   * The output hits collection of G4TrackerHits.                                                                                                                                   
 	   */
-	  G4TrackerHitsCollection* hitsCollection_;
+	  G4TriggerPadHitsCollection* hitsCollection_;
 
 	  /**                                                                                                                                                                               
 	   * The subdetector ID.                                                                                                                                                            

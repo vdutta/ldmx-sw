@@ -29,6 +29,7 @@
 #pragma link C++ class ldmx::RunHeader+;
 #pragma link C++ class ldmx::SimCalorimeterHit+;
 #pragma link C++ class ldmx::SimTrackerHit+;
+#pragma link C++ class ldmx::SimTriggerPadHit+;
 #pragma link C++ class ldmx::SimParticle+;
 #pragma link C++ class ldmx::TriggerResult+;
 #pragma link C++ class ldmx::TrackerVetoResult+; 

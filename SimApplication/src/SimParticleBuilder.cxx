@@ -5,6 +5,7 @@
 #include "Event/EventConstants.h"
 #include "SimApplication/G4CalorimeterHit.h"
 #include "SimApplication/G4TrackerHit.h"
+#include "SimApplication/G4TriggerPadHit.h"
 #include "SimApplication/UserTrackingAction.h"
 
 // Geant4

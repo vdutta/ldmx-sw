@@ -17,7 +17,7 @@ namespace ldmx {
     const std::string EventConstants::SIM_PARTICLES = "SimParticles";
     const std::string EventConstants::TAGGER_SIM_HITS = "TaggerSimHits";
     const std::string EventConstants::TARGET_SIM_HITS = "TargetSimHits";
-    const std::string EventConstants::TRIGGER_PAD_SIM_HITS = "TriggerPadSimHits";
+    const std::string EventConstants::TRIGGERPAD_SIM_HITS = "TriggerPadSimHits";
     const std::string EventConstants::TRIGGER_RESULT = "TriggerResult";
     const std::string EventConstants::CLUSTER_ALGO_RESULT = "ClusterAlgoResult";
 
@@ -30,6 +30,7 @@ namespace ldmx {
     const std::string EventConstants::SIM_PARTICLE = "ldmx::SimParticle";
     const std::string EventConstants::SIM_CALORIMETER_HIT = "ldmx::SimCalorimeterHit";
     const std::string EventConstants::SIM_TRACKER_HIT = "ldmx::SimTrackerHit";
+    const std::string EventConstants::SIM_TRIGGERPAD_HIT = "ldmx::SimTriggerPadHit";
     const std::string EventConstants::RUN_HEADER = "ldmx::RunHeader";
     const std::string EventConstants::PN_WEIGHT = "ldmx::pnWeight";
 
