@@ -303,16 +303,18 @@ namespace ldmx {
         getHistoDirectory();
         
         std::vector<std::string> range_names(10);
-        range_names[0] = "(-1,+1)";
-        range_names[1] = "[+1,+2)";
-        range_names[2] = "(-2,-1)";
-        range_names[3] = "[+2,+inf)";
-        range_names[4] = "(-3,-2]";
-        range_names[5] = "(-4,-3]";
-        range_names[6] = "(-5,-4]";
-        range_names[7] = "(-6,-5]";
-        range_names[8] = "(-inf,-6]";
-        range_names[9] = "(-inf,+inf)";
+        // n <--> negative
+        // p <--> positive
+        range_names[0] = "n1-p1";
+        range_names[1] = "p1-p2";
+        range_names[2] = "n2-n1";
+        range_names[3] = "p2-pinf";
+        range_names[4] = "n3-n2";
+        range_names[5] = "n4-n3";
+        range_names[6] = "n5-n4";
+        range_names[7] = "n6-n5";
+        range_names[8] = "ninf-n6]";
+        range_names[9] = "ninf-pinf";
     
         for ( int i = 0; i < range_names.size(); i++ ) {
             std::string range_name = range_names.at(i);
