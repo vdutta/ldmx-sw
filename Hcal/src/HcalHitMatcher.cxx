@@ -192,7 +192,7 @@ namespace ldmx {
                     
                     double part_hCalhit_timeDiff = (hCalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
                     
-                    h_hit_time_creation_time_diff->Fill(part_hCalhit_timeDiff);
+                    h_hit_time_creation_time_diff_SD[9]->Fill(part_hCalhit_timeDiff);
                     h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hCalhit_timeDiff);
                     if(part_hCalhit_timeDiff < 15.0)  {
                         h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hCalhit->getPE());
@@ -202,7 +202,7 @@ namespace ldmx {
                     } else if(part_hCalhit_timeDiff > 40.0)  {
                         h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hCalhit->getPE());
                         h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hCalhit->getPE());
-                                        h_part_hCalhit_tdif_great40_position->Fill(hCalhit->getZ(), hCalhit_radialdist);
+                        h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                         h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hCalhit->getZ(), hCalhit_radialdist);
                     }
         
@@ -316,68 +316,118 @@ namespace ldmx {
     
         for ( int i = 0; i < range_names.size(); i++ ) {
             std::string range_name = range_names.at(i);
-            h_PDGIDs_SD[i]=new TH1F("PDG_IDs_SD_"+range_name,
-                    "PDG_IDs_SD1",10000,-5000,5000);
-            h_ZdepthofHCalHit_SD[i]=new TH1F("Z depth of HCal hits_SD_"+range_name, 
-                    "Z depth of HCal hits_SD"+range_name+" (10mm bins)", 320, 0, 3200);
-            h_ParticleHit_Distance_SD[0]=new TH1F("Distance between sim particle and HCal hits_SD_"+range_name, 
-                    "Distance between sim particle and HCal hits_SD_"+range_name+" (5mm bins)", 400, 0, 2000);
-            h_HCalhit_zbyr_SD[i]=new TH2D("HCal hit locations_SD_"+range_name, 
-                    "HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)",
+            h_PDGIDs_SD[i]=new TH1F(
+                    ("PDG_IDs_SD_"+range_name).c_str(),
+                    ("PDG_IDs_SD_"+range_name).c_str(),
+                    10000,-5000,5000);
+            h_ZdepthofHCalHit_SD[i]=new TH1F(
+                    ("Z depth of HCal hits_SD_"+range_name).c_str(),
+                    ("Z depth of HCal hits_SD"+range_name+" (10mm bins)").c_str(),
+                    320, 0, 3200);
+            h_ParticleHit_Distance_SD[i]=new TH1F(
+                    ("Distance between sim particle and HCal hits_SD_"+range_name).c_str(), 
+                    ("Distance between sim particle and HCal hits_SD_"+range_name+" (5mm bins)").c_str(), 
+                    400, 0, 2000);
+            h_HCalhit_zbyr_SD[i]=new TH2D(
+                    ("HCal hit locations_SD_"+range_name).c_str(), 
+                    ("HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_photon_zbyr_SD[i]=new TH2D("HCal photon hit locations_SD_"+range_name, 
-                    "HCal photon hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+            h_HCalhit_photon_zbyr_SD[i]=new TH2D(
+                    ("HCal photon hit locations_SD_"+range_name).c_str(), 
+                    ("HCal photon hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_electron_zbyr_SD[i]=new TH2D("HCal electron hit locations_SD_"+range_name, 
-                    "HCal electron hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+            h_HCalhit_electron_zbyr_SD[i]=new TH2D(
+                    ("HCal electron hit locations_SD_"+range_name).c_str(), 
+                    ("HCal electron hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_neutron_zbyr_SD[i]=new TH2D("HCal neutron hit locations_SD_"+range_name, 
-                    "HCal neutron hit locations_SD"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+            h_HCalhit_neutron_zbyr_SD[i]=new TH2D(
+                    ("HCal neutron hit locations_SD_"+range_name).c_str(), 
+                    ("HCal neutron hit locations_SD"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_other_zbyr_SD[i]=new TH2D("HCal other particle hit locations_SD_"+range_name, 
-                    "HCal other particle hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+            h_HCalhit_other_zbyr_SD[i]=new TH2D(
+                    ("HCal other particle hit locations_SD_"+range_name).c_str(), 
+                    ("HCal other particle hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_unmatched_zbyr_SD[i]=new TH2D("HCal unmatched hit locations_SD_"+range_name, 
-                    "HCal unmatched hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",
+            h_HCalhit_unmatched_zbyr_SD[i]=new TH2D(
+                    ("HCal unmatched hit locations_SD_"+range_name).c_str(), 
+                    ("HCal unmatched hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
-            h_HCalhit_photon_energy_SD[i]=new TH1F("HCal Photon hit Energies_SD_"+range_name,
-                    "HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count", 4000, 0, 4000);
-            h_HCalhit_getTime_SD[i]=new TH1F("Creation time of particles causing HCal hits_SD_"+range_name, 
-                    "Creation time of particles causing HCal hits_SD_"+range_name+";Time(ns);Number of particles created", 500, 0, 500);
-            h_HCalhit_getTime_nucleons_SD[i]=new TH1F("Creation time of nucleons causing HCal hits_SD_"+range_name,
-                    "nucleons causing HCal hits_SD_"+range_name+";Time(ns);Number of Nucleons created", 500, 0, 500);
-            h_HCalhit_nucleon_time_vs_energy_SD[i]=new TH2D("Nucleon time vs energy_SD_"+range_name, 
-                    "Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)",100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-            h_E_cal_summed_energy_SD[i]=new TH1F("E_cal_summed_energy_SD_"+range_name,
-                    "E_cal_summed_energy_SD_"+range_name+";Energy(MeV)(10MeV bin width);Count",800,0,8000);//10MeV bins
-            h_total_particles_SD[i]=new TH1F("total_particles_SD_"+range_name,
-                    "total_particles_SD_+"range_name+";Number of particles per event;Count",50,0,50);
-            h_particle_energy_SD[i]=new TH1F("matched_particle_energy_SD_"+range_name,
-                    "matched_particle_energy_SD_"+range_name+";Energy(MeV)(5MeV bin width);Count",800,0,4000);
-            h_hcal_hit_time_all_SD[i]=new TH1F("HCal_hit_time_all_SD_"+range_name,
-                    "HCal_hit_time_all_SD_"+range_name+";time(ns)(5ns bin width);Count",100,0,500);
-            h_hit_time_creation_time_diff_SD[i]=new TH1F("hit_time_creation_time_diff_SD_"+range_name,
-                    "hit_time_creation_time_diff_SD_"+range_name+";time(ns)(2ns bin width);Count",100,0,200);
-            h_part_hCalhit_tdif_less15_PE_SD[i]=new TH1F("part_hCalhit_tdif_less15_PE_SD_"+range_name,
-                    "part_hCalhit_tdif_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
-            h_part_hCalhit_tdif_less15_position_SD[i]=new TH2D("part_hCalhit_tdif_less15_position_SD_"+range_name,
-                    "part_hCalhit_tdif_less15_position_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)",80,0,3200,112,0,4500);
-            h_part_hCalhit_tdif_great40_PE_SD[i]=new TH1F("part_hCalhit_tdif_great40_PE_SD_"+range_name,
-                    "part_hCalhit_tdif_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
-            h_part_hCalhit_tdif_great40_position_SD[i]=new TH2D("part_hCalhit_tdif_great40_position_SD_"+range_name,
-                    "part_hCalhit_tdif_great40_position_SD_"+range_name,80,0,3200,112,0,4500);
-            h_hCalhit_time_less15_PE_SD[i]=new TH1F("hCalhit_time_less15_PE_SD_"+range_name,
-                    "hCalhit_time_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
-            h_hCalhit_time_less15_position_SD[i]=new TH2D("hCalhit_time_less15_position_SD_"+range_name,
-                    "hCalhit_time_less15_position_SD_"+range_name,80,0,3200,112,0,4500);
-            h_hCalhit_time_great40_PE_SD[i]=new TH1F("hCalhit_time_great40_PE_SD_"+range_name,
-                    "hCalhit_time_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
-            h_hCalhit_time_great40_position_SD[i]=new TH2D("hCalhit_time_great40_position_SD_"+range_name,
-                    "hCalhit_time_great40_position_SD_"+range_name,80,0,3200,112,0,4500);
-            h_hcal_hits_all_PEs_SD[i]=new TH1F("hcal_hits_all_PEs_SD_"+range_name,
-                    "hcal_hits_all_PEs_SD_"+range_name+";Photoelectrons(PEs);Count",200,0,200);
-            h_hcal_hits_max_PE_of_event_SD[i]=new TH1F("h_hcal_hits_max_PE_of_event_SD_"+range_name,
-                    "h_hcal_hits_max_PE_of_event_SD_"+range_name+";Photoelectrons(PEs);Count",500,0,500);
+            h_HCalhit_photon_energy_SD[i]=new TH1F(
+                    ("HCal Photon hit Energies_SD_"+range_name).c_str(),
+                    ("HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count").c_str(), 
+                    4000, 0, 4000);
+            h_HCalhit_getTime_SD[i]=new TH1F(
+                    ("Creation time of particles causing HCal hits_SD_"+range_name).c_str(), 
+                    ("Creation time of particles causing HCal hits_SD_"+range_name+";Time(ns);Number of particles created").c_str(), 
+                    500, 0, 500);
+            h_HCalhit_getTime_nucleons_SD[i]=new TH1F(
+                    ("Creation time of nucleons causing HCal hits_SD_"+range_name).c_str(),
+                    ("nucleons causing HCal hits_SD_"+range_name+";Time(ns);Number of Nucleons created").c_str(), 
+                    500, 0, 500);
+            h_HCalhit_nucleon_time_vs_energy_SD[i]=new TH2D(
+                    ("Nucleon time vs energy_SD_"+range_name).c_str(), 
+                    ("Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)").c_str(),
+                    100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
+            h_E_cal_summed_energy_SD[i]=new TH1F(
+                    ("E_cal_summed_energy_SD_"+range_name).c_str(),
+                    ("E_cal_summed_energy_SD_"+range_name+";Energy(MeV)(10MeV bin width);Count").c_str(),
+                    800,0,8000);//10MeV bins
+            h_total_particles_SD[i]=new TH1F(
+                    ("total_particles_SD_"+range_name).c_str(),
+                    ("total_particles_SD_"+range_name+";Number of particles per event;Count").c_str(),
+                    50,0,50);
+            h_particle_energy_SD[i]=new TH1F(
+                    ("matched_particle_energy_SD_"+range_name).c_str(),
+                    ("matched_particle_energy_SD_"+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
+                    800,0,4000);
+            h_hcal_hit_time_all_SD[i]=new TH1F(
+                    ("HCal_hit_time_all_SD_"+range_name).c_str(),
+                    ("HCal_hit_time_all_SD_"+range_name+";time(ns)(5ns bin width);Count").c_str(),
+                    100,0,500);
+            h_hit_time_creation_time_diff_SD[i]=new TH1F(
+                    ("hit_time_creation_time_diff_SD_"+range_name).c_str(),
+                    ("hit_time_creation_time_diff_SD_"+range_name+";time(ns)(2ns bin width);Count").c_str(),
+                    100,0,200);
+            h_part_hCalhit_tdif_less15_PE_SD[i]=new TH1F(
+                    ("part_hCalhit_tdif_less15_PE_SD_"+range_name).c_str(),
+                    ("part_hCalhit_tdif_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+            h_part_hCalhit_tdif_less15_position_SD[i]=new TH2D(
+                    ("part_hCalhit_tdif_less15_position_SD_"+range_name).c_str(),
+                    ("part_hCalhit_tdif_less15_position_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+            h_part_hCalhit_tdif_great40_PE_SD[i]=new TH1F(
+                    ("part_hCalhit_tdif_great40_PE_SD_"+range_name).c_str(),
+                    ("part_hCalhit_tdif_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+            h_part_hCalhit_tdif_great40_position_SD[i]=new TH2D(
+                    ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
+                    ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
+                    80,0,3200,112,0,4500);
+            h_hCalhit_time_less15_PE_SD[i]=new TH1F(
+                    ("hCalhit_time_less15_PE_SD_"+range_name).c_str(),
+                    ("hCalhit_time_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+            h_hCalhit_time_less15_position_SD[i]=new TH2D(
+                    ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
+                    ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
+                    80,0,3200,112,0,4500);
+            h_hCalhit_time_great40_PE_SD[i]=new TH1F(
+                    ("hCalhit_time_great40_PE_SD_"+range_name).c_str(),
+                    ("hCalhit_time_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+            h_hCalhit_time_great40_position_SD[i]=new TH2D(
+                    ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
+                    ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
+                    80,0,3200,112,0,4500);
+            h_hcal_hits_all_PEs_SD[i]=new TH1F(
+                    ("hcal_hits_all_PEs_SD_"+range_name).c_str(),
+                    ("hcal_hits_all_PEs_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+            h_hcal_hits_max_PE_of_event_SD[i]=new TH1F(
+                    ("h_hcal_hits_max_PE_of_event_SD_"+range_name).c_str(),
+                    ("h_hcal_hits_max_PE_of_event_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    500,0,500);
         } //iterate over range_names
     
         return;
