@@ -1,7 +1,7 @@
 /**
  * @file HcalHitMatcher.h
  * @brief
- * @author Matthew Forsman
+ * @author Matthew Forsman, Tom Eichlersmith
  */
 #ifndef HCAL_HCALHITMATCHER_H
 #define HCAL_HCALHITMATCHER_H
@@ -28,8 +28,9 @@
 #include "Event/Event.h"
 #include "Framework/EventProcessor.h" //Needed to declare processor
 #include "Framework/ParameterSet.h" // Needed to import parameters from configuration file
-
-class SimTrackerHit;
+#include "Event/HcalHit.h"
+#include "Event/SimParticle.h"
+#include "Event/SimCalorimeterHit.h"
 
 namespace ldmx {
     
@@ -94,7 +95,6 @@ namespace ldmx {
         	std::string EcalScoringPlane_; //* Name of Ecal Scoring Plane Hits Collection
         	std::string HcalScoringPlane_; //* Name of Hcal Scoring Plane Hits Collection
             
-            unsigned long int numHits_; //* Total number of Hcal Hits
             unsigned long int numNonNoiseHits_; //* Number of Non-Noise Hcal Hits
             unsigned long int numMatchedHits_; //* Number of Hcal Hits matched to a sim particle
         
@@ -117,7 +117,6 @@ namespace ldmx {
              */
         	TH1* h_PDGIDs_SD[10];
         	TH1* h_ZdepthofHCalHit_SD[10];
-        	TH1* h_ParticleHit_Distance_SD[10];
         	TH2D* h_HCalhit_zbyr_SD[10];
         	TH2D* h_HCalhit_photon_zbyr_SD[10];
         	TH2D* h_HCalhit_electron_zbyr_SD[10];

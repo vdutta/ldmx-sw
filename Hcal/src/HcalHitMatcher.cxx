@@ -7,12 +7,10 @@
  *        sim particle's trajectory to a reconstructed Hcal hit.
  *        Plots and results are then tabulated in ROOT based on the sim particle and Hcal hit matches.
  *
- * @author Matthew Forsman 
+ * @author Matthew Forsman, Tom Eichlersmith
  */
 
 #include "Hcal/HcalHitMatcher.h"
-#include "Event/HcalHit.h"
-#include "Event/SimParticle.h"
 
 namespace ldmx {
 
@@ -32,243 +30,186 @@ namespace ldmx {
         const TClonesArray* ecalScoringPlaneHits = event.getCollection( EcalScoringPlane_ );
         const TClonesArray* simParticles = event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
 
-        std::vector<SimTrackerHit*> simVec;
-        std::vector<SimTrackerHit*> filteredSimVec;//Sim particles are organized from highest to lowest momentum
+        std::vector< ldmx::SimTrackerHit* > ecalScoringPlaneHits_sorted;
+        std::vector< ldmx::SimParticle* > ecalScoringPlaneSimParticles;
     
         for (int i = 0; i < ecalScoringPlaneHits->GetEntriesFast(); i++ ) {
             ldmx::SimTrackerHit* ecalSPH = (ldmx::SimTrackerHit*)(ecalScoringPlaneHits->At(i));
-            simVec.push_back(ecalSPH);
+            ecalScoringPlaneHits_sorted.push_back(ecalSPH);
         }
 
+        //sort scoring plane hits by particle and then by momentum
+        std::sort(ecalScoringPlaneHits_sorted.begin(), ecalScoringPlaneHits_sorted.end(), compSims);
 
-        std::sort(simVec.begin(), simVec.end(), compSims);
-
-        SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
-        for (int j = 0; j < simVec.size(); j++) {
-            SimParticle* sP = simVec[j]->getSimParticle();
-            if (sP == lastP) continue;
-            lastP = sP;
-            filteredSimVec.push_back(simVec[j]);
-        }
-
-        std::sort(filteredSimVec.begin(), filteredSimVec.end(), compSimsP);
-
-        //----------This section obtains a list of sim particles that cross the hcal scoring plane---------->
-        //Currently it is NOT being used to obtain any information
-//        
-//        const TClonesArray* scoringPlaneHits_h=event.getCollection(scoringPlane_h);
-//        const TClonesArray* simParticles_h=event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
-//    
-//        ldmx::SimTrackerHit* hcalSPP;
-//        std::vector<SimTrackerHit*> simVec_h;
-//        std::vector<SimTrackerHit*> filteredSimVec_h;//Sim particles are organized from highest to lowest momentum
-//    
-//        if ( scoringPlaneHits_h->GetEntriesFast() > 0 ) {
-//            for (TIter next(scoringPlaneHits_h); hcalSPP = (ldmx::SimTrackerHit*)next();) {
-//                simVec_h.push_back(hcalSPP);
-//            }
-//        }
-//    
-//        std::sort(simVec_h.begin(), simVec_h.end(), compSims);
-//
-//        SimParticle* lastP_h = 0; // sometimes multiple SP hits from same particle
-//        for (int j = 0; j < simVec_h.size(); j++) {
-//            SimParticle* sP_h = simVec_h[j]->getSimParticle();
-//            if (sP_h == lastP_h) continue;
-//            lastP = sP_h;
-//            filteredSimVec_h.push_back(simVec_h[j]);
-//        }
-//        
-//        std::sort(filteredSimVec_h.begin(), filteredSimVec_h.end(), compSimsP);
-    
-    
-        //----------This section calculates the energy in the ECal---------->
-        //Then uses this energy to set standard deviation range
-
-        const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
-
-        double e_cal_sum_energy = 0;
-        for(int i=0; i < ecalHitColl->GetEntriesFast(); i++) {
-            ldmx::EcalHit* ecalhit = (ldmx::EcalHit*)(ecalHitColl->At(i));
-            if ( ! ecalhit->isNoise() ) { //Only add non-noise hits
-                e_cal_sum_energy += ecalhit->getEnergy();
+        //skip repeat sim particles (sometimes they create multiple hits)
+        for (int j = 0; j < ecalScoringPlaneHits_sorted.size(); j++) {
+            ldmx::SimParticle* sP = ecalScoringPlaneHits_sorted.at(j)->getSimParticle();
+            if ( ecalScoringPlaneSimParticles.empty() or sP != ecalScoringPlaneSimParticles.back() ) {
+                //sim particle hasn't already been listed
+                ecalScoringPlaneSimParticles.push_back( sP );
             }
         }
-
-        //Classify this event as one of the standard deviation regions
-        int ecal_sumESD = 1; //Labels what approximate standard deviation range the summed ecal energy is
-        if(e_cal_sum_energy<4400 && e_cal_sum_energy>3600)       ecal_sumESD=0;//Normal range (within ~1SD)
-        else if(e_cal_sum_energy>=4400 && e_cal_sum_energy<4800) ecal_sumESD=1;//High Range (within than +1SD to +2SD)
-        else if(e_cal_sum_energy<=3600 && e_cal_sum_energy>3200) ecal_sumESD=2;//low range (within -1SD to -2SD)
-        else if(e_cal_sum_energy>=4800)                          ecal_sumESD=3;//Higher Range (higher than 2SD)
-        else if(e_cal_sum_energy<=3200 && e_cal_sum_energy>2800) ecal_sumESD=4;//lower Range (within -2SD to -3SD)
-        else if(e_cal_sum_energy<=2800 && e_cal_sum_energy>2400) ecal_sumESD=5;//very low range (within -3SD to -4SD)
-        else if(e_cal_sum_energy<=2400 && e_cal_sum_energy>2000) ecal_sumESD=6;//extremely low range (within -4SD to -5SD)
-        else if(e_cal_sum_energy<=2000 && e_cal_sum_energy>1600) ecal_sumESD=7;//super-duper low range (within -5SD to -6SD)
-        else if(e_cal_sum_energy<=1600)                          ecal_sumESD=8;//mega-ultra-super-duper low range (Less than -6SD)
-        else ecal_sumESD = 1;//shouldn't ever get here
-
-        //Bin event information
-        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
-        h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
-    
-        h_total_particles_SD[9]->Fill(filteredSimVec.size());
-        h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
-
-        //----This section matches HCal hits to sim particles and records results----->
-        const TClonesArray* hcalHitColl = event.getCollection( HcalHitColl_ );
-
-        float max_PE_of_event=0;
-        for(int i=0; i < hcalHitColl->GetEntriesFast(); i++) { //Begin loop over hcalhits array
-            ldmx::HcalHit* hcalhit = (ldmx::HcalHit*)(hcalHitColl->At(i));
-            numHits_++;
-            if ( ! hcalhit->getNoise() ) { //Only analyze non-noise hits
-
-                numNonNoiseHits_++;
-                int pdgID=0; //PDG of sim particle that matched this hit
-                int simPartNum = -1; //index of sim particle that matched this hcal hit
-
-                double new_dist=9999, dist=9998; //initializing distance variables
-                for(int j=0; j<filteredSimVec.size(); j++) { //Iterate over all sim particles and match one to an Hcal hit
-                    SimParticle* sP = filteredSimVec[j]->getSimParticle();
-                    pdgID = sP->getPdgID();
-                    
-                    std::vector<double> simStart = sP->getVertex();
-                    std::vector<double> simEnd = sP->getEndPoint();
         
-                    TVector3 simStartT = TVector3(simStart[0], simStart[1], simStart[2]);
-                    TVector3 simEndT = TVector3(simEnd[0], simEnd[1], simEnd[2]);
-                    TVector3 hCalPoint = TVector3(hcalhit->getX(), hcalhit->getY(), hcalhit->getZ());
-                    
-                    new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
-                    
-                    h_ParticleHit_Distance_SD[9]->Fill(new_dist);
-                    h_ParticleHit_Distance_SD[ecal_sumESD]->Fill(new_dist);
-        
-                    if(simStart[2]<10.0 and sP->getEnergy()>3000.0) {
-                        //discarding original electron?
-                        //check if sim particle is too close to the front of the hcal?
-                        //DO NOTHING (skip this sim particle)
-                    } else if(new_dist < dist) {
-                        dist = new_dist; //Distance to matched particle
-                        simPartNum = j; //Matched particle number in array of sim particles
-                    }
-                    
-                } //iterate over sim particles to match one to current hcal hit
-
-                //check if able to match sim particle(s) to hcal hit
-                if(simPartNum >= 0) {
-                    pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
-                }
-
-                double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
-                double hcalhit_radialdist = 0;
-                //check to avoid a floating point error
-                if(abs(hcalhit_radialdist2) > 1e-5) {
-                    hcalhit_radialdist = sqrt(hcalhit_radialdist2);
-                }
-
-                h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
-                h_hcal_hit_time_all_SD[9]->Fill(hcalhit->getTime());
-                h_hcal_hits_all_PEs_SD[9]->Fill(hcalhit->getPE());
-                
-                h_HCalhit_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill(hcalhit->getZ());
-                h_hcal_hit_time_all_SD[ecal_sumESD]->Fill(hcalhit->getTime());
-                h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                
-                if(hcalhit->getTime() < 15.0)  {
-                    h_hCalhit_time_less15_PE_SD[9]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                } else if(hcalhit->getTime() > 40.0)  {
-                    h_hCalhit_time_great40_PE_SD[9]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                }
-                
-                if(hcalhit->getPE() > max_PE_of_event)
-                    max_PE_of_event=hcalhit->getPE();
-                
-                if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
-                
-                    numMatchedHits_++;
-                    h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
-                    h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
-                    
-                    double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                    
-                    h_hit_time_creation_time_diff_SD[9]->Fill(part_hcalhit_timeDiff);
-                    h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
-                    if(part_hcalhit_timeDiff < 15.0)  {
-                        h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                        h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    } else if(part_hcalhit_timeDiff > 40.0)  {
-                        h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                        h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    }
-                    
-                    //protons or neutrons (nucleons) 
-                    if( pdgID==2112 or pdgID==2212 ) { 
-                        h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                        h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
-                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                        h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                        h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
-                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                    }
-                    
-                    h_PDGIDs_SD[9]->Fill(pdgID);
-                    h_PDGIDs_SD[ecal_sumESD]->Fill(pdgID);
-        
-                    h_particle_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                    h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-        
-                    switch(pdgID) {
-                        case 11:
-                            h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            break;
-                        case 22:
-                            h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                            h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                            h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                            break;
-                        case 2112:
-                            h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                            h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            break;
-                        default:
-                            h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            break;
-                    }
-
-                } else {
-
-                    h_HCalhit_unmatched_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-
-                } //matched or unmatched
-    
-            } // if not a noise hit
-
-        }//End loop over hcalhits array
-
-        // maximum PE in hcal hits for the event
-        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
-        h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
-
+        //--Now ecalScoringPlaneSimParticles contains a vector of SimParticles that crossed the ecal scoring plane ------->
+//    
+//        //----------This section calculates the energy in the ECal---------->
+//        //Then uses this energy to set standard deviation range
+//
+//        const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
+//
+//        double e_cal_sum_energy = 0;
+//        for(int i=0; i < ecalHitColl->GetEntriesFast(); i++) {
+//            ldmx::EcalHit* ecalhit = (ldmx::EcalHit*)(ecalHitColl->At(i));
+//            if ( ! ecalhit->isNoise() ) { //Only add non-noise hits
+//                e_cal_sum_energy += ecalhit->getEnergy();
+//            }
+//        }
+//
+//        //Classify this event as one of the standard deviation regions
+//        int ecal_sumESD = 1; //Labels what approximate standard deviation range the summed ecal energy is
+//        if(e_cal_sum_energy<4400 && e_cal_sum_energy>3600)       ecal_sumESD=0;//Normal range (within ~1SD)
+//        else if(e_cal_sum_energy>=4400 && e_cal_sum_energy<4800) ecal_sumESD=1;//High Range (within than +1SD to +2SD)
+//        else if(e_cal_sum_energy<=3600 && e_cal_sum_energy>3200) ecal_sumESD=2;//low range (within -1SD to -2SD)
+//        else if(e_cal_sum_energy>=4800)                          ecal_sumESD=3;//Higher Range (higher than 2SD)
+//        else if(e_cal_sum_energy<=3200 && e_cal_sum_energy>2800) ecal_sumESD=4;//lower Range (within -2SD to -3SD)
+//        else if(e_cal_sum_energy<=2800 && e_cal_sum_energy>2400) ecal_sumESD=5;//very low range (within -3SD to -4SD)
+//        else if(e_cal_sum_energy<=2400 && e_cal_sum_energy>2000) ecal_sumESD=6;//extremely low range (within -4SD to -5SD)
+//        else if(e_cal_sum_energy<=2000 && e_cal_sum_energy>1600) ecal_sumESD=7;//super-duper low range (within -5SD to -6SD)
+//        else if(e_cal_sum_energy<=1600)                          ecal_sumESD=8;//mega-ultra-super-duper low range (Less than -6SD)
+//        else ecal_sumESD = 1;//shouldn't ever get here
+//
+//        //Bin event information
+//        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
+//        h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
+//    
+//        h_total_particles_SD[9]->Fill(filteredSimVec.size());
+//        h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
+//
+//        //----This section matches HCal hits to sim particles and records results----->
+//        const TClonesArray* hcalSimHits = event.getCollection( EventConstants::HCAL_SIM_HITS , "sim" );
+//
+//        float max_PE_of_event=0;
+//        int numHcalSimHits = hcalSimHits->GetEntries();
+//        for(int iHit=0; iHit < numHcalSimHits; iHit++) {
+//            ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
+//
+//            numNonNoiseHits_++;
+//            int pdgID=0; //PDG of sim particle that matched this hit
+//            int simPartNum = -1; //index of sim particle that matched this hcal hit
+//
+//            //check if able to match sim particle(s) to hcal hit
+//            if(simPartNum >= 0) {
+//                pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
+//            }
+//
+//            double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
+//            double hcalhit_radialdist = 0;
+//            //check to avoid a floating point error
+//            if(abs(hcalhit_radialdist2) > 1e-5) {
+//                hcalhit_radialdist = sqrt(hcalhit_radialdist2);
+//            }
+//
+//            h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//            h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
+//            h_hcal_hit_time_all_SD[9]->Fill(hcalhit->getTime());
+//            h_hcal_hits_all_PEs_SD[9]->Fill(hcalhit->getPE());
+//            
+//            h_HCalhit_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//            h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill(hcalhit->getZ());
+//            h_hcal_hit_time_all_SD[ecal_sumESD]->Fill(hcalhit->getTime());
+//            h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//            
+//            if(hcalhit->getTime() < 15.0)  {
+//                h_hCalhit_time_less15_PE_SD[9]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//            } else if(hcalhit->getTime() > 40.0)  {
+//                h_hCalhit_time_great40_PE_SD[9]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//            }
+//            
+//            if(hcalhit->getPE() > max_PE_of_event)
+//                max_PE_of_event=hcalhit->getPE();
+//
+//            bool matched = false;
+//            if( matched ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
+//            
+//                numMatchedHits_++;
+//                h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
+//                h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
+//                
+//                double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                
+//                h_hit_time_creation_time_diff_SD[9]->Fill(part_hcalhit_timeDiff);
+//                h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
+//                if(part_hcalhit_timeDiff < 15.0)  {
+//                    h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hcalhit->getPE());
+//                    h_part_hCalhit_tdif_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//                    h_part_hCalhit_tdif_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                    h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                } else if(part_hcalhit_timeDiff > 40.0)  {
+//                    h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hcalhit->getPE());
+//                    h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//                    h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                    h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                }
+//                
+//                //protons or neutrons (nucleons) 
+//                if( pdgID==2112 or pdgID==2212 ) { 
+//                    h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                    h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
+//                            filteredSimVec[simPartNum]->getSimParticle()->getTime(),
+//                            filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                    h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                    h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
+//                            filteredSimVec[simPartNum]->getSimParticle()->getTime(),
+//                            filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                }
+//                
+//                h_PDGIDs_SD[9]->Fill(pdgID);
+//                h_PDGIDs_SD[ecal_sumESD]->Fill(pdgID);
+//    
+//                h_particle_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//    
+//                switch(pdgID) {
+//                    case 11:
+//                        h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        break;
+//                    case 22:
+//                        h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                        h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                        h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                        break;
+//                    case 2112:
+//                        h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                        h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        break;
+//                    default:
+//                        h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+//                        break;
+//                }
+//
+//            } else {
+//
+//                h_HCalhit_unmatched_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//
+//            } //matched or unmatched
+//
+//
+//        }//End loop over hcalhits array
+//
+//        // maximum PE in hcal hits for the event
+//        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
+//        h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
+//
         return;
     } //analyze
 
@@ -319,7 +260,6 @@ namespace ldmx {
 
     void HcalHitMatcher::onProcessStart() {
         
-        numHits_ = 0;
         numNonNoiseHits_ = 0;
         numMatchedHits_ = 0;
 
@@ -349,10 +289,6 @@ namespace ldmx {
                     ("Z depth of HCal hits_SD_"+range_name).c_str(),
                     ("Z depth of HCal hits_SD"+range_name+" (10mm bins)").c_str(),
                     320, 0, 3200);
-            h_ParticleHit_Distance_SD[i]=new TH1F(
-                    ("Distance between sim particle and HCal hits_SD_"+range_name).c_str(), 
-                    ("Distance between sim particle and HCal hits_SD_"+range_name+" (5mm bins)").c_str(), 
-                    400, 0, 2000);
             h_HCalhit_zbyr_SD[i]=new TH2D(
                     ("HCal hit locations_SD_"+range_name).c_str(), 
                     ("HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
@@ -472,7 +408,6 @@ namespace ldmx {
     
     void HcalHitMatcher::onProcessEnd() {
         
-        std::cout << "Total Number of Hits:     " << numHits_ << std::endl;
         std::cout << "Number of Non Noise Hits: " << numNonNoiseHits_ << std::endl;
         std::cout << "Number of Matched Hits:   " << numMatchedHits_ << std::endl;
 
