@@ -81,8 +81,11 @@ namespace ldmx {
              * Finds histogram directory and initializes all of the histograms.
              */
             virtual void onProcessStart(); 
-
-            virtual void onProcessEnd() { }
+            
+            /**
+             * Prints out totals on numbers of hcal hits.
+             */
+            virtual void onProcessEnd();
 
         private:
 	
@@ -90,6 +93,10 @@ namespace ldmx {
         	std::string HcalHitColl_; //* Name of Hcal Digis Collection
         	std::string EcalScoringPlane_; //* Name of Ecal Scoring Plane Hits Collection
         	std::string HcalScoringPlane_; //* Name of Hcal Scoring Plane Hits Collection
+            
+            unsigned long int numHits_; //* Total number of Hcal Hits
+            unsigned long int numNonNoiseHits_; //* Number of Non-Noise Hcal Hits
+            unsigned long int numMatchedHits_; //* Number of Hcal Hits matched to a sim particle
         
         	/**
              * Same histograms but limiting particles to specific energy regions

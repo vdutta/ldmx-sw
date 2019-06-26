@@ -121,9 +121,10 @@ namespace ldmx {
         float max_PE_of_event=0;
         for(int i=0; i < hcalHitColl->GetEntriesFast(); i++) { //Begin loop over hcalhits array
             ldmx::HcalHit* hcalhit = (ldmx::HcalHit*)(hcalHitColl->At(i));
-
+            numHits_++;
             if ( ! hcalhit->getNoise() ) { //Only analyze non-noise hits
-                std::cout << "    Non Noise" << std::endl; 
+
+                numNonNoiseHits_++;
                 int pdgID=0; //PDG of sim particle that matched this hit
                 int simPartNum = -1; //index of sim particle that matched this hcal hit
 
@@ -150,21 +151,20 @@ namespace ldmx {
                     } else if(new_dist < dist) {
                         dist = new_dist; //Distance to matched particle
                         simPartNum = j; //Matched particle number in array of sim particles
-                        std::cout << "      Matched particle index: " << j << std::endl;
                     }
                     
                 } //iterate over sim particles to match one to current hcal hit
-                std::cout << "    Matched sim particle to hcal hit " << simPartNum << std::endl;
+
                 //check if able to match sim particle(s) to hcal hit
                 if(simPartNum >= 0) {
                     pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
                 }
-                std::cout << "    Checked if simParticle is real" << std::endl; 
+
                 double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
                 double hcalhit_radialdist = 0;
                 if(abs(hcalhit_radialdist2) > 1e-5) //check to avoid a floating point error
                     hcalhit_radialdist = sqrt(hcalhit_radialdist2);
-                std::cout << "    Calculated radial distance of hcal hit" << std::endl;
+
                 h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                 h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
                 h_hcal_hit_time_all_SD[9]->Fill(hcalhit->getTime());
@@ -189,9 +189,10 @@ namespace ldmx {
                 
                 if(hcalhit->getPE() > max_PE_of_event)
                     max_PE_of_event=hcalhit->getPE();
-                std::cout << "    Filled histograms that dont require matching" << std::endl; 
+                
                 if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
-                    std::cout << "      Matched Hit" << std::endl;
+                
+                    numMatchedHits_++;
                     h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
                     h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
                     
@@ -244,12 +245,12 @@ namespace ldmx {
                             h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
                     }
-                    std::cout << "      Filled matched histograms" << std::endl;
+
                 } else {
-                    std::cout << "      Unmatched hit" << std::endl;
+
                     h_HCalhit_unmatched_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                     h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    std::cout << "      Filled unmatched histograms" << std::endl;
+
                 } //matched or unmatched
     
             } // if not a noise hit
@@ -310,6 +311,10 @@ namespace ldmx {
 
     void HcalHitMatcher::onProcessStart() {
         
+        numHits_ = 0;
+        numNonNoiseHits_ = 0;
+        numMatchedHits_ = 0;
+
         getHistoDirectory();
         
         std::vector<std::string> range_names(10);
@@ -445,6 +450,15 @@ namespace ldmx {
         return;
     } //onProcessStart
     
+    void HcalHitMatcher::onProcessEnd() {
+        
+        std::cout << "Total Number of Hits:     " << numHits_ << std::endl;
+        std::cout << "Number of Non Noise Hits: " << numNonNoiseHits_ << std::endl;
+        std::cout << "Number of Matched Hits:   " << numMatchedHits_ << std::endl;
+
+        return;
+    }
+
 } //ldmx namespace
 
 DECLARE_ANALYZER_NS(ldmx, HcalHitMatcher);
