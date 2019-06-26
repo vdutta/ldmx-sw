@@ -27,11 +27,11 @@ namespace ldmx {
     }
 
     void HcalHitMatcher::analyze(const ldmx::Event& event) {
-        std::cout << "In analyze" << std::endl;
+
         //----------This section obtains a list of sim particles that cross the ecal scoring plane---------->
         const TClonesArray* ecalScoringPlaneHits = event.getCollection( EcalScoringPlane_ );
         const TClonesArray* simParticles = event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
-        std::cout << "  Got ecal scoring plane hits and sim particle collections" << std::endl;
+
         std::vector<SimTrackerHit*> simVec;
         std::vector<SimTrackerHit*> filteredSimVec;//Sim particles are organized from highest to lowest momentum
     
@@ -40,9 +40,9 @@ namespace ldmx {
             simVec.push_back(ecalSPH);
         }
 
-        std::cout << "  Fill sim tracker hit vector" << std::endl;
+
         std::sort(simVec.begin(), simVec.end(), compSims);
-        std::cout << "  Sort sim vector by particle id" << std::endl; 
+
         SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
         for (int j = 0; j < simVec.size(); j++) {
             SimParticle* sP = simVec[j]->getSimParticle();
@@ -50,9 +50,9 @@ namespace ldmx {
             lastP = sP;
             filteredSimVec.push_back(simVec[j]);
         }
-        std::cout << "  Remove multiple sim hits from a single sim particle" << std::endl; 
+
         std::sort(filteredSimVec.begin(), filteredSimVec.end(), compSimsP);
-        std::cout << "  Sort filter sim hits by momentum" << std::endl; 
+
         //----------This section obtains a list of sim particles that cross the hcal scoring plane---------->
         //Currently it is NOT being used to obtain any information
 //        
@@ -84,9 +84,9 @@ namespace ldmx {
     
         //----------This section calculates the energy in the ECal---------->
         //Then uses this energy to set standard deviation range
-        std::cout << "  About to get ecal digis" << std::endl;
+
         const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
-        std::cout << "  Get ecal digis collection" << std::endl; 
+
         double e_cal_sum_energy = 0;
         for(int i=0; i < ecalHitColl->GetEntriesFast(); i++) {
             ldmx::EcalHit* ecalhit = (ldmx::EcalHit*)(ecalHitColl->At(i));
@@ -94,7 +94,7 @@ namespace ldmx {
                 e_cal_sum_energy += ecalhit->getEnergy();
             }
         }
-        std::cout << "  Calculate total energy in ecal from non noise hits" << std::endl;
+
         //Classify this event as one of the standard deviation regions
         int ecal_sumESD = 1; //Labels what approximate standard deviation range the summed ecal energy is
         if(e_cal_sum_energy<4400 && e_cal_sum_energy>3600)       ecal_sumESD=0;//Normal range (within ~1SD)
@@ -107,21 +107,21 @@ namespace ldmx {
         else if(e_cal_sum_energy<=2000 && e_cal_sum_energy>1600) ecal_sumESD=7;//super-duper low range (within -5SD to -6SD)
         else if(e_cal_sum_energy<=1600)                          ecal_sumESD=8;//mega-ultra-super-duper low range (Less than -6SD)
         else ecal_sumESD = 1;//shouldn't ever get here
-        std::cout << "  Define standard deviation range" << std::endl;
+
         //Bin event information
         h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
         h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
     
         h_total_particles_SD[9]->Fill(filteredSimVec.size());
         h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
-        std::cout << "  Filled some histograms" << std::endl;
+
         //----This section matches HCal hits to sim particles and records results----->
         const TClonesArray* hcalHitColl = event.getCollection( HcalHitColl_ );
-        std::cout << "  Get hcal digis collection" << std::endl;
+
         float max_PE_of_event=0;
         for(int i=0; i < hcalHitColl->GetEntriesFast(); i++) { //Begin loop over hcalhits array
             ldmx::HcalHit* hcalhit = (ldmx::HcalHit*)(hcalHitColl->At(i));
-            std::cout << "    " << i << " hcal hit" << std::endl;
+
             if ( ! hcalhit->getNoise() ) { //Only analyze non-noise hits
                 std::cout << "    Non Noise" << std::endl; 
                 int pdgID=0; //PDG of sim particle that matched this hit
@@ -189,7 +189,7 @@ namespace ldmx {
                 
                 if(hcalhit->getPE() > max_PE_of_event)
                     max_PE_of_event=hcalhit->getPE();
-                std::cout << "    Filled histograms that doing require matching" << std::endl; 
+                std::cout << "    Filled histograms that dont require matching" << std::endl; 
                 if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
                     std::cout << "      Matched Hit" << std::endl;
                     h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
@@ -259,7 +259,7 @@ namespace ldmx {
         // maximum PE in hcal hits for the event
         h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
         h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
-        std::cout << "End of analyze" << std::endl;
+
         return;
     } //analyze
 
