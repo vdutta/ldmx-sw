@@ -145,8 +145,9 @@ namespace ldmx {
                     h_ParticleHit_Distance_SD[9]->Fill(new_dist);
                     h_ParticleHit_Distance_SD[ecal_sumESD]->Fill(new_dist);
         
-                    if(simStart[2]<10.0 && sP->getEnergy()>3000.0) {
-                        //check if sim particle is too close to the front of the hcal
+                    if(simStart[2]<10.0 and sP->getEnergy()>3000.0) {
+                        //discarding original electron?
+                        //check if sim particle is too close to the front of the hcal?
                         //DO NOTHING (skip this sim particle)
                     } else if(new_dist < dist) {
                         dist = new_dist; //Distance to matched particle
@@ -162,8 +163,10 @@ namespace ldmx {
 
                 double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
                 double hcalhit_radialdist = 0;
-                if(abs(hcalhit_radialdist2) > 1e-5) //check to avoid a floating point error
+                //check to avoid a floating point error
+                if(abs(hcalhit_radialdist2) > 1e-5) {
                     hcalhit_radialdist = sqrt(hcalhit_radialdist2);
+                }
 
                 h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                 h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
@@ -211,8 +214,9 @@ namespace ldmx {
                         h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                         h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                     }
-        
-                    if(pdgID==2112 || pdgID==2212) { 
+                    
+                    //protons or neutrons (nucleons) 
+                    if( pdgID==2112 or pdgID==2212 ) { 
                         h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
                         h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
                                 filteredSimVec[simPartNum]->getSimParticle()->getTime(),
@@ -230,18 +234,22 @@ namespace ldmx {
                     h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
         
                     switch(pdgID) {
-                        case 11:h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                        case 11:
+                            h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
-                        case 22:h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                        case 22:
+                            h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                             h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                             h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                             break;
-                        case 2112:h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                              h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                              break;
-                        default:h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                        case 2112:
+                            h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                            h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            break;
+                        default:
+                            h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
                     }
@@ -349,26 +357,32 @@ namespace ldmx {
                     ("HCal hit locations_SD_"+range_name).c_str(), 
                     ("HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_photon_zbyr_SD[i]=new TH2D(
                     ("HCal photon hit locations_SD_"+range_name).c_str(), 
                     ("HCal photon hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_photon_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_electron_zbyr_SD[i]=new TH2D(
                     ("HCal electron hit locations_SD_"+range_name).c_str(), 
                     ("HCal electron hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_electron_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_neutron_zbyr_SD[i]=new TH2D(
                     ("HCal neutron hit locations_SD_"+range_name).c_str(), 
                     ("HCal neutron hit locations_SD"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_neutron_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_other_zbyr_SD[i]=new TH2D(
                     ("HCal other particle hit locations_SD_"+range_name).c_str(), 
                     ("HCal other particle hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_other_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_unmatched_zbyr_SD[i]=new TH2D(
                     ("HCal unmatched hit locations_SD_"+range_name).c_str(), 
                     ("HCal unmatched hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_HCalhit_unmatched_zbyr_SD[i]->SetDrawOption("colz");
             h_HCalhit_photon_energy_SD[i]=new TH1F(
                     ("HCal Photon hit Energies_SD_"+range_name).c_str(),
                     ("HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count").c_str(), 
@@ -385,10 +399,12 @@ namespace ldmx {
                     ("Nucleon time vs energy_SD_"+range_name).c_str(), 
                     ("Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)").c_str(),
                     100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
+            h_HCalhit_nucleon_time_vs_energy_SD[i]->SetDrawOption("colz");
             h_E_cal_summed_energy_SD[i]=new TH1F(
                     ("E_cal_summed_energy_SD_"+range_name).c_str(),
                     ("E_cal_summed_energy_SD_"+range_name+";Energy(MeV)(10MeV bin width);Count").c_str(),
                     800,0,8000);//10MeV bins
+            h_E_cal_summed_energy_SD[i]->SetDrawOption("colz");
             h_total_particles_SD[i]=new TH1F(
                     ("total_particles_SD_"+range_name).c_str(),
                     ("total_particles_SD_"+range_name+";Number of particles per event;Count").c_str(),
@@ -413,6 +429,7 @@ namespace ldmx {
                     ("part_hCalhit_tdif_less15_position_SD_"+range_name).c_str(),
                     ("part_hCalhit_tdif_less15_position_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
+            h_part_hCalhit_tdif_less15_position_SD[i]->SetDrawOption("colz");
             h_part_hCalhit_tdif_great40_PE_SD[i]=new TH1F(
                     ("part_hCalhit_tdif_great40_PE_SD_"+range_name).c_str(),
                     ("part_hCalhit_tdif_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
@@ -421,6 +438,7 @@ namespace ldmx {
                     ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
                     ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
                     80,0,3200,112,0,4500);
+            h_part_hCalhit_tdif_great40_position_SD[i]->SetDrawOption("colz");
             h_hCalhit_time_less15_PE_SD[i]=new TH1F(
                     ("hCalhit_time_less15_PE_SD_"+range_name).c_str(),
                     ("hCalhit_time_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
@@ -429,6 +447,7 @@ namespace ldmx {
                     ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
                     ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
                     80,0,3200,112,0,4500);
+            h_hCalhit_time_less15_position_SD[i]->SetDrawOption("colz");
             h_hCalhit_time_great40_PE_SD[i]=new TH1F(
                     ("hCalhit_time_great40_PE_SD_"+range_name).c_str(),
                     ("hCalhit_time_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
@@ -437,6 +456,7 @@ namespace ldmx {
                     ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
                     ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
                     80,0,3200,112,0,4500);
+            h_hCalhit_time_great40_position_SD[i]->SetDrawOption("colz");
             h_hcal_hits_all_PEs_SD[i]=new TH1F(
                     ("hcal_hits_all_PEs_SD_"+range_name).c_str(),
                     ("hcal_hits_all_PEs_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
