@@ -49,54 +49,74 @@ namespace ldmx {
                 ecalScoringPlaneSimParticles.push_back( sP );
             }
         }
+        // Now ecalScoringPlaneSimParticles contains a vector of SimParticles that crossed the ecal scoring plane
+    
+        //----------This section calculates the energy in the ECal----------------------------------------->
+        //Then uses this energy to set standard deviation range
+
+        const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
+
+        double e_cal_sum_energy = 0;
+        for(int i=0; i < ecalHitColl->GetEntriesFast(); i++) {
+            ldmx::EcalHit* ecalhit = (ldmx::EcalHit*)(ecalHitColl->At(i));
+            if ( ! ecalhit->isNoise() ) { //Only add non-noise hits
+                e_cal_sum_energy += ecalhit->getEnergy();
+            }
+        }
+
+        //Classify this event as one of the standard deviation regions
+        int ecal_sumESD = 0; //Labels what approximate standard deviation range the summed ecal energy is
+        if(e_cal_sum_energy<4400 && e_cal_sum_energy>3600)       ecal_sumESD=0;//Normal range (within ~1SD)
+        else if(e_cal_sum_energy>=4400 && e_cal_sum_energy<4800) ecal_sumESD=1;//High Range (within than +1SD to +2SD)
+        else if(e_cal_sum_energy<=3600 && e_cal_sum_energy>3200) ecal_sumESD=2;//low range (within -1SD to -2SD)
+        else if(e_cal_sum_energy>=4800)                          ecal_sumESD=3;//Higher Range (higher than 2SD)
+        else if(e_cal_sum_energy<=3200 && e_cal_sum_energy>2800) ecal_sumESD=4;//lower Range (within -2SD to -3SD)
+        else if(e_cal_sum_energy<=2800 && e_cal_sum_energy>2400) ecal_sumESD=5;//very low range (within -3SD to -4SD)
+        else if(e_cal_sum_energy<=2400 && e_cal_sum_energy>2000) ecal_sumESD=6;//extremely low range (within -4SD to -5SD)
+        else if(e_cal_sum_energy<=2000 && e_cal_sum_energy>1600) ecal_sumESD=7;//super-duper low range (within -5SD to -6SD)
+        else if(e_cal_sum_energy<=1600)                          ecal_sumESD=8;//mega-ultra-super-duper low range (Less than -6SD)
+        else ecal_sumESD = 0;//shouldn't ever get here
+
+        //Bin event information
+        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
+        h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
+    
+        h_total_particles_SD[9]->Fill(ecalScoringPlaneSimParticles.size());
+        h_total_particles_SD[ecal_sumESD]->Fill(ecalScoringPlaneSimParticles.size());
+
+        //----This section matches HCal hits to sim particles and records results---------------------------->
         
-        //--Now ecalScoringPlaneSimParticles contains a vector of SimParticles that crossed the ecal scoring plane ------->
-//    
-//        //----------This section calculates the energy in the ECal---------->
-//        //Then uses this energy to set standard deviation range
-//
-//        const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
-//
-//        double e_cal_sum_energy = 0;
-//        for(int i=0; i < ecalHitColl->GetEntriesFast(); i++) {
-//            ldmx::EcalHit* ecalhit = (ldmx::EcalHit*)(ecalHitColl->At(i));
-//            if ( ! ecalhit->isNoise() ) { //Only add non-noise hits
-//                e_cal_sum_energy += ecalhit->getEnergy();
-//            }
-//        }
-//
-//        //Classify this event as one of the standard deviation regions
-//        int ecal_sumESD = 1; //Labels what approximate standard deviation range the summed ecal energy is
-//        if(e_cal_sum_energy<4400 && e_cal_sum_energy>3600)       ecal_sumESD=0;//Normal range (within ~1SD)
-//        else if(e_cal_sum_energy>=4400 && e_cal_sum_energy<4800) ecal_sumESD=1;//High Range (within than +1SD to +2SD)
-//        else if(e_cal_sum_energy<=3600 && e_cal_sum_energy>3200) ecal_sumESD=2;//low range (within -1SD to -2SD)
-//        else if(e_cal_sum_energy>=4800)                          ecal_sumESD=3;//Higher Range (higher than 2SD)
-//        else if(e_cal_sum_energy<=3200 && e_cal_sum_energy>2800) ecal_sumESD=4;//lower Range (within -2SD to -3SD)
-//        else if(e_cal_sum_energy<=2800 && e_cal_sum_energy>2400) ecal_sumESD=5;//very low range (within -3SD to -4SD)
-//        else if(e_cal_sum_energy<=2400 && e_cal_sum_energy>2000) ecal_sumESD=6;//extremely low range (within -4SD to -5SD)
-//        else if(e_cal_sum_energy<=2000 && e_cal_sum_energy>1600) ecal_sumESD=7;//super-duper low range (within -5SD to -6SD)
-//        else if(e_cal_sum_energy<=1600)                          ecal_sumESD=8;//mega-ultra-super-duper low range (Less than -6SD)
-//        else ecal_sumESD = 1;//shouldn't ever get here
-//
-//        //Bin event information
-//        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
-//        h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
-//    
-//        h_total_particles_SD[9]->Fill(filteredSimVec.size());
-//        h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
-//
-//        //----This section matches HCal hits to sim particles and records results----->
-//        const TClonesArray* hcalSimHits = event.getCollection( EventConstants::HCAL_SIM_HITS , "sim" );
-//
-//        float max_PE_of_event=0;
-//        int numHcalSimHits = hcalSimHits->GetEntries();
-//        for(int iHit=0; iHit < numHcalSimHits; iHit++) {
-//            ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
-//
-//            numNonNoiseHits_++;
-//            int pdgID=0; //PDG of sim particle that matched this hit
-//            int simPartNum = -1; //index of sim particle that matched this hcal hit
-//
+        const TClonesArray* hcalSimHits = event.getCollection( EventConstants::HCAL_SIM_HITS , "sim" );
+
+        float max_PE_of_event=0;
+        int numHcalSimHits = hcalSimHits->GetEntries();
+        for(int iHit=0; iHit < numHcalSimHits; iHit++) {
+            ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
+
+            numNonNoiseHits_++;
+            
+            bool matched = false; //bool check if found responsible sim particle
+            ldmx::SimParticle* responsibleSimParticle = nullptr; //sim particle responsible for hit
+            int numContribs = hcalhit->getNumberOfContribs();
+            for ( int iCon = 0; iCon < numContribs; iCon++ ) {
+                responsibleSimParticle = (hcalhit->getContrib( iCon )).particle;
+
+                for ( int iPart = 0; iPart < ecalScoringPlaneSimParticles.size(); iPart++ ) {
+                    
+                    if ( responsibleSimParticle == ecalScoringPlaneSimParticles.at(iPart) ) {
+                        //same sim particle
+                        matched = true;
+                        break;
+                    }
+
+                    if ( matched ) {
+                        //already matched a sim particle
+                        break;
+                    }
+
+                } //iPart: iterate through scoring plane particles to attempt to find a match
+            } //iCon: iterate through contributions to this hit
+
 //            //check if able to match sim particle(s) to hcal hit
 //            if(simPartNum >= 0) {
 //                pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
@@ -204,7 +224,7 @@ namespace ldmx {
 //            } //matched or unmatched
 //
 //
-//        }//End loop over hcalhits array
+        }//End loop over hcalhits array
 //
 //        // maximum PE in hcal hits for the event
 //        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
