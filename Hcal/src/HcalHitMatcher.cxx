@@ -44,7 +44,11 @@ namespace ldmx {
         //skip repeat sim particles (sometimes they create multiple hits)
         for (int j = 0; j < ecalScoringPlaneHits_sorted.size(); j++) {
             ldmx::SimParticle* sP = ecalScoringPlaneHits_sorted.at(j)->getSimParticle();
-            if ( ecalScoringPlaneSimParticles.empty() or sP != ecalScoringPlaneSimParticles.back() ) {
+            if ( 
+                 !(sP->getPdgID() == 11 and (sP->getVertex()).at(2) < 0.0 ) and //not the original electron
+                 (ecalScoringPlaneSimParticles.empty() or               //list is empty
+                  sP != ecalScoringPlaneSimParticles.back())            //last sim particle added is different
+               ) {
                 //sim particle hasn't already been listed
                 ecalScoringPlaneSimParticles.push_back( sP );
             }
@@ -100,22 +104,25 @@ namespace ldmx {
             int numContribs = hcalhit->getNumberOfContribs();
             for ( int iCon = 0; iCon < numContribs; iCon++ ) {
                 responsibleSimParticle = (hcalhit->getContrib( iCon )).particle;
-
+                responsibleSimParticle->Print();
                 for ( int iPart = 0; iPart < ecalScoringPlaneSimParticles.size(); iPart++ ) {
                     
                     if ( responsibleSimParticle == ecalScoringPlaneSimParticles.at(iPart) ) {
                         //same sim particle
-                        matched = true;
-                        break;
-                    }
-
-                    if ( matched ) {
-                        //already matched a sim particle
+                        //matched = true;
                         break;
                     }
 
                 } //iPart: iterate through scoring plane particles to attempt to find a match
+
+                if ( matched ) {
+                    //already matched a sim particle
+                    break;
+                }
+
             } //iCon: iterate through contributions to this hit
+
+            responsibleSimParticle->Print();
 
 //            //check if able to match sim particle(s) to hcal hit
 //            if(simPartNum >= 0) {
