@@ -45,8 +45,6 @@ namespace ldmx {
             /**
              * Gets strings from ParameterSet class for collection names.
              * Collection strings that are searched for:
-             *      caloHitCollection_e (collection of ecal hits)
-             *      caloHitCollection_h (collection of hcal hits)
              *      scoringPlaneHits_e (collection of ecal hits that crossed ecal scoring plane)
              *      scoringPlaneHits_h (collection of hcal hits that cross hcal scoring plane)
              */
@@ -88,7 +86,10 @@ namespace ldmx {
 
         private:
 	
-        	std::string caloCol_e, caloCol_h, scoringPlane_e, scoringPlane_h; //scoringPlane_;
+        	std::string EcalHitColl_; //* Name of Ecal Digis Collection
+        	std::string HcalHitColl_; //* Name of Hcal Digis Collection
+        	std::string EcalScoringPlane_; //* Name of Ecal Scoring Plane Hits Collection
+        	std::string HcalScoringPlane_; //* Name of Hcal Scoring Plane Hits Collection
         
         	/**
              * Same histograms but limiting particles to specific energy regions
