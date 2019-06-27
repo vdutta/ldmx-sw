@@ -96,7 +96,8 @@ namespace ldmx {
         	std::string HcalScoringPlane_; //* Name of Hcal Scoring Plane Hits Collection
             
             unsigned long int numNonNoiseHits_; //* Number of Non-Noise Hcal Hits
-            unsigned long int numMatchedHits_; //* Number of Hcal Hits matched to a sim particle
+            unsigned long int numMatchedHits_; //* Number of Hcal Hits matched to a sim particle (excluding original electron)
+            unsigned long int numOrigElectronHits_; //* Number of Hcal Hits matched to the original electron
         
         	/**
              * Same histograms but limiting particles to specific energy regions

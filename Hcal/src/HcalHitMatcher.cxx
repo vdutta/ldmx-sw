@@ -42,13 +42,16 @@ namespace ldmx {
         std::sort(ecalScoringPlaneHits_sorted.begin(), ecalScoringPlaneHits_sorted.end(), compSims);
 
         //skip repeat sim particles (sometimes they create multiple hits)
+        ldmx::SimParticle* originalElectron = nullptr;
         for (int j = 0; j < ecalScoringPlaneHits_sorted.size(); j++) {
             ldmx::SimParticle* sP = ecalScoringPlaneHits_sorted.at(j)->getSimParticle();
-            if ( 
-                 !(sP->getPdgID() == 11 and (sP->getVertex()).at(2) < 0.0 ) and //not the original electron
-                 (ecalScoringPlaneSimParticles.empty() or               //list is empty
-                  sP != ecalScoringPlaneSimParticles.back())            //last sim particle added is different
-               ) {
+            if ( sP->getPdgID() == 11 and (sP->getVertex()).at(2) < 0.0 ) {
+                //original electron - skip it
+                originalElectron = sP;
+            } else if ( 
+                 ecalScoringPlaneSimParticles.empty() or               //list is empty
+                 sP != ecalScoringPlaneSimParticles.back()            //last sim particle added is different
+                      ) {
                 //sim particle hasn't already been listed
                 ecalScoringPlaneSimParticles.push_back( sP );
             }
@@ -94,6 +97,7 @@ namespace ldmx {
 
         float max_PE_of_event=0;
         int numHcalSimHits = hcalSimHits->GetEntries();
+        std::cout << "Num Hcal Hits: " << numHcalSimHits << std::endl;
         for(int iHit=0; iHit < numHcalSimHits; iHit++) {
             ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
 
@@ -102,33 +106,33 @@ namespace ldmx {
             bool matched = false; //bool check if found responsible sim particle
             ldmx::SimParticle* responsibleSimParticle = nullptr; //sim particle responsible for hit
             int numContribs = hcalhit->getNumberOfContribs();
+            std::cout << "  Num Contributors: " << numContribs << std::endl;
             for ( int iCon = 0; iCon < numContribs; iCon++ ) {
-                responsibleSimParticle = (hcalhit->getContrib( iCon )).particle;
-                responsibleSimParticle->Print();
-                for ( int iPart = 0; iPart < ecalScoringPlaneSimParticles.size(); iPart++ ) {
-                    
-                    if ( responsibleSimParticle == ecalScoringPlaneSimParticles.at(iPart) ) {
-                        //same sim particle
-                        //matched = true;
-                        break;
-                    }
+                ldmx::SimParticle* contributor = (hcalhit->getContrib( iCon )).particle;
+                
+                if ( contributor == originalElectron ) {
+                    //contributor is original electron
+                    numOrigElectronHits_++;
+                } else {
+                    for ( int iPart = 0; iPart < ecalScoringPlaneSimParticles.size(); iPart++ ) {
+                        
+                        if ( contributor == ecalScoringPlaneSimParticles.at(iPart) ) {
+                            //same sim particle
+                            matched = true;
+                            responsibleSimParticle = contributor;
+                            numMatchedHits_++;
+                            break;
+                        } //check if contributor is in list of ecal scoring plane hits
+    
+                    } //iPart: iterate through scoring plane particles to attempt to find a match
+                } //check if contributor is original electron
 
-                } //iPart: iterate through scoring plane particles to attempt to find a match
-
-                if ( matched ) {
-                    //already matched a sim particle
-                    break;
-                }
+                //exit loop if already matched a sim particle
+                if ( matched ) { break; }
 
             } //iCon: iterate through contributions to this hit
 
-            responsibleSimParticle->Print();
 
-//            //check if able to match sim particle(s) to hcal hit
-//            if(simPartNum >= 0) {
-//                pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
-//            }
-//
 //            double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
 //            double hcalhit_radialdist = 0;
 //            //check to avoid a floating point error
@@ -161,10 +165,8 @@ namespace ldmx {
 //            if(hcalhit->getPE() > max_PE_of_event)
 //                max_PE_of_event=hcalhit->getPE();
 //
-//            bool matched = false;
-//            if( matched ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
+//            if( matched ) {
 //            
-//                numMatchedHits_++;
 //                h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
 //                h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
 //                
@@ -289,6 +291,7 @@ namespace ldmx {
         
         numNonNoiseHits_ = 0;
         numMatchedHits_ = 0;
+        numOrigElectronHits_ = 0;
 
         getHistoDirectory();
         
@@ -435,8 +438,11 @@ namespace ldmx {
     
     void HcalHitMatcher::onProcessEnd() {
         
-        std::cout << "Number of Non Noise Hits: " << numNonNoiseHits_ << std::endl;
-        std::cout << "Number of Matched Hits:   " << numMatchedHits_ << std::endl;
+        std::cout << "Number of Non Noise Hits:           " << numNonNoiseHits_ << std::endl;
+        std::cout << "Number of Matched Hits (no OG e):   " << numMatchedHits_ << std::endl;
+        std::cout << "Number of Original Electron Hits:   " << numOrigElectronHits_ << std::endl;
+        std::cout << "Number of Unassigned Hits:          "; 
+        std::cout << numNonNoiseHits_ - (numMatchedHits_ + numOrigElectronHits_) << std::endl;
 
         return;
     }
