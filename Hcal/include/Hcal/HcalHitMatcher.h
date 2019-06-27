@@ -99,45 +99,39 @@ namespace ldmx {
              * These energy regions are specific ranges of standard deviations of the 
              * total particle energy histogram.
              * These ranges are approximate.
-             *  Index   Range in Standard Deviations
-             *  0       (-1,+1)
-             *  1       [+1,+2)
-             *  2       (-2,-1]
-             *  3       [+2,inf)
-             *  4       (-3,-2]
-             *  5       (-4,-3]
-             *  6       (-5,-4]
-             *  7       (-6,-5]
-             *  8       (-inf,-6]
-             *  9       (-inf,inf) - all events
+             *  Index   Range Name  Range in Standard Deviations
+             *  0       ALL         (-inf,+inf)
+             *  1       HI          (+1,+inf)
+             *  2       MID         [-1,+1]
+             *  3       LOW         (-inf,-1)
              */
-        	TH1* h_PDGIDs_SD[10];
-        	TH1* h_ZdepthofHCalHit_SD[10];
-        	TH2D* h_HCalhit_zbyr_SD[10];
-        	TH2D* h_HCalhit_photon_zbyr_SD[10];
-        	TH2D* h_HCalhit_electron_zbyr_SD[10];
-        	TH2D* h_HCalhit_neutron_zbyr_SD[10];
-        	TH2D* h_HCalhit_other_zbyr_SD[10];
-        	TH2D* h_HCalhit_unmatched_zbyr_SD[10];
-        	TH1* h_HCalhit_photon_energy_SD[10];
-        	TH1* h_HCalhit_getTime_SD[10];
-        	TH1* h_HCalhit_getTime_nucleons_SD[10];
-        	TH2D* h_HCalhit_nucleon_time_vs_energy_SD[10];
-        	TH1F* h_E_cal_summed_energy_SD[10];
-        	TH1F* h_total_particles_SD[10];
-        	TH1F* h_particle_energy_SD[10];
-        	TH1F* h_hcal_hit_time_all_SD[10];
-        	TH1F* h_hit_time_creation_time_diff_SD[10];
-        	TH1F* h_part_hCalhit_tdif_less15_PE_SD[10];
-        	TH2D* h_part_hCalhit_tdif_less15_position_SD[10];
-        	TH1F* h_part_hCalhit_tdif_great40_PE_SD[10];
-        	TH2D* h_part_hCalhit_tdif_great40_position_SD[10];
-        	TH1F* h_hCalhit_time_less15_PE_SD[10];
-        	TH2D* h_hCalhit_time_less15_position_SD[10];
-        	TH1F* h_hCalhit_time_great40_PE_SD[10];
-        	TH2D* h_hCalhit_time_great40_position_SD[10];
-        	TH1F* h_hcal_hits_all_PEs_SD[10];
-        	TH1F* h_hcal_hits_max_PE_of_event_SD[10];
+        	TH1* h_PDGIDs_SD[4];
+        	TH1* h_ZdepthofHCalHit_SD[4];
+        	TH2D* h_HCalhit_zbyr_SD[4];
+        	TH2D* h_HCalhit_photon_zbyr_SD[4];
+        	TH2D* h_HCalhit_electron_zbyr_SD[4];
+        	TH2D* h_HCalhit_neutron_zbyr_SD[4];
+        	TH2D* h_HCalhit_other_zbyr_SD[4];
+        	TH2D* h_HCalhit_unmatched_zbyr_SD[4];
+        	TH1* h_HCalhit_photon_energy_SD[4];
+        	TH1* h_HCalhit_getTime_SD[4];
+        	TH1* h_HCalhit_getTime_nucleons_SD[4];
+        	TH2D* h_HCalhit_nucleon_time_vs_energy_SD[4];
+        	TH1F* h_E_cal_summed_energy_SD[4];
+        	TH1F* h_total_particles_SD[4];
+        	TH1F* h_particle_energy_SD[4];
+        	TH1F* h_hcal_hit_time_all_SD[4];
+        	TH1F* h_hit_time_creation_time_diff_SD[4];
+        	TH1F* h_part_hCalhit_tdif_less15_PE_SD[4];
+        	TH2D* h_part_hCalhit_tdif_less15_position_SD[4];
+        	TH1F* h_part_hCalhit_tdif_great40_PE_SD[4];
+        	TH2D* h_part_hCalhit_tdif_great40_position_SD[4];
+        	TH1F* h_hCalhit_time_less15_PE_SD[4];
+        	TH2D* h_hCalhit_time_less15_position_SD[4];
+        	TH1F* h_hCalhit_time_great40_PE_SD[4];
+        	TH2D* h_hCalhit_time_great40_position_SD[4];
+        	TH1F* h_hcal_hits_all_PEs_SD[4];
+        	TH1F* h_hcal_hits_max_PE_of_event_SD[4];
 
 	};
 }
