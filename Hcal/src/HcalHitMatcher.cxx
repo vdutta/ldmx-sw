@@ -26,7 +26,7 @@ namespace ldmx {
 
     void HcalHitMatcher::analyze(const ldmx::Event& event) {
 
-        //----------This section obtains a list of sim particles that cross the ecal scoring plane---------->
+        //----------This section obtains a list of sim particles that cross the ecal scoring plane----------->
         const TClonesArray* ecalScoringPlaneHits = event.getCollection( EcalScoringPlane_ );
         const TClonesArray* simParticles = event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
 
@@ -58,7 +58,7 @@ namespace ldmx {
         }
         // Now ecalScoringPlaneSimParticles contains a vector of SimParticles that crossed the ecal scoring plane
     
-        //----------This section calculates the energy in the ECal----------------------------------------->
+        //----------This section calculates the energy in the ECal------------------------------------------->
         //Then uses this energy to set standard deviation range
 
         const TClonesArray* ecalHitColl = event.getCollection( EcalHitColl_ ); 
@@ -107,7 +107,7 @@ namespace ldmx {
             float hitEDep = hcalhit->getEdep();
             float hitTime = hcalhit->getTime();
 
-            //------Fill Histograms with Hcal Hit information ------------------------------------->
+            //------Fill Histograms with Hcal Hit information ----------------------------------------------->
 
             h_ZdepthofHCalHit_SD[9]->Fill( hitZ );
             h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill( hitZ );
@@ -144,9 +144,9 @@ namespace ldmx {
 //            if(hcalhit->getPE() > max_PE_of_event)
 //                max_PE_of_event=hcalhit->getPE();
 
-            //------Find a Sim Particle that caused this hit -------------------------------------->
+            //------Find a Sim Particle that caused this hit ------------------------------------------------>
             
-            bool matched = false; //bool check if found responsible sim particle
+            bool isOrigElectron = false;
             ldmx::SimParticle* responsibleSimParticle = nullptr; //sim particle responsible for hit
             int numContribs = hcalhit->getNumberOfContribs();
             for ( int iCon = 0; iCon < numContribs; iCon++ ) {
@@ -154,13 +154,14 @@ namespace ldmx {
                 
                 if ( contributor == originalElectron ) {
                     //contributor is original electron
+                    isOrigElectron = true;
+                    responsibleSimParticle = originalElectron;
                     numOrigElectronHits_++;
                 } else {
                     for ( int iPart = 0; iPart < ecalScoringPlaneSimParticles.size(); iPart++ ) {
                         
                         if ( contributor == ecalScoringPlaneSimParticles.at(iPart) ) {
                             //same sim particle
-                            matched = true;
                             responsibleSimParticle = contributor;
                             numMatchedHits_++;
                             break;
@@ -170,16 +171,18 @@ namespace ldmx {
                 } //check if contributor is original electron
 
                 //exit loop if already matched a sim particle
-                if ( matched ) { break; }
+                if ( responsibleSimParticle ) { break; }
 
             } //iCon: iterate through contributions to this hit
+            //responsibleSimParticle points to the Sim Particle that caused the hcal hit (if found)
 
-            // responsibleSimParticle points to the Sim Particle that caused the hcal hit (if found)
+            //------Fill Histograms with SimParticle information for matched hit ---------------------------->
 
-            //------Fill Histograms with SimParticle information for matched hit ------------------>
-
-            if( matched ) {
-                
+            if ( responsibleSimParticle and isOrigElectron ) {
+                //original electron caused this hit
+                //DO NOTHING (for now)
+            } else if ( responsibleSimParticle ) {
+                //found particle and it is not original electron
                 //get sim particle info
                 double particleTime = responsibleSimParticle->getTime();
                 int particlePDG = responsibleSimParticle->getPdgID();
@@ -238,7 +241,7 @@ namespace ldmx {
                 }
 
             } else {
-
+                //Did not find particle matched to this hit
                 h_HCalhit_unmatched_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist);
                 h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist);
 
