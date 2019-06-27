@@ -69,11 +69,6 @@ namespace ldmx {
              */
     	    static bool compSims(const SimTrackerHit* a, const SimTrackerHit* b); 
     
-            /**
-             * Calculate the distance between the line segment from v to w and the point p.
-             */
-    	    double point_line_distance(TVector3 v, TVector3 w, TVector3 p);
-    
     	    virtual void onFileOpen() { }
 
             virtual void onFileClose() { }

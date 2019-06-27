@@ -277,31 +277,6 @@ namespace ldmx {
         }
     }
 
-    //This function finds the minimum distance between a line segment and a point in 3D space
-    double HcalHitMatcher::point_line_distance(TVector3 v, TVector3 w, TVector3 p)  {
-        
-        //Define 2 line segments from point v to w and from point v to p
-        TVector3 vw = TVector3(w.x()-v.x(), w.y()-v.y(), w.z()-v.z());
-        TVector3 vp = TVector3(v.x()-p.x(), v.y()-p.y(), v.z()-p.z());
-    
-        //Define both line segment's magnitude squared
-        const double L2vw = pow(vw.Mag(), 2);
-        const double L2vp = pow(vp.Mag(), 2);
-    
-        //Define a parameter t clamped between 0 and 1 so that the distance is never measured from 
-        //beyond the endpoints of the line segment
-        const double t = std::max(0.0, -1*vp.Dot(vw)/L2vw);//std::max(0.0, std::min(1.0, -1*vp.Dot(vw)/L2vw));
-    
-        //Calculate the minimum distance squared
-        double d2 = L2vp + 2.0*t*vp.Dot(vw) + pow(t,2)*L2vw;
-    
-        //Return minimum distance and catch floating point errors near zero
-        if(abs(d2) < 1e-5)
-            return 0;
-        else
-            return sqrt(d2);
-    }
-
     void HcalHitMatcher::onProcessStart() {
         
         numNonNoiseHits_ = 0;
