@@ -97,7 +97,6 @@ namespace ldmx {
 
         float max_PE_of_event=0;
         int numHcalSimHits = hcalSimHits->GetEntries();
-        std::cout << "Num Hcal Hits: " << numHcalSimHits << std::endl;
         for(int iHit=0; iHit < numHcalSimHits; iHit++) {
             ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
 
@@ -106,7 +105,6 @@ namespace ldmx {
             bool matched = false; //bool check if found responsible sim particle
             ldmx::SimParticle* responsibleSimParticle = nullptr; //sim particle responsible for hit
             int numContribs = hcalhit->getNumberOfContribs();
-            std::cout << "  Num Contributors: " << numContribs << std::endl;
             for ( int iCon = 0; iCon < numContribs; iCon++ ) {
                 ldmx::SimParticle* contributor = (hcalhit->getContrib( iCon )).particle;
                 
