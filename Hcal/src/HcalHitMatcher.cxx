@@ -98,9 +98,53 @@ namespace ldmx {
         float max_PE_of_event=0;
         int numHcalSimHits = hcalSimHits->GetEntries();
         for(int iHit=0; iHit < numHcalSimHits; iHit++) {
-            ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
-
             numNonNoiseHits_++;
+
+            // get hit information for histograms
+            ldmx::SimCalorimeterHit* hcalhit = (ldmx::SimCalorimeterHit*)(hcalSimHits->At(iHit));
+            std::vector<float> hitPosition = hcalhit->getPosition();
+            float hitZ = hitPosition.at(2);
+            float hitEDep = hcalhit->getEdep();
+            float hitTime = hcalhit->getTime();
+
+            //------Fill Histograms with Hcal Hit information ------------------------------------->
+
+            h_ZdepthofHCalHit_SD[9]->Fill( hitZ );
+            h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill( hitZ );
+
+            h_hcal_hit_time_all_SD[9]->Fill( hitTime );
+            h_hcal_hit_time_all_SD[ecal_sumESD]->Fill( hitTime );
+
+            double hcalhit_radialdist2 = pow(hitPosition.at(0), 2) + pow(hitPosition.at(1), 2);
+            double hcalhit_radialdist = 0;
+            //check to avoid a floating point error
+            if(abs(hcalhit_radialdist2) > 1e-5) {
+                hcalhit_radialdist = sqrt(hcalhit_radialdist2);
+            }
+
+            h_HCalhit_zbyr_SD[9]->Fill( hitZ, hcalhit_radialdist );
+            h_HCalhit_zbyr_SD[ecal_sumESD]->Fill( hitZ , hcalhit_radialdist );
+            
+            if(hcalhit->getTime() < 15.0)  {
+//                h_hCalhit_time_less15_PE_SD[9]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                h_hCalhit_time_less15_position_SD[9]->Fill( hitZ , hcalhit_radialdist );
+                h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill( hitZ , hcalhit_radialdist );
+            } else if(hcalhit->getTime() > 40.0)  {
+//                h_hCalhit_time_great40_PE_SD[9]->Fill(hcalhit->getPE());
+//                h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                h_hCalhit_time_great40_position_SD[9]->Fill( hitZ , hcalhit_radialdist );
+                h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill( hitZ , hcalhit_radialdist );
+            }
+
+            //SimCalorimeterHit does not have the PE deposited in the Hcal, that is determined by HcalDigiProducer
+            //when making the HcalHits from the SimCalorimeterHits
+//            h_hcal_hits_all_PEs_SD[9]->Fill(hcalhit->getPE());
+//            h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+//            if(hcalhit->getPE() > max_PE_of_event)
+//                max_PE_of_event=hcalhit->getPE();
+
+            //------Find a Sim Particle that caused this hit -------------------------------------->
             
             bool matched = false; //bool check if found responsible sim particle
             ldmx::SimParticle* responsibleSimParticle = nullptr; //sim particle responsible for hit
@@ -130,113 +174,83 @@ namespace ldmx {
 
             } //iCon: iterate through contributions to this hit
 
+            // responsibleSimParticle points to the Sim Particle that caused the hcal hit (if found)
 
-//            double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
-//            double hcalhit_radialdist = 0;
-//            //check to avoid a floating point error
-//            if(abs(hcalhit_radialdist2) > 1e-5) {
-//                hcalhit_radialdist = sqrt(hcalhit_radialdist2);
-//            }
-//
-//            h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//            h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
-//            h_hcal_hit_time_all_SD[9]->Fill(hcalhit->getTime());
-//            h_hcal_hits_all_PEs_SD[9]->Fill(hcalhit->getPE());
-//            
-//            h_HCalhit_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//            h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill(hcalhit->getZ());
-//            h_hcal_hit_time_all_SD[ecal_sumESD]->Fill(hcalhit->getTime());
-//            h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-//            
-//            if(hcalhit->getTime() < 15.0)  {
-//                h_hCalhit_time_less15_PE_SD[9]->Fill(hcalhit->getPE());
-//                h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-//                h_hCalhit_time_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//            } else if(hcalhit->getTime() > 40.0)  {
-//                h_hCalhit_time_great40_PE_SD[9]->Fill(hcalhit->getPE());
-//                h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-//                h_hCalhit_time_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//            }
-//            
-//            if(hcalhit->getPE() > max_PE_of_event)
-//                max_PE_of_event=hcalhit->getPE();
-//
-//            if( matched ) {
-//            
-//                h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
-//                h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
-//                
-//                double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
-//                
-//                h_hit_time_creation_time_diff_SD[9]->Fill(part_hcalhit_timeDiff);
-//                h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
-//                if(part_hcalhit_timeDiff < 15.0)  {
+            //------Fill Histograms with SimParticle information for matched hit ------------------>
+
+            if( matched ) {
+                
+                //get sim particle info
+                double particleTime = responsibleSimParticle->getTime();
+                int particlePDG = responsibleSimParticle->getPdgID();
+                double particleEnergy = responsibleSimParticle->getEnergy();
+                
+                double part_hcalhit_timeDiff = hitTime - particleTime;
+                
+                h_hit_time_creation_time_diff_SD[9]->Fill( part_hcalhit_timeDiff );
+                h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill( part_hcalhit_timeDiff );
+                if(part_hcalhit_timeDiff < 15.0)  {
 //                    h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hcalhit->getPE());
 //                    h_part_hCalhit_tdif_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-//                    h_part_hCalhit_tdif_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                    h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                } else if(part_hcalhit_timeDiff > 40.0)  {
+                    h_part_hCalhit_tdif_less15_position_SD[9]->Fill( hitZ , hcalhit_radialdist );
+                    h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill( hitZ , hcalhit_radialdist );
+                } else if(part_hcalhit_timeDiff > 40.0)  {
 //                    h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hcalhit->getPE());
 //                    h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-//                    h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                    h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                }
-//                
-//                //protons or neutrons (nucleons) 
-//                if( pdgID==2112 or pdgID==2212 ) { 
-//                    h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-//                    h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
-//                            filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-//                            filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                    h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-//                    h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
-//                            filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-//                            filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                }
-//                
-//                h_PDGIDs_SD[9]->Fill(pdgID);
-//                h_PDGIDs_SD[ecal_sumESD]->Fill(pdgID);
-//    
-//                h_particle_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//    
-//                switch(pdgID) {
-//                    case 11:
-//                        h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        break;
-//                    case 22:
-//                        h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                        h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                        h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                        break;
-//                    case 2112:
-//                        h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                        h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        break;
-//                    default:
-//                        h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-//                        break;
-//                }
-//
-//            } else {
-//
-//                h_HCalhit_unmatched_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//
-//            } //matched or unmatched
-//
-//
+                    h_part_hCalhit_tdif_great40_position_SD[9]->Fill( hitZ , hcalhit_radialdist );
+                    h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill( hitZ , hcalhit_radialdist );
+                }
+                
+                //protons or neutrons (nucleons) 
+                if( particlePDG==2112 or particlePDG==2212 ) { 
+                    h_HCalhit_getTime_nucleons_SD[9]->Fill( particleTime );
+                    h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill( particleTime );
+
+                    h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill( particleTime , particleEnergy );
+                    h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill( particleTime , particleEnergy );
+                }
+                
+                h_PDGIDs_SD[9]->Fill( particlePDG );
+                h_PDGIDs_SD[ecal_sumESD]->Fill( particlePDG );
+    
+                h_particle_energy_SD[9]->Fill( particleEnergy );
+                h_particle_energy_SD[ecal_sumESD]->Fill( particleEnergy );
+    
+                switch(particlePDG) {
+                    case 11:
+                        h_HCalhit_electron_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist); 
+                        h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist); 
+                        break;
+                    case 22:
+                        h_HCalhit_photon_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist); 
+                        h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist);
+                        h_HCalhit_photon_energy_SD[9]->Fill( particleEnergy );
+                        h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill( particleEnergy );
+                        break;
+                    case 2112:
+                        h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist);
+                        h_HCalhit_neutron_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist); 
+                        break;
+                    default:
+                        h_HCalhit_other_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist); 
+                        h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist); 
+                        break;
+                }
+
+            } else {
+
+                h_HCalhit_unmatched_zbyr_SD[9]->Fill(hitZ, hcalhit_radialdist);
+                h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hitZ, hcalhit_radialdist);
+
+            } //matched or unmatched
+
+
         }//End loop over hcalhits array
-//
+
 //        // maximum PE in hcal hits for the event
 //        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
 //        h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
-//
+
         return;
     } //analyze
 
