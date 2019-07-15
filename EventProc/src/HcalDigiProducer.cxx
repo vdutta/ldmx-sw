@@ -157,7 +157,9 @@ namespace ldmx {
             int cur_subsection = curDetId->getFieldValue("section");            
             int cur_layer      = curDetId->getFieldValue("layer");
             int cur_strip      = curDetId->getFieldValue("strip");
-            float cur_xpos, cur_ypos; 
+            float smeared_x = hcalXpos[detIDraw];
+            float smeared_y = hcalYpos[detIDraw];
+            float smeared_z = hcalZpos[detIDraw];
 
             if (cur_subsection != 0){ // for sidecal don't worry about attenuation because it's single readout
                 hcalLayerPEs[detIDraw] = random_->Poisson(meanPE+meanNoise_);
@@ -168,10 +170,10 @@ namespace ldmx {
                 float total_width = STRIPS_BACK_PER_LAYER_*50.0;
                 float distance_along_bar = 0;
                 if (cur_layer % 2 == 0){
-                    distance_along_bar = fabs(cur_ypos);
+                    distance_along_bar = fabs(smeared_y);
                 }
                 if (cur_layer % 2 == 1){
-                    distance_along_bar = fabs(cur_xpos);
+                    distance_along_bar = fabs(smeared_x);
                 }
                 float meanPE_close = meanPE * exp( -1. * ((total_width/2. - distance_along_bar) / 1000.) / strip_attenuation_length_ );
                 float meanPE_far   = meanPE * exp( -1. * ((total_width/2. + distance_along_bar) / 1000.) / strip_attenuation_length_ );
@@ -187,17 +189,17 @@ namespace ldmx {
                 float total_super_strips = STRIPS_BACK_PER_LAYER_/SUPER_STRIP_SIZE_; // to help the integer round up
                 float total_width = STRIPS_BACK_PER_LAYER_*50.0;
                 if (cur_layer % 2 == 0){ // even layers, vertical
-                    cur_xpos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
-                    cur_ypos = hcalYpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
+                    smeared_x = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
+                    smeared_y = hcalYpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
                 }
                 if (cur_layer % 2 == 1){ // odd layers, horizontal
-                    cur_ypos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
-                    cur_xpos = hcalXpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
+                    smeared_y = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
+                    smeared_x = hcalXpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
                 }
-                if (cur_xpos > total_width/2.) cur_xpos = total_width/2.;
-                if (cur_xpos < -1.*total_width/2.) cur_xpos = -1.*total_width/2.;
-                if (cur_ypos > total_width/2.) cur_ypos = total_width/2.;
-                if (cur_ypos < -1.*total_width/2.) cur_ypos = -1.*total_width/2.;
+                if (smeared_x > total_width/2.) smeared_x = total_width/2.;
+                if (smeared_x < -1.*total_width/2.) smeared_x = -1.*total_width/2.;
+                if (smeared_y > total_width/2.) smeared_y = total_width/2.;
+                if (smeared_y < -1.*total_width/2.) smeared_y = -1.*total_width/2.;
                 // std::cout << "super_strip_width = " << super_strip_width << "\t total_super_strips = " << total_super_strips << "\t total_width = " << total_width << std::endl;
             }
 
@@ -211,11 +213,9 @@ namespace ldmx {
                 hit->setAmplitude(hcalLayerPEs[detIDraw]);
                 hit->setEnergy(energy);
                 hit->setTime(hcaldetIDTime[detIDraw]);
-                // hit->setXpos(hcalXpos[detIDraw]);
-                // hit->setYpos(hcalYpos[detIDraw]);
-                hit->setXpos(cur_xpos); // quantized and smeared positions
-                hit->setYpos(cur_ypos); // quantized and smeared positions
-                hit->setZpos(hcalZpos[detIDraw]);
+                hit->setXpos(smeared_x); // quantized and smeared positions (depends on side or back hcal)
+                hit->setYpos(smeared_y); // quantized and smeared positions
+                hit->setZpos(smeared_z);// quantized and smeared positions
                 hit->setNoise(false);
                 ihit++;
                 
