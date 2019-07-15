@@ -55,7 +55,10 @@ int main(int nargs, const char** )  {
     //Export geometry to new file
     //  Separate parser to force all geometries written to one file
     G4GDMLParser write_parser;
-    write_parser.Write( "TGeofriend_detector.gdml" , worldVol );
+    write_parser.Write( 
+            "TGeofriend_detector.gdml" , 
+            worldVol 
+            );
 
     return 0;
 }
