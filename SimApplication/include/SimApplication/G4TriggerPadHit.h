@@ -196,8 +196,8 @@ namespace ldmx {
             }
 
             /**
-             * Get the global time.
-             * @return The global time.
+             * Get the global time [ns].
+             * @return The global time [ns].
              */
             float getTime() {
                 return time_;
@@ -205,7 +205,7 @@ namespace ldmx {
 
             /**
              * Set the global time.
-             * @param time The global time.
+             * @param time The global time [ns].
              */
             void setTime(float time) {
                 this->time_ = time;

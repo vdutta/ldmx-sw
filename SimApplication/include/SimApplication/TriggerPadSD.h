@@ -25,7 +25,7 @@ namespace ldmx {
      *
      * @todo Add actual custom hit processing for Trigger scintillator pad detector.
      */
-    class TriggerPadSD : public CalorimeterSD {
+  class TriggerPadSD : public CalorimeterSD { // public G4VSensitiveDetector { 
 
         public:
 
@@ -60,6 +60,12 @@ namespace ldmx {
 	   * @param hcEvent The hits collections of the event.
 	   */
 	  void Initialize(G4HCofThisEvent* hcEvent);
+
+	  /**                                                                                                                                                                               
+	   * End of event hook.                                                                                                                                                             
+	   * @param hcEvent The hits collections of the event.                                                                                                                              
+	   */
+	  void EndOfEvent(G4HCofThisEvent* hcEvent);
 
 
     };

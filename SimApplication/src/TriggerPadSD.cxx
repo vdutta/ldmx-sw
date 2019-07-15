@@ -16,7 +16,8 @@
 namespace ldmx {
 
     TriggerPadSD::TriggerPadSD(G4String name, G4String theCollectionName, int subdetID, DetectorID* detID) :
-            CalorimeterSD(name, theCollectionName, subdetID, detID),
+      //      G4SensitiveDetector(name, theCollectionName, subdetID, detID),// 
+      CalorimeterSD(name, theCollectionName, subdetID, detID),
             birksc1_(1.29e-2),
             birksc2_(9.59e-6)
     {
@@ -25,6 +26,12 @@ namespace ldmx {
     TriggerPadSD::~TriggerPadSD() {}
 
     G4bool TriggerPadSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) {
+
+
+        if (this->verboseLevel > 2) {
+	  std::cout << "[ TriggerPadSD::ProcessHits ]: Running ProcessHits " << std::endl;
+        }
+
 
         // Determine if current particle of this step is a Geantino.
         G4ParticleDefinition* pdef = aStep->GetTrack()->GetDefinition();
@@ -43,6 +50,12 @@ namespace ldmx {
             }
             return false;
         }
+
+
+        if (this->verboseLevel > 2) {
+	  std::cout << "[ TriggerPadSD::ProcessHits ]: Got a non-zero edep or geantino step: edep = " << edep << std::endl;
+        }
+
 
         //---------------------------------------------------------------------------------------------------
         //                Birks' Law 
@@ -82,14 +95,24 @@ namespace ldmx {
             birksFactor = 1.0 / (1.0 + birksc1_ * dedx + birksc2_ * dedx * dedx);
             if (aStep->GetTrack()->GetDefinition() == G4Gamma::GammaDefinition()) birksFactor = 1.0;
             if (aStep->GetTrack()->GetDefinition() == G4Neutron::NeutronDefinition()) birksFactor = 1.0;  
+
+	    if (this->verboseLevel > 2) {
+	      std::cout << "[ TriggerPadSD::ProcessHits ]: Calculated Birks's factor " << birksFactor << std::endl;
+	    }
+	    
         }
 
 
         // Create a new hit. 
         G4TriggerPadHit* hit = new G4TriggerPadHit();
+	if (this->verboseLevel > 2) {
+	  std::cout << "[ TriggerPadSD::ProcessHits ]: Got TriggerPadHit " << std::endl;
+	}
+
 
         // Set the edep.
         hit->setEdep(edep*birksFactor);
+
  
         // Get the scintillator solid box
 	//        G4Box* scint = static_cast<G4Box*>(aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume()->GetSolid());
@@ -141,12 +164,31 @@ namespace ldmx {
         return true;
     }
   void TriggerPadSD::Initialize(G4HCofThisEvent* hce) {
-
-    // Setup hits collection and the HC ID.                                                                                                                                               
-    hitsCollection_ = new G4TriggerPadHitsCollection(SensitiveDetectorName, collectionName[0]);
-    int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
-    hce->AddHitsCollection(hcID, hitsCollection_);
+    if (this->verboseLevel > 2) {
+      std::cout << " [ TriggerPadSD::Initialize ]: setting up hits collection " << std::endl;
+      // Setup hits collection and the HC ID.                                                                                                                                               
+      hitsCollection_ = new G4TriggerPadHitsCollection(SensitiveDetectorName, collectionName[0]);
+      int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+      hce->AddHitsCollection(hcID, hitsCollection_);
+    }
+    
+  } 
+  void TriggerPadSD::EndOfEvent(G4HCofThisEvent*) {
+    
+    // Print number of hits.                                                                                                                                                              
+    if (this->verboseLevel > 0) {
+      std::cout << GetName() << " had " << hitsCollection_->entries() << " hits in event" << std::endl;
+    }
+    
+    // Print each hit in hits collection.                                                                                                                                                 
+    if (this->verboseLevel > 1) {
+      for (unsigned iHit = 0; iHit < hitsCollection_->GetSize(); iHit++) {
+	(*hitsCollection_)[iHit]->Print();
+      }
+    }
   }
   
+  
+  
 }
-
+  
