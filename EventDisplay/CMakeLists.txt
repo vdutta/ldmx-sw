@@ -4,7 +4,7 @@ module(
   EXTRA_SOURCES EventDisplayDict.cxx
   DEPENDENCIES Event DetDescr Framework
   EXECUTABLES src/ldmx_eve.cxx
-  EXTERNAL_DEPENDENCIES ROOT
+  EXTERNAL_DEPENDENCIES Geant4 ROOT
 )
 
 # generate ROOT dictionary for Event classes 

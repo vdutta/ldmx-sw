@@ -1,5 +1,6 @@
 # declare DetDescr module
 module(
   NAME DetDescr
-  EXTERNAL_DEPENDENCIES ROOT
+  EXECUTABLES src/ldmx_charm_gdml.cxx
+  EXTERNAL_DEPENDENCIES Geant4 ROOT
 )
