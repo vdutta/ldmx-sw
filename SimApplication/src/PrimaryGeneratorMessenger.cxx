@@ -63,7 +63,7 @@ namespace ldmx {
 
         ///////// LHE input
         if (command == lheOpenCmd_) { 
-            primaryGeneratorAction_->setPrimaryGenerator(new LHEPrimaryGenerator(new LHEReader(newValues))); 
+            primaryGeneratorAction_->setPrimaryGenerator(new LHEPrimaryGenerator(newValues)); 
         }
     
         ///////// ROOT input

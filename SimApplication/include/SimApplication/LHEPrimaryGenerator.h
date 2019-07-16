@@ -12,7 +12,12 @@
 #include "G4VPrimaryGenerator.hh"
 
 // LDMX
-#include "SimApplication/LHEReader.h"
+//#include "SimApplication/LHEReader.h"
+#include "SimApplication/LHEF.h"
+
+// STL
+#include <string> //lhe file name
+#include <sstream> //parsing #vertex flag
 
 namespace ldmx {
 
@@ -28,7 +33,7 @@ namespace ldmx {
              * Class constructor.
              * @param reader The LHE reader with the event data.
              */
-            LHEPrimaryGenerator(LHEReader* reader);
+            LHEPrimaryGenerator( std::string lhe_file_name );
 
             /**
              * Class destructor.
@@ -46,7 +51,7 @@ namespace ldmx {
             /**
              * The LHE reader with the event data.
              */
-            LHEReader* reader_;
+            LHEF::Reader reader_;
     };
 
 }

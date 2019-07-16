@@ -13,36 +13,60 @@
 
 namespace ldmx {
 
-    LHEPrimaryGenerator::LHEPrimaryGenerator(LHEReader* theReader) :
-            reader_(theReader) {
+    LHEPrimaryGenerator::LHEPrimaryGenerator( std::string lhe_file_name ) :
+            reader_( lhe_file_name ) {
     }
 
-    LHEPrimaryGenerator::~LHEPrimaryGenerator() {
-        delete reader_;
-    }
+    LHEPrimaryGenerator::~LHEPrimaryGenerator() { }
 
     void LHEPrimaryGenerator::GeneratePrimaryVertex(G4Event* anEvent) {
 
-        LHEEvent* lheEvent = reader_->readNextEvent();
+        if ( reader_.readEvent() ) {
+            
+            //grab package of current event info from reader
+            LHEF::HEPEUP currentEventInfo = reader_.hepeup;
 
-        if (lheEvent != NULL) {
+            //the LHE::Reader::junk string may contain a vertex definition
+            std::stringstream maybeVertex;
+            maybeVertex << currentEventInfo.junk;
 
+            double vertex_x(0.0), vertex_y(0.0), vertex_z(0.0); //default vertex is the origin
+            std::string flag; //parse for the #vertex flag
+            while ( maybeVertex >> flag ) {
+                //check for vertex flag
+                if ( flag == "#vertex" ) {
+                    maybeVertex >> vertex_x >> vertex_y >> vertex_z;
+                }
+            }
+
+            //Open a new G4 primary vertex for this event
             G4PrimaryVertex* vertex = new G4PrimaryVertex();
-            vertex->SetPosition(lheEvent->getVertex()[0],lheEvent->getVertex()[1],lheEvent->getVertex()[2]);
-            vertex->SetWeight(lheEvent->getXWGTUP());
+            vertex->SetPosition( vertex_x , vertex_y , vertex_z );
 
-            std::map<LHEParticle*, G4PrimaryParticle*> particleMap;
+            vertex->SetWeight( currentEventInfo.XWGTUP );
 
-            int particleIndex = 0;
-            const std::vector<LHEParticle*>& particles = lheEvent->getParticles();
-            for (std::vector<LHEParticle*>::const_iterator it = particles.begin(); it != particles.end(); it++) {
+            //list of primary particles already created
+            std::vector<G4PrimaryParticle*> primaryList;
 
-                LHEParticle* particle = (*it);
+            //loop through particles in event and add them to G4
+            int numParticles = currentEventInfo.NUP;
+            for ( int particleIndex = 0; particleIndex < numParticles; particleIndex++ ) {
 
-                if (particle->getISTUP() > 0) {
+                int particleStatus                      = currentEventInfo.ISTUP.at(particleIndex);
+                long int particlePDG                    = currentEventInfo.IDUP.at(particleIndex);
+                std::vector<double> particleMomentum    = currentEventInfo.PUP.at(particleIndex);
+                double particleInvarTime                = currentEventInfo.VTIMUP.at(particleIndex);
+                unsigned int primaryMotherIndex         = currentEventInfo.MOTHUP.at(particleIndex).first;
+                int primaryMotherStatus                 = currentEventInfo.ISTUP.at(primaryMotherIndex);
 
+                if ( particleStatus > 0) {
+                    //status for this particle is activated
+
+                    //create G4 primary particle for this activated particle
                     G4PrimaryParticle* primary = new G4PrimaryParticle();
-                    if (particle->getIDUP() == -623) { /* Tungsten ion */
+
+                    if ( particlePDG == -623) {
+                        //special importing for Tunsten Ion (W)
                         G4ParticleDefinition* tungstenIonDef = G4IonTable::GetIonTable()->GetIon(74, 184, 0.);
                         if (tungstenIonDef != NULL) {
                             primary->SetParticleDefinition(tungstenIonDef);
@@ -52,38 +76,38 @@ namespace ldmx {
                                         "Failed to find particle definition for W ion.");
                         }
                     } else {
-                        primary->SetPDGcode(particle->getIDUP());
+                        primary->SetPDGcode( particlePDG );
                     }
 
-                    primary->Set4Momentum(particle->getPUP(0) * GeV, 
-                                          particle->getPUP(1) * GeV, 
-                                          particle->getPUP(2) * GeV, 
-                                          particle->getPUP(3) * GeV);
-                    primary->SetProperTime(particle->getVTIMUP() * nanosecond);
+                    primary->Set4Momentum(particleMomentum.at(0) * GeV, 
+                                          particleMomentum.at(1) * GeV, 
+                                          particleMomentum.at(2) * GeV, 
+                                          particleMomentum.at(3) * GeV);
+                    primary->SetProperTime(particleInvarTime * nanosecond);
 
                     UserPrimaryParticleInformation* primaryInfo = new UserPrimaryParticleInformation();
-                    primaryInfo->setHepEvtStatus(particle->getISTUP());
-                    primary->SetUserInformation(primaryInfo);
+                    primaryInfo->setHepEvtStatus( particleStatus );
+                    primary->SetUserInformation( primaryInfo );
 
-                    particleMap[particle] = primary;
+                    primaryList.push_back( primary );
 
-                    /*
-                     * Assign primary as daughter but only if the mother is not a DOC particle.
-                     */
-                    if (particle->getMother(0) != NULL && particle->getMother(0)->getISTUP() > 0) {
-                        G4PrimaryParticle* primaryMom = particleMap[particle->getMother(0)];
+                    // Add primary to particle tree
+                    //      add primary as daugter to its mother if the mother exists and has non-zero status
+                    //      otherwise set primary as root primary for this vertex
+                    if ( primaryMotherIndex > 0 and primaryMotherIndex < primaryList.size() and primaryMotherStatus > 0 ) {
+                        G4PrimaryParticle* primaryMom = primaryList.at( primaryMotherIndex );
                         if (primaryMom != NULL) {
-                            primaryMom->SetDaughter(primary);
+                            primaryMom->SetDaughter( primary );
                         }
                     } else {
-                        vertex->SetPrimary(primary);
+                        vertex->SetPrimary( primary );
                     }
 
-                } 
+                } //status for current particle is activated 
 
-                ++particleIndex;
-            }
+            } //loop through particles (particleIndex)
 
+            //add primary vertex to geant event with particle tree
             anEvent->AddPrimaryVertex(vertex);
 
         } else {
@@ -92,7 +116,7 @@ namespace ldmx {
             anEvent->SetEventAborted();
         }
 
-        delete lheEvent;
+        return;
     }
 
 }
