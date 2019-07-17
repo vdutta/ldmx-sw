@@ -42,13 +42,12 @@ namespace ldmx {
             simVec.push_back(ecalSPH);
         }
 
-
         std::sort(simVec.begin(), simVec.end(), compSims);
 
         SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
         for (int j = 0; j < simVec.size(); j++) {
             SimParticle* sP = simVec[j]->getSimParticle();
-            if (sP == lastP) continue;
+            if (sP == lastP) continue; //skip repeats
             lastP = sP;
             filteredSimVec.push_back(simVec[j]);
         }
@@ -111,11 +110,11 @@ namespace ldmx {
         else ecal_sumESD = 1;//shouldn't ever get here
 
         //Bin event information
-        h_E_cal_summed_energy_SD[9]->Fill(e_cal_sum_energy);
-        h_E_cal_summed_energy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
+        h_Ecal_SummedEnergy_SD[9]->Fill(e_cal_sum_energy);
+        h_Ecal_SummedEnergy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
     
-        h_total_particles_SD[9]->Fill(filteredSimVec.size());
-        h_total_particles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
+        h_NumParticles_SD[9]->Fill(filteredSimVec.size());
+        h_NumParticles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
 
         //----This section matches HCal hits to sim particles and records results----->
         const TClonesArray* hcalHitColl = event.getCollection( HcalHitColl_ );
@@ -132,6 +131,7 @@ namespace ldmx {
 
                 double new_dist=9999, dist=9998; //initializing distance variables
                 for(int j=0; j<filteredSimVec.size(); j++) { //Iterate over all sim particles and match one to an Hcal hit
+
                     SimParticle* sP = filteredSimVec[j]->getSimParticle();
                     pdgID = sP->getPdgID();
                     
@@ -144,8 +144,8 @@ namespace ldmx {
                     
                     new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
                     
-                    h_ParticleHit_Distance_SD[9]->Fill(new_dist);
-                    h_ParticleHit_Distance_SD[ecal_sumESD]->Fill(new_dist);
+                    h_Particle_HitDistance_All_SD[9]->Fill(new_dist);
+                    h_Particle_HitDistance_All_SD[ecal_sumESD]->Fill(new_dist);
         
                     if(simStart[2]<10.0 and sP->getEnergy()>3000.0) {
                         //discarding original electron?
@@ -170,26 +170,26 @@ namespace ldmx {
                     hcalhit_radialdist = sqrt(hcalhit_radialdist2);
                 }
 
-                h_HCalhit_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                h_ZdepthofHCalHit_SD[9]->Fill(hcalhit->getZ());
-                h_hcal_hit_time_all_SD[9]->Fill(hcalhit->getTime());
-                h_hcal_hits_all_PEs_SD[9]->Fill(hcalhit->getPE());
+                h_HcalHit_ZbyR_All_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                h_HcalHit_Z_SD[9]->Fill(hcalhit->getZ());
+                h_HcalHit_Time_All_SD[9]->Fill(hcalhit->getTime());
+                h_HcalHit_PE_All_SD[9]->Fill(hcalhit->getPE());
                 
-                h_HCalhit_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                h_ZdepthofHCalHit_SD[ecal_sumESD]->Fill(hcalhit->getZ());
-                h_hcal_hit_time_all_SD[ecal_sumESD]->Fill(hcalhit->getTime());
-                h_hcal_hits_all_PEs_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                h_HcalHit_ZbyR_All_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                h_HcalHit_Z_SD[ecal_sumESD]->Fill(hcalhit->getZ());
+                h_HcalHit_Time_All_SD[ecal_sumESD]->Fill(hcalhit->getTime());
+                h_HcalHit_PE_All_SD[ecal_sumESD]->Fill(hcalhit->getPE());
                 
                 if(hcalhit->getTime() < 15.0)  {
-                    h_hCalhit_time_less15_PE_SD[9]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_hCalhit_time_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_PE_TimeLess15_SD[9]->Fill(hcalhit->getPE());
+                    h_HcalHit_PE_TimeLess15_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                    h_HcalHit_ZbyR_TimeLess15_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_ZbyR_TimeLess15_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                 } else if(hcalhit->getTime() > 40.0)  {
-                    h_hCalhit_time_great40_PE_SD[9]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                    h_hCalhit_time_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_hCalhit_time_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_PE_TimeGreat40_SD[9]->Fill(hcalhit->getPE());
+                    h_HcalHit_PE_TimeGreat40_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                    h_HcalHit_ZbyR_TimeGreat40_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_ZbyR_TimeGreat40_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                 }
                 
                 if(hcalhit->getPE() > max_PE_of_event)
@@ -198,68 +198,73 @@ namespace ldmx {
                 if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
                 
                     numMatchedHits_++;
-                    h_HCalhit_getTime_SD[9]->Fill(hcalhit->getTime());
-                    h_HCalhit_getTime_SD[ecal_sumESD]->Fill(hcalhit->getTime());
+
+                    h_Particle_HitDistance_Matched_SD[9]->Fill(new_dist);
+                    h_Particle_HitDistance_Matched_SD[ecal_sumESD]->Fill(new_dist);
+        
+                    h_HcalHit_Time_Matched_All_SD[9]->Fill(hcalhit->getTime());
+                    h_HcalHit_Time_Matched_All_SD[ecal_sumESD]->Fill(hcalhit->getTime());
                     
+                    h_Particle_PDGID_Matched_SD[9]->Fill(pdgID);
+                    h_Particle_PDGID_Matched_SD[ecal_sumESD]->Fill(pdgID);
+        
                     double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
                     
-                    h_hit_time_creation_time_diff_SD[9]->Fill(part_hcalhit_timeDiff);
-                    h_hit_time_creation_time_diff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
+                    h_HcalHit_Time_Matched_Tdiff_SD[9]->Fill(part_hcalhit_timeDiff);
+                    h_HcalHit_Time_Matched_Tdiff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
+
                     if(part_hcalhit_timeDiff < 15.0)  {
-                        h_part_hCalhit_tdif_less15_PE_SD[9]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_less15_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_less15_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                        h_part_hCalhit_tdif_less15_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                        h_HcalHit_PE_Matched_TdifLess15_SD[9]->Fill(hcalhit->getPE());
+                        h_HcalHit_PE_Matched_TdifLess15_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                        h_HcalHit_ZbyR_Matched_TdifLess15_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                        h_HcalHit_ZbyR_Matched_TdifLess15_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                     } else if(part_hcalhit_timeDiff > 40.0)  {
-                        h_part_hCalhit_tdif_great40_PE_SD[9]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_great40_PE_SD[ecal_sumESD]->Fill(hcalhit->getPE());
-                        h_part_hCalhit_tdif_great40_position_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                        h_part_hCalhit_tdif_great40_position_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                        h_HcalHit_PE_Matched_TdifGreat40_SD[9]->Fill(hcalhit->getPE());
+                        h_HcalHit_PE_Matched_TdifGreat40_SD[ecal_sumESD]->Fill(hcalhit->getPE());
+                        h_HcalHit_ZbyR_Matched_TdifGreat40_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                        h_HcalHit_ZbyR_Matched_TdifGreat40_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
                     }
                     
                     //protons or neutrons (nucleons) 
                     if( pdgID==2112 or pdgID==2212 ) { 
-                        h_HCalhit_getTime_nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                        h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
-                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                        h_HCalhit_getTime_nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
-                        h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
-                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                        h_HcalHit_Time_Matched_Nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                        h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
+//                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
+//                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                        h_HcalHit_Time_Matched_Nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                        h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
+//                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
+//                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                     }
                     
-                    h_PDGIDs_SD[9]->Fill(pdgID);
-                    h_PDGIDs_SD[ecal_sumESD]->Fill(pdgID);
-        
-                    h_particle_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                    h_particle_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                    h_Particle_Energy_Matched_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                    h_Particle_Energy_Matched_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
         
                     switch(pdgID) {
                         case 11:
-                            h_HCalhit_electron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_electron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Electron_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Electron_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
                         case 22:
-                            h_HCalhit_photon_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_photon_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                            h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                            h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                            h_HcalHit_ZbyR_Matched_Photon_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Photon_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+//                            h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                            h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
                             break;
                         case 2112:
-                            h_HCalhit_neutron_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                            h_HCalhit_neutron_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Neutron_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                            h_HcalHit_ZbyR_Matched_Neutron_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
                         default:
-                            h_HCalhit_other_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
-                            h_HCalhit_other_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Other_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
+                            h_HcalHit_ZbyR_Matched_Other_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             break;
                     }
 
                 } else {
 
-                    h_HCalhit_unmatched_zbyr_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-                    h_HCalhit_unmatched_zbyr_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_ZbyR_Unmatched_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist);
+                    h_HcalHit_ZbyR_Unmatched_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
 
                 } //matched or unmatched
     
@@ -268,8 +273,8 @@ namespace ldmx {
         }//End loop over hcalhits array
 
         // maximum PE in hcal hits for the event
-        h_hcal_hits_max_PE_of_event_SD[9]->Fill(max_PE_of_event);
-        h_hcal_hits_max_PE_of_event_SD[ecal_sumESD]->Fill(max_PE_of_event);
+        h_EventMaxPE_SD[9]->Fill(max_PE_of_event);
+        h_EventMaxPE_SD[ecal_sumESD]->Fill(max_PE_of_event);
 
         return;
     } //analyze
@@ -327,36 +332,6 @@ namespace ldmx {
 
         TDirectory* d_base = getHistoDirectory();
 
-        //create a directory for each type of histogram we care about
-        TDirectory* d_PDGIDs = d_base->mkdir( "PDG_IDs" , "PDG_IDs");
-        TDirectory* d_ZdeptofHcalHit = d_base->mkdir( "ZDepth_of_HcalHit" , "ZDepth_of_HcalHit" );
-        TDirectory* d_ParticleHit_Distance
-        TDirectory* d_HCalhit_zbyr
-        TDirectory* d_HCalhit_photon_zbyr
-        TDirectory* d_HCalhit_electron_zbyr
-        TDirectory* d_HCalhit_neutron_zbyr
-        TDirectory* d_HCalhit_other_zbyr
-        TDirectory* d_HCalhit_unmatched_zbyr
-        TDirectory* d_HCalhit_photon_energy
-        TDirectory* d_HCalhit_getTime
-        TDirectory* d_HCalhit_getTime_nucleons
-        TDirectory* d_HCalhit_nucleon_time_vs_energy
-        TDirectory* d_E_cal_summed_energy
-        TDirectory* d_total_particles
-        TDirectory* d_particle_energy
-        TDirectory* d_hcal_hit_time_all
-        TDirectory* d_hit_time_creation_time_diff
-        TDirectory* d_part_hCalhit_tdif_less15_PE
-        TDirectory* d_part_hCalhit_tdif_less15_position
-        TDirectory* d_part_hCalhit_tdif_great40_PE
-        TDirectory* d_part_hCalhit_tdif_great40_position
-        TDirectory* d_hCalhit_time_less15_PE
-        TDirectory* d_hCalhit_time_less15_position
-        TDirectory* d_hCalhit_time_great40_PE
-        TDirectory* d_hCalhit_time_great40_position
-        TDirectory* d_hcal_hits_all_PEs
-        TDirectory* d_hcal_hits_max_PE_of_event
-
         std::vector<std::string> range_names(10);
         // n <--> negative
         // p <--> positive
@@ -370,164 +345,167 @@ namespace ldmx {
         range_names[7] = "n6-n5";
         range_names[8] = "ninf-n6]";
         range_names[9] = "ninf-pinf";
-   
 
         for ( int i = 0; i < range_names.size(); i++ ) {
             std::string range_name = range_names.at(i);
 
-            d_PDGIDs->cd();
-            h_PDGIDs_SD[i]=new TH1F(
-                    ("PDG_IDs_SD_"+range_name).c_str(),
-                    ("PDG_IDs_SD_"+range_name).c_str(),
-                    10000,-5000,5000);
-
-            d_ZdepthofHcalHit->cd();
-            h_ZdepthofHCalHit_SD[i]=new TH1F(
-                    ("Z depth of HCal hits_SD_"+range_name).c_str(),
-                    ("Z depth of HCal hits_SD"+range_name+" (10mm bins)").c_str(),
-                    320, 0, 3200);
-
-            h_ParticleHit_Distance_SD[i]=new TH1F(
-                    ("Distance between sim particle and HCal hits_SD_"+range_name).c_str(), 
-                    ("Distance between sim particle and HCal hits_SD_"+range_name+" (5mm bins)").c_str(), 
-                    400, 0, 2000);
-            
-            h_HCalhit_zbyr_SD[i]=new TH2D(
-                    ("HCal hit locations_SD_"+range_name).c_str(), 
-                    ("HCal hit locations_SD_"+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_photon_zbyr_SD[i]=new TH2D(
-                    ("HCal photon hit locations_SD_"+range_name).c_str(), 
-                    ("HCal photon hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_photon_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_electron_zbyr_SD[i]=new TH2D(
-                    ("HCal electron hit locations_SD_"+range_name).c_str(), 
-                    ("HCal electron hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_electron_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_neutron_zbyr_SD[i]=new TH2D(
-                    ("HCal neutron hit locations_SD_"+range_name).c_str(), 
-                    ("HCal neutron hit locations_SD"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_neutron_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_other_zbyr_SD[i]=new TH2D(
-                    ("HCal other particle hit locations_SD_"+range_name).c_str(), 
-                    ("HCal other particle hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_other_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_unmatched_zbyr_SD[i]=new TH2D(
-                    ("HCal unmatched hit locations_SD_"+range_name).c_str(), 
-                    ("HCal unmatched hit locations_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_HCalhit_unmatched_zbyr_SD[i]->SetDrawOption("colz");
-
-            h_HCalhit_photon_energy_SD[i]=new TH1F(
-                    ("HCal Photon hit Energies_SD_"+range_name).c_str(),
-                    ("HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count").c_str(), 
-                    4000, 0, 4000);
-
-            h_HCalhit_getTime_SD[i]=new TH1F(
-                    ("Creation time of particles causing HCal hits_SD_"+range_name).c_str(), 
-                    ("Creation time of particles causing HCal hits_SD_"+range_name+";Time(ns);Number of particles created").c_str(), 
-                    500, 0, 500);
-
-            h_HCalhit_getTime_nucleons_SD[i]=new TH1F(
-                    ("Creation time of nucleons causing HCal hits_SD_"+range_name).c_str(),
-                    ("nucleons causing HCal hits_SD_"+range_name+";Time(ns);Number of Nucleons created").c_str(), 
-                    500, 0, 500);
-
-            h_HCalhit_nucleon_time_vs_energy_SD[i]=new TH2D(
-                    ("Nucleon time vs energy_SD_"+range_name).c_str(), 
-                    ("Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)").c_str(),
-                    100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
-            h_HCalhit_nucleon_time_vs_energy_SD[i]->SetDrawOption("colz");
-
-            h_E_cal_summed_energy_SD[i]=new TH1F(
-                    ("E_cal_summed_energy_SD_"+range_name).c_str(),
-                    ("E_cal_summed_energy_SD_"+range_name+";Energy(MeV)(10MeV bin width);Count").c_str(),
+            h_Ecal_SummedEnergy_SD[i]=new TH1D(
+                    ("Ecal_SummedEnergy_SD_"+range_name).c_str(),
+                    ("Ecal Summed Energy SD "+range_name+";Energy(MeV) (10MeV bin width);Count").c_str(),
                     800,0,8000);//10MeV bins
-            h_E_cal_summed_energy_SD[i]->SetDrawOption("colz");
 
-            h_total_particles_SD[i]=new TH1F(
-                    ("total_particles_SD_"+range_name).c_str(),
-                    ("total_particles_SD_"+range_name+";Number of particles per event;Count").c_str(),
+            h_NumParticles_SD[i]=new TH1D(
+                    ("NumParticles_SD_"+range_name).c_str(),
+                    ("Num Particles in Event SD "+range_name+";Number of particles per event;Count").c_str(),
                     50,0,50);
 
-            h_particle_energy_SD[i]=new TH1F(
-                    ("matched_particle_energy_SD_"+range_name).c_str(),
-                    ("matched_particle_energy_SD_"+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
+            h_EventMaxPE_SD[i]=new TH1D(
+                    ("EventMaxPE_SD_"+range_name).c_str(),
+                    ("Maximum PE for all Hits in Event SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    500,0,500);
+
+            h_Particle_PDGID_All_SD[i]=new TH1D(
+                    ("Particle_PDGID_All_SD_"+range_name).c_str(),
+                    ("PDG IDs SD "+range_name).c_str(),
+                    10000,-5000,5000);
+
+            h_Particle_PDGID_Matched_SD[i]=new TH1D(
+                    ("Particle_PDGID_Matched_SD_"+range_name).c_str(),
+                    ("PDG IDs when matched SD "+range_name).c_str(),
+                    10000,-5000,5000);
+
+            h_Particle_HitDistance_All_SD[i]=new TH1D(
+                    ("Particle_HitDistance_All_SD_"+range_name).c_str(), 
+                    ("Distance between SimParticle and HcalHit SD "+range_name+" (5mm bins)").c_str(), 
+                    400, 0, 2000);
+            
+            h_Particle_HitDistance_Matched_SD[i]=new TH1D(
+                    ("Particle_HitDistance_Matched_SD_"+range_name).c_str(), 
+                    ("Distance between SimParticle and HcalHit when matched SD "+range_name+" (5mm bins)").c_str(), 
+                    400, 0, 2000);
+            
+            h_Particle_Energy_All_SD[i]=new TH1D(
+                    ("Particle_Energy_All_SD_"+range_name).c_str(),
+                    ("All Particle Energies SD "+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
                     800,0,4000);
 
-            h_hcal_hit_time_all_SD[i]=new TH1F(
-                    ("HCal_hit_time_all_SD_"+range_name).c_str(),
-                    ("HCal_hit_time_all_SD_"+range_name+";time(ns)(5ns bin width);Count").c_str(),
+            h_Particle_Energy_Matched_SD[i]=new TH1D(
+                    ("Particle_Energy_Matched_SD_"+range_name).c_str(),
+                    ("Matched Particle Energies SD "+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
+                    800,0,4000);
+
+            h_HcalHit_Z_SD[i]=new TH1D(
+                    ("HcalHit_Z_SD_"+range_name).c_str(),
+                    ("Z depth of HCal hits SD "+range_name+" (10mm bins)").c_str(),
+                    320, 0, 3200);
+
+            h_HcalHit_ZbyR_All_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_All_SD_"+range_name).c_str(), 
+                    ("All HcalHit locations SD "+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Unmatched_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Unmatched_SD_"+range_name).c_str(), 
+                    ("Hcal unmatched hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_TimeLess15_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_TimeLess15_SD_"+range_name).c_str(),
+                    ("HcalHits with Time < 15ns locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_TimeGreat40_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_TimeGreat40_SD_"+range_name).c_str(),
+                    ("HcalHits with Time > 40ns locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_Photon_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_Photon_SD_"+range_name).c_str(), 
+                    ("Hcal photon hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_Electron_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_Electron_SD_"+range_name).c_str(), 
+                    ("Hcal electron hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_Neutron_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_Neutron_SD_"+range_name).c_str(), 
+                    ("Hcal neutron hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_Other_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_Other_SD_"+range_name).c_str(), 
+                    ("Hcal other particle hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_TdifLess15_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_TdifLess15_SD_"+range_name).c_str(),
+                    ("Matched HcalHit location with time diff < 15ns SD "+
+                     range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_ZbyR_Matched_TdifGreat40_SD[i]=new TH2D(
+                    ("HcalHit_ZbyR_Matched_TdifGreat40_SD_"+range_name).c_str(),
+                    ("Matched HcalHit location with time diff > 40ns SD "+
+                     range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
+                    80,0,3200,112,0,4500);
+
+            h_HcalHit_PE_All_SD[i]=new TH1D(
+                    ("HcalHit_PE_All_SD_"+range_name).c_str(),
+                    ("PEs of all HcalHits SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+
+            h_HcalHit_PE_TimeLess15_SD[i]=new TH1D(
+                    ("HcalHit_PE_TimeLess15_SD_"+range_name).c_str(),
+                    ("HcalHits with Time < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+
+            h_HcalHit_PE_TimeGreat40_SD[i]=new TH1D(
+                    ("HcalHit_PE_TimeGreat40_SD_"+range_name).c_str(),
+                    ("HcalHits with Time > 40ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+
+            h_HcalHit_PE_Matched_TdifLess15_SD[i]=new TH1D(
+                    ("HcalHit_PE_Matched_TdifLess15_SD_"+range_name).c_str(),
+                    ("Matched HcalHit with Time diff < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+
+            h_HcalHit_PE_Matched_TdifGreat40_SD[i]=new TH1D(
+                    ("HcalHit_PE_Matched_TdifGreat40_SD_"+range_name).c_str(),
+                    ("Matched HcalHit with Time diff > 40ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    200,0,200);
+
+            h_HcalHit_Time_All_SD[i]=new TH1D(
+                    ("HcalHit_Time_All_SD_"+range_name).c_str(),
+                    ("Time of All HcalHits SD "+range_name+";time(ns)(5ns bin width);Count").c_str(),
                     100,0,500);
 
-            h_hit_time_creation_time_diff_SD[i]=new TH1F(
-                    ("hit_time_creation_time_diff_SD_"+range_name).c_str(),
-                    ("hit_time_creation_time_diff_SD_"+range_name+";time(ns)(2ns bin width);Count").c_str(),
+            h_HcalHit_Time_Matched_All_SD[i]=new TH1D(
+                    ("HcalHit_Time_Matched_All_SD_"+range_name).c_str(), 
+                    ("Time of Matched HcalHits SD "+range_name+";Time(ns);Number of particles created").c_str(), 
+                    500, 0, 500);
+
+            h_HcalHit_Time_Matched_Nucleons_SD[i]=new TH1D(
+                    ("HcalHit_Time_Matched_Nucleons_SD_"+range_name).c_str(),
+                    ("Time of HcalHits Matched to Nucleons SD "+range_name+";Time(ns);Number of Nucleons created").c_str(), 
+                    500, 0, 500);
+            
+            h_HcalHit_Time_Matched_Tdiff_SD[i]=new TH1D(
+                    ("HcalHit_Time_Matched_Tdiff_SD_"+range_name).c_str(),
+                    ("Time Diff between SimParticle and matched HcalHit SD "+range_name+";time(ns)(2ns bin width);Count").c_str(),
                     100,0,200);
 
-            h_part_hCalhit_tdif_less15_PE_SD[i]=new TH1F(
-                    ("part_hCalhit_tdif_less15_PE_SD_"+range_name).c_str(),
-                    ("part_hCalhit_tdif_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    200,0,200);
+//            h_HCalhit_photon_energy_SD[i]=new TH1D(
+//                    ("HCal Photon hit Energies_SD_"+range_name).c_str(),
+//                    ("HCal Photon hit Energies_SD_"+range_name+";Energy(MeV);Count").c_str(), 
+//                    4000, 0, 4000);
+//
+//            h_HCalhit_nucleon_time_vs_energy_SD[i]=new TH2D(
+//                    ("Nucleon time vs energy_SD_"+range_name).c_str(), 
+//                    ("Nucleon time vs energy_SD_"+range_name+";Creation Time(ns);Energy(MeV)").c_str(),
+//                    100,0,500,250,0,4000); // 5ns time resolution, 16MeV resolution
 
-            h_part_hCalhit_tdif_less15_position_SD[i]=new TH2D(
-                    ("part_hCalhit_tdif_less15_position_SD_"+range_name).c_str(),
-                    ("part_hCalhit_tdif_less15_position_SD_"+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
-                    80,0,3200,112,0,4500);
-            h_part_hCalhit_tdif_less15_position_SD[i]->SetDrawOption("colz");
-
-            h_part_hCalhit_tdif_great40_PE_SD[i]=new TH1F(
-                    ("part_hCalhit_tdif_great40_PE_SD_"+range_name).c_str(),
-                    ("part_hCalhit_tdif_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    200,0,200);
-
-            h_part_hCalhit_tdif_great40_position_SD[i]=new TH2D(
-                    ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
-                    ("part_hCalhit_tdif_great40_position_SD_"+range_name).c_str(),
-                    80,0,3200,112,0,4500);
-            h_part_hCalhit_tdif_great40_position_SD[i]->SetDrawOption("colz");
-
-            h_hCalhit_time_less15_PE_SD[i]=new TH1F(
-                    ("hCalhit_time_less15_PE_SD_"+range_name).c_str(),
-                    ("hCalhit_time_less15_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    200,0,200);
-
-            h_hCalhit_time_less15_position_SD[i]=new TH2D(
-                    ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
-                    ("hCalhit_time_less15_position_SD_"+range_name).c_str(),
-                    80,0,3200,112,0,4500);
-            h_hCalhit_time_less15_position_SD[i]->SetDrawOption("colz");
-
-            h_hCalhit_time_great40_PE_SD[i]=new TH1F(
-                    ("hCalhit_time_great40_PE_SD_"+range_name).c_str(),
-                    ("hCalhit_time_great40_PE_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    200,0,200);
-
-            h_hCalhit_time_great40_position_SD[i]=new TH2D(
-                    ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
-                    ("hCalhit_time_great40_position_SD_"+range_name).c_str(),
-                    80,0,3200,112,0,4500);
-            h_hCalhit_time_great40_position_SD[i]->SetDrawOption("colz");
-
-            h_hcal_hits_all_PEs_SD[i]=new TH1F(
-                    ("hcal_hits_all_PEs_SD_"+range_name).c_str(),
-                    ("hcal_hits_all_PEs_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    200,0,200);
-
-            h_hcal_hits_max_PE_of_event_SD[i]=new TH1F(
-                    ("h_hcal_hits_max_PE_of_event_SD_"+range_name).c_str(),
-                    ("h_hcal_hits_max_PE_of_event_SD_"+range_name+";Photoelectrons(PEs);Count").c_str(),
-                    500,0,500);
         } //iterate over range_names
 
         //go back to base histogram directory

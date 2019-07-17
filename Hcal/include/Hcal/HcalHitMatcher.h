@@ -2,6 +2,7 @@
  * @file HcalHitMatcher.h
  * @brief
  * @author Matthew Forsman
+ * @author Tom Eichlersmith
  */
 #ifndef HCAL_HCALHITMATCHER_H
 #define HCAL_HCALHITMATCHER_H
@@ -115,34 +116,51 @@ namespace ldmx {
              *  8       (-inf,-6]
              *  9       (-inf,inf) - all events
              */
-        	TH1* h_PDGIDs_SD[10];
-        	TH1* h_ZdepthofHCalHit_SD[10];
-        	TH1* h_ParticleHit_Distance_SD[10];
-        	TH2D* h_HCalhit_zbyr_SD[10];
-        	TH2D* h_HCalhit_photon_zbyr_SD[10];
-        	TH2D* h_HCalhit_electron_zbyr_SD[10];
-        	TH2D* h_HCalhit_neutron_zbyr_SD[10];
-        	TH2D* h_HCalhit_other_zbyr_SD[10];
-        	TH2D* h_HCalhit_unmatched_zbyr_SD[10];
-        	TH1* h_HCalhit_photon_energy_SD[10];
-        	TH1* h_HCalhit_getTime_SD[10];
-        	TH1* h_HCalhit_getTime_nucleons_SD[10];
-        	TH2D* h_HCalhit_nucleon_time_vs_energy_SD[10];
-        	TH1F* h_E_cal_summed_energy_SD[10];
-        	TH1F* h_total_particles_SD[10];
-        	TH1F* h_particle_energy_SD[10];
-        	TH1F* h_hcal_hit_time_all_SD[10];
-        	TH1F* h_hit_time_creation_time_diff_SD[10];
-        	TH1F* h_part_hCalhit_tdif_less15_PE_SD[10];
-        	TH2D* h_part_hCalhit_tdif_less15_position_SD[10];
-        	TH1F* h_part_hCalhit_tdif_great40_PE_SD[10];
-        	TH2D* h_part_hCalhit_tdif_great40_position_SD[10];
-        	TH1F* h_hCalhit_time_less15_PE_SD[10];
-        	TH2D* h_hCalhit_time_less15_position_SD[10];
-        	TH1F* h_hCalhit_time_great40_PE_SD[10];
-        	TH2D* h_hCalhit_time_great40_position_SD[10];
-        	TH1F* h_hcal_hits_all_PEs_SD[10];
-        	TH1F* h_hcal_hits_max_PE_of_event_SD[10];
+
+            //Event information (i.e. One Entry per Event)
+        	TH1D* h_Ecal_SummedEnergy_SD[10];
+        	TH1D* h_NumParticles_SD[10];
+            TH1D* h_EventMaxPE_SD[10];
+
+            //SimParticle
+            TH1D* h_Particle_PDGID_All_SD[10]; //All PDG IDs - NOT IMPLEMENTED
+            TH1D* h_Particle_PDGID_Matched_SD[10]; //Matched PDG IDs
+        	TH1D* h_Particle_HitDistance_All_SD[10]; //Distance between SimParticles and HcalHits
+        	TH1D* h_Particle_HitDistance_Matched_SD[10]; //Distance between SimParticles and HcalHits
+        	TH1D* h_Particle_Energy_All_SD[10]; //All SimParticle energies - NOT IMPLEMENTED
+        	TH1D* h_Particle_Energy_Matched_SD[10]; //Matched SimParticle energies
+
+            //Position of HcalHits
+        	TH1D* h_HcalHit_Z_SD[10];
+        	TH2D* h_HcalHit_ZbyR_All_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Unmatched_SD[10];
+        	TH2D* h_HcalHit_ZbyR_TimeLess15_SD[10];
+        	TH2D* h_HcalHit_ZbyR_TimeGreat40_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_Photon_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_Electron_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_Neutron_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_Other_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_TdifLess15_SD[10];
+        	TH2D* h_HcalHit_ZbyR_Matched_TdifGreat40_SD[10];
+            
+            //PEs of HcalHit
+        	TH1D* h_HcalHit_PE_All_SD[10];
+        	TH1D* h_HcalHit_PE_TimeLess15_SD[10];
+        	TH1D* h_HcalHit_PE_TimeGreat40_SD[10];
+        	TH1D* h_HcalHit_PE_Matched_TdifLess15_SD[10];
+        	TH1D* h_HcalHit_PE_Matched_TdifGreat40_SD[10];
+
+            //Time of HcalHit
+        	TH1D* h_HcalHit_Time_All_SD[10];
+        	TH1D* h_HcalHit_Time_Matched_All_SD[10];
+        	TH1D* h_HcalHit_Time_Matched_Nucleons_SD[10];
+        	TH1D* h_HcalHit_Time_Matched_Tdiff_SD[10];
+
+            //Deprecated for now
+//        	TH1D* h_HcalHit_photon_energy_SD[10];
+//        	TH2D* h_HcalHit_nucleon_time_vs_energy_SD[10];
+
+
 
 	};
 }
