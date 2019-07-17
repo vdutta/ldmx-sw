@@ -30,6 +30,8 @@ namespace ldmx {
 
     void HcalHitMatcher::analyze(const ldmx::Event& event) {
 
+        numEvents_++;
+
         //----------This section obtains a list of sim particles that cross the ecal scoring plane---------->
         const TClonesArray* ecalScoringPlaneHits = event.getCollection( EcalScoringPlane_ );
         const TClonesArray* simParticles = event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
@@ -122,7 +124,7 @@ namespace ldmx {
         float max_PE_of_event=0;
         for(int i=0; i < hcalHitColl->GetEntriesFast(); i++) { //Begin loop over hcalhits array
             ldmx::HcalHit* hcalhit = (ldmx::HcalHit*)(hcalHitColl->At(i));
-            numHits_++;
+            
             if ( ! hcalhit->getNoise() ) { //Only analyze non-noise hits
 
                 numNonNoiseHits_++;
@@ -210,8 +212,8 @@ namespace ldmx {
         
                     double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
                     
-                    h_HcalHit_Time_Matched_Tdiff_SD[9]->Fill(part_hcalhit_timeDiff);
-                    h_HcalHit_Time_Matched_Tdiff_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
+                    h_HcalHit_Time_Matched_Tdif_SD[9]->Fill(part_hcalhit_timeDiff);
+                    h_HcalHit_Time_Matched_Tdif_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
 
                     if(part_hcalhit_timeDiff < 15.0)  {
                         h_HcalHit_PE_Matched_TdifLess15_SD[9]->Fill(hcalhit->getPE());
@@ -326,11 +328,97 @@ namespace ldmx {
 
     void HcalHitMatcher::onProcessStart() {
         
-        numHits_ = 0;
         numNonNoiseHits_ = 0;
         numMatchedHits_ = 0;
+        numEvents_ = 0;
 
+        // Make directory tree to organize histograms in
         TDirectory* d_base = getHistoDirectory();
+
+        //////////// Directory Tree
+        //  Ecal_SummedEnergy
+        //  NumParticles
+        //  EventMaxPE
+        //  Particle
+        //      PDGID
+        //          All
+        //          Matched
+        //      HitDistance
+        //          All
+        //          Matched
+        //      Energy
+        //          All
+        //          Matched
+        //  HcalHit
+        //      Z
+        //      ZbyR
+        //          All
+        //          Unmatched
+        //          TimeLess15
+        //          TimeGreat40
+        //          Matched
+        //              Photon
+        //              Electron
+        //              Neutron
+        //              Other
+        //              TdifLess15
+        //              TdifGreat40
+        //      PE
+        //          All
+        //          TimeLess15
+        //          TimeGreat40
+        //          Matched
+        //              TdifLess15
+        //              TdifGreat40
+        //      Time
+        //          All
+        //          Matched
+        //              All
+        //              Nucleons
+        //              Tdif
+
+        TDirectory* d_Ecal_SummedEnergy                 = d_base->mkdir( "Ecal_SummedEnergy" );
+        TDirectory* d_NumParticles                      = d_base->mkdir( "NumParticles" );
+        TDirectory* d_EventMaxPE                        = d_base->mkdir( "EventMaxPE" );
+
+        TDirectory* d_Particle                          = d_base->mkdir( "Particle" );
+        TDirectory* d_Particle_PDGID                    = d_Particle->mkdir( "PDGID" );
+        TDirectory* d_Particle_PDGID_All                = d_Particle_PDGID->mkdir( "All" );
+        TDirectory* d_Particle_PDGID_Matched            = d_Particle_PDGID->mkdir( "Matched" );
+        TDirectory* d_Particle_HitDistance              = d_Particle->mkdir( "HitDistance" );
+        TDirectory* d_Particle_HitDistance_All          = d_Particle_HitDistance->mkdir( "All" );
+        TDirectory* d_Particle_HitDistance_Matched      = d_Particle_HitDistance->mkdir( "Matched" );
+        TDirectory* d_Particle_Energy                   = d_Particle->mkdir( "Energy" );
+        TDirectory* d_Particle_Energy_All               = d_Particle_Energy->mkdir( "All" );
+        TDirectory* d_Particle_Energy_Matched           = d_Particle_Energy->mkdir( "Matched" );
+
+        TDirectory* d_HcalHit                           = d_base->mkdir( "HcalHit" );
+        TDirectory* d_HcalHit_Z                         = d_HcalHit->mkdir( "Z" );
+        TDirectory* d_HcalHit_ZbyR                      = d_HcalHit->mkdir( "ZbyR" );
+        TDirectory* d_HcalHit_ZbyR_All                  = d_HcalHit_ZbyR->mkdir( "All" );
+        TDirectory* d_HcalHit_ZbyR_Unmatched            = d_HcalHit_ZbyR->mkdir( "Unmatched" );
+        TDirectory* d_HcalHit_ZbyR_TimeLess15           = d_HcalHit_ZbyR->mkdir( "TimeLess15" );
+        TDirectory* d_HcalHit_ZbyR_TimeGreat40          = d_HcalHit_ZbyR->mkdir( "TimeGreat40" );
+        TDirectory* d_HcalHit_ZbyR_Matched              = d_HcalHit_ZbyR->mkdir( "Matched" );
+        TDirectory* d_HcalHit_ZbyR_Matched_Photon       = d_HcalHit_ZbyR_Matched->mkdir( "Photon" );
+        TDirectory* d_HcalHit_ZbyR_Matched_Electron     = d_HcalHit_ZbyR_Matched->mkdir( "Electron" );
+        TDirectory* d_HcalHit_ZbyR_Matched_Neutron      = d_HcalHit_ZbyR_Matched->mkdir( "Neutron" );
+        TDirectory* d_HcalHit_ZbyR_Matched_Other        = d_HcalHit_ZbyR_Matched->mkdir( "Other" );
+        TDirectory* d_HcalHit_ZbyR_Matched_TdifLess15   = d_HcalHit_ZbyR_Matched->mkdir( "TdifLess15" );
+        TDirectory* d_HcalHit_ZbyR_Matched_TdifGreat40  = d_HcalHit_ZbyR_Matched->mkdir( "TdifGreat40" );
+        TDirectory* d_HcalHit_PE                        = d_HcalHit->mkdir( "PE" );
+        TDirectory* d_HcalHit_PE_All                    = d_HcalHit_PE->mkdir( "All" );
+        TDirectory* d_HcalHit_PE_TimeLess15             = d_HcalHit_PE->mkdir( "TimeLess15" );
+        TDirectory* d_HcalHit_PE_TimeGreat40            = d_HcalHit_PE->mkdir( "TimeGreat40" );
+        TDirectory* d_HcalHit_PE_Matched                = d_HcalHit_PE->mkdir( "Matched" );
+        TDirectory* d_HcalHit_PE_Matched_TdifLess15     = d_HcalHit_PE_Matched->mkdir( "TdifLess15" );
+        TDirectory* d_HcalHit_PE_Matched_TdifGreat40    = d_HcalHit_PE_Matched->mkdir( "TdifGreat40" );
+        TDirectory* d_HcalHit_Time                      = d_HcalHit->mkdir( "Time" );
+        TDirectory* d_HcalHit_Time_All                  = d_HcalHit_Time->mkdir( "All" );
+        TDirectory* d_HcalHit_Time_Matched              = d_HcalHit_Time->mkdir( "Matched" );
+        TDirectory* d_HcalHit_Time_Matched_All          = d_HcalHit_Time_Matched->mkdir( "All" );
+        TDirectory* d_HcalHit_Time_Matched_Nucleons     = d_HcalHit_Time_Matched->mkdir( "Nucleons" );
+        TDirectory* d_HcalHit_Time_Matched_Tdif         = d_HcalHit_Time_Matched->mkdir( "Tdif" );
 
         std::vector<std::string> range_names(10);
         // n <--> negative
@@ -343,156 +431,185 @@ namespace ldmx {
         range_names[5] = "n4-n3";
         range_names[6] = "n5-n4";
         range_names[7] = "n6-n5";
-        range_names[8] = "ninf-n6]";
+        range_names[8] = "ninf-n6";
         range_names[9] = "ninf-pinf";
 
         for ( int i = 0; i < range_names.size(); i++ ) {
             std::string range_name = range_names.at(i);
 
+            d_Ecal_SummedEnergy->cd();
             h_Ecal_SummedEnergy_SD[i]=new TH1D(
                     ("Ecal_SummedEnergy_SD_"+range_name).c_str(),
                     ("Ecal Summed Energy SD "+range_name+";Energy(MeV) (10MeV bin width);Count").c_str(),
                     800,0,8000);//10MeV bins
 
+            d_NumParticles->cd();
             h_NumParticles_SD[i]=new TH1D(
                     ("NumParticles_SD_"+range_name).c_str(),
                     ("Num Particles in Event SD "+range_name+";Number of particles per event;Count").c_str(),
                     50,0,50);
 
+            d_EventMaxPE->cd();
             h_EventMaxPE_SD[i]=new TH1D(
                     ("EventMaxPE_SD_"+range_name).c_str(),
                     ("Maximum PE for all Hits in Event SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     500,0,500);
 
+            d_Particle_PDGID_All->cd();
             h_Particle_PDGID_All_SD[i]=new TH1D(
                     ("Particle_PDGID_All_SD_"+range_name).c_str(),
                     ("PDG IDs SD "+range_name).c_str(),
                     10000,-5000,5000);
 
+            d_Particle_PDGID_Matched->cd();
             h_Particle_PDGID_Matched_SD[i]=new TH1D(
                     ("Particle_PDGID_Matched_SD_"+range_name).c_str(),
                     ("PDG IDs when matched SD "+range_name).c_str(),
                     10000,-5000,5000);
 
+            d_Particle_HitDistance_All->cd();
             h_Particle_HitDistance_All_SD[i]=new TH1D(
                     ("Particle_HitDistance_All_SD_"+range_name).c_str(), 
                     ("Distance between SimParticle and HcalHit SD "+range_name+" (5mm bins)").c_str(), 
                     400, 0, 2000);
             
+            d_Particle_HitDistance_Matched->cd();
             h_Particle_HitDistance_Matched_SD[i]=new TH1D(
                     ("Particle_HitDistance_Matched_SD_"+range_name).c_str(), 
                     ("Distance between SimParticle and HcalHit when matched SD "+range_name+" (5mm bins)").c_str(), 
                     400, 0, 2000);
             
+            d_Particle_Energy_All->cd();
             h_Particle_Energy_All_SD[i]=new TH1D(
                     ("Particle_Energy_All_SD_"+range_name).c_str(),
                     ("All Particle Energies SD "+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
                     800,0,4000);
 
+            d_Particle_Energy_Matched->cd();
             h_Particle_Energy_Matched_SD[i]=new TH1D(
                     ("Particle_Energy_Matched_SD_"+range_name).c_str(),
                     ("Matched Particle Energies SD "+range_name+";Energy(MeV)(5MeV bin width);Count").c_str(),
                     800,0,4000);
 
+            d_HcalHit_Z->cd();
             h_HcalHit_Z_SD[i]=new TH1D(
                     ("HcalHit_Z_SD_"+range_name).c_str(),
                     ("Z depth of HCal hits SD "+range_name+" (10mm bins)").c_str(),
                     320, 0, 3200);
 
+            d_HcalHit_ZbyR_All->cd();
             h_HcalHit_ZbyR_All_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_All_SD_"+range_name).c_str(), 
                     ("All HcalHit locations SD "+range_name+";Z depth (mm); radial distance from z-axis (mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Unmatched->cd();
             h_HcalHit_ZbyR_Unmatched_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Unmatched_SD_"+range_name).c_str(), 
                     ("Hcal unmatched hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_TimeLess15->cd();
             h_HcalHit_ZbyR_TimeLess15_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_TimeLess15_SD_"+range_name).c_str(),
                     ("HcalHits with Time < 15ns locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_TimeGreat40->cd();
             h_HcalHit_ZbyR_TimeGreat40_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_TimeGreat40_SD_"+range_name).c_str(),
                     ("HcalHits with Time > 40ns locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_Photon->cd();
             h_HcalHit_ZbyR_Matched_Photon_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_Photon_SD_"+range_name).c_str(), 
                     ("Hcal photon hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_Electron->cd();
             h_HcalHit_ZbyR_Matched_Electron_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_Electron_SD_"+range_name).c_str(), 
                     ("Hcal electron hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_Neutron->cd();
             h_HcalHit_ZbyR_Matched_Neutron_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_Neutron_SD_"+range_name).c_str(), 
                     ("Hcal neutron hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_Other->cd();
             h_HcalHit_ZbyR_Matched_Other_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_Other_SD_"+range_name).c_str(), 
                     ("Hcal other particle hit locations SD "+range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_TdifLess15->cd();
             h_HcalHit_ZbyR_Matched_TdifLess15_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_TdifLess15_SD_"+range_name).c_str(),
-                    ("Matched HcalHit location with time diff < 15ns SD "+
+                    ("Matched HcalHit location with time dif < 15ns SD "+
                      range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_ZbyR_Matched_TdifGreat40->cd();
             h_HcalHit_ZbyR_Matched_TdifGreat40_SD[i]=new TH2D(
                     ("HcalHit_ZbyR_Matched_TdifGreat40_SD_"+range_name).c_str(),
-                    ("Matched HcalHit location with time diff > 40ns SD "+
+                    ("Matched HcalHit location with time dif > 40ns SD "+
                      range_name+";Z depth(mm);radial distance from z-axis(mm)").c_str(),
                     80,0,3200,112,0,4500);
 
+            d_HcalHit_PE_All->cd();
             h_HcalHit_PE_All_SD[i]=new TH1D(
                     ("HcalHit_PE_All_SD_"+range_name).c_str(),
                     ("PEs of all HcalHits SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     200,0,200);
 
+            d_HcalHit_PE_TimeLess15->cd();
             h_HcalHit_PE_TimeLess15_SD[i]=new TH1D(
                     ("HcalHit_PE_TimeLess15_SD_"+range_name).c_str(),
-                    ("HcalHits with Time < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                   ("HcalHits with Time < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     200,0,200);
 
+            d_HcalHit_PE_TimeGreat40->cd();
             h_HcalHit_PE_TimeGreat40_SD[i]=new TH1D(
                     ("HcalHit_PE_TimeGreat40_SD_"+range_name).c_str(),
                     ("HcalHits with Time > 40ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     200,0,200);
 
+            d_HcalHit_PE_Matched_TdifLess15->cd();
             h_HcalHit_PE_Matched_TdifLess15_SD[i]=new TH1D(
                     ("HcalHit_PE_Matched_TdifLess15_SD_"+range_name).c_str(),
-                    ("Matched HcalHit with Time diff < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    ("Matched HcalHit with Time dif < 15ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     200,0,200);
 
+            d_HcalHit_PE_Matched_TdifGreat40->cd();
             h_HcalHit_PE_Matched_TdifGreat40_SD[i]=new TH1D(
                     ("HcalHit_PE_Matched_TdifGreat40_SD_"+range_name).c_str(),
-                    ("Matched HcalHit with Time diff > 40ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
+                    ("Matched HcalHit with Time dif > 40ns SD "+range_name+";Photoelectrons(PEs);Count").c_str(),
                     200,0,200);
 
+            d_HcalHit_Time_All->cd();
             h_HcalHit_Time_All_SD[i]=new TH1D(
                     ("HcalHit_Time_All_SD_"+range_name).c_str(),
                     ("Time of All HcalHits SD "+range_name+";time(ns)(5ns bin width);Count").c_str(),
                     100,0,500);
 
+            d_HcalHit_Time_Matched_All->cd();
             h_HcalHit_Time_Matched_All_SD[i]=new TH1D(
                     ("HcalHit_Time_Matched_All_SD_"+range_name).c_str(), 
                     ("Time of Matched HcalHits SD "+range_name+";Time(ns);Number of particles created").c_str(), 
                     500, 0, 500);
 
+            d_HcalHit_Time_Matched_Nucleons->cd();
             h_HcalHit_Time_Matched_Nucleons_SD[i]=new TH1D(
                     ("HcalHit_Time_Matched_Nucleons_SD_"+range_name).c_str(),
                     ("Time of HcalHits Matched to Nucleons SD "+range_name+";Time(ns);Number of Nucleons created").c_str(), 
                     500, 0, 500);
             
-            h_HcalHit_Time_Matched_Tdiff_SD[i]=new TH1D(
-                    ("HcalHit_Time_Matched_Tdiff_SD_"+range_name).c_str(),
+            d_HcalHit_Time_Matched_Tdif->cd();
+            h_HcalHit_Time_Matched_Tdif_SD[i]=new TH1D(
+                    ("HcalHit_Time_Matched_Tdif_SD_"+range_name).c_str(),
                     ("Time Diff between SimParticle and matched HcalHit SD "+range_name+";time(ns)(2ns bin width);Count").c_str(),
                     100,0,200);
 
@@ -516,9 +633,24 @@ namespace ldmx {
     
     void HcalHitMatcher::onProcessEnd() {
         
-        std::cout << "Total Number of Hits:     " << numHits_ << std::endl;
-        std::cout << "Number of Non Noise Hits: " << numNonNoiseHits_ << std::endl;
-        std::cout << "Number of Matched Hits:   " << numMatchedHits_ << std::endl;
+        double hitRate, matchRate;
+        {
+            //temporary variables for calculating rates
+            double numerator = numNonNoiseHits_;
+            double denominator = numEvents_;
+            hitRate = numerator/denominator;
+
+            numerator = numMatchedHits_;
+            denominator = numNonNoiseHits_;
+            matchRate = numerator / denominator;
+        }
+
+        std::cout << hitRate << std::endl;
+        printf( "Number of Events:          %i\n" , numEvents_ );
+        printf( "Number of Non Noise Hits:  %i\n" , numNonNoiseHits_ );
+        printf( "Number of Matched Hits:    %i\n" , numMatchedHits_ );
+        printf( "Hit Rate (hits/events):    %f\n" , hitRate );
+        printf( "Match Rate (matches/hits): %f\n" , matchRate );
 
         return;
     }
