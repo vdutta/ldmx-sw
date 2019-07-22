@@ -35,7 +35,7 @@
          Note: the ecal mother box is set to be 1mm larger in all dimensions than its raw values (again to prevent overlap),
             so the buffer in this file needs to be larger than 1mm
     -->
-    <variable name="side_layers"       value="31"/>
+    <variable name="side_layers"       value="29"/> <!-- 31 -->
     <variable name="side_Ecal_dx"      value="520.0+80.0"/>
     <variable name="side_Ecal_dy"      value="520.0+80.0"/>
     <variable name="side_dz"           value="449.1+150.9"/>    
