@@ -33,9 +33,9 @@
     <!-- side_Ecal_dx and dy have to be greater than the Ecal_dx and dy values in ecal.gdml -->
     <!-- side_dz has to be greater than the Ecal_dz values in ecal.gdml -->
     <variable name="side_layers"       value="31"/>
-    <variable name="side_Ecal_dx"      value="525."/>
-    <variable name="side_Ecal_dy"      value="525."/>
-    <variable name="side_dz"           value="300"/>    
+    <variable name="side_Ecal_dx"      value="520.0+5.0"/>
+    <variable name="side_Ecal_dy"      value="520.0+5.0"/>
+    <variable name="side_dz"           value="427.0+3.0"/>    
     <variable name="side_abso_thick"   value="20."/>
     <variable name="side_layer_thick"  value="side_abso_thick + scint_thick + 2.0*air_thick"/>
     <variable name="sideTB_dx"         value="(back_dx+side_Ecal_dx)/2.0"/>
