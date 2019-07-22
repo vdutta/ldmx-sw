@@ -29,9 +29,12 @@
     <variable name="back_dz3"          value="back_numLayers3*back_layer3_thick"/>
     <variable name="back_dz"           value="back_dz1+back_dz2+back_dz3"/>
      
-    <!-- side Around HCal Layer component widths -->
-    <!-- side_Ecal_dx and dy have to be greater than the Ecal_dx and dy values in ecal.gdml -->
-    <!-- side_dz has to be greater than the Ecal_dz values in ecal.gdml -->
+    <!-- side Around HCal Layer component widths
+         side_Ecal_dx, dy, and dz have to be greater than the Ecal_dx, dy, and dz values in ecal.gdml to prevent overlap
+         to make this clear, the values from ecal.gdml should be the first number and the small buffer should be the second
+         Note: the ecal mother box is set to be 1mm larger in all dimensions than its raw values (again to prevent overlap),
+            so the buffer in this file needs to be larger than 1mm
+    -->
     <variable name="side_layers"       value="31"/>
     <variable name="side_Ecal_dx"      value="520.0+5.0"/>
     <variable name="side_Ecal_dy"      value="520.0+5.0"/>
