@@ -211,10 +211,10 @@ namespace ldmx {
                 hit->setAmplitude(hcalLayerPEs[detIDraw]);
                 hit->setEnergy(energy);
                 hit->setTime(hcaldetIDTime[detIDraw]);
-                // hit->setXpos(hcalXpos[detIDraw]);
-                // hit->setYpos(hcalYpos[detIDraw]);
-                hit->setXpos(cur_xpos); // quantized and smeared positions
-                hit->setYpos(cur_ypos); // quantized and smeared positions
+                hit->setXpos(hcalXpos[detIDraw]);
+                hit->setYpos(hcalYpos[detIDraw]);
+                // hit->setXpos(cur_xpos); // quantized and smeared positions
+                // hit->setYpos(cur_ypos); // quantized and smeared positions
                 hit->setZpos(hcalZpos[detIDraw]);
                 hit->setNoise(false);
                 ihit++;
