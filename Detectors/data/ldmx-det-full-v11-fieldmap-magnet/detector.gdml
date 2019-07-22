@@ -48,10 +48,9 @@
     <constant name="ecal_front_z" value="21.5*cm"/>
             
     <!-- position of calorimeter mother -->
-    <constant name="em_calorimeter_thickness" value="427.0*mm"/> <!-- Needs to be taken from ecal.gdml by hand -->
+    <constant name="em_calorimeter_thickness" value="449.1*mm"/> <!-- Needs to be taken from ecal.gdml by hand -->
     <constant name="em_calorimeter_pos_z" value="ecal_front_z + em_calorimeter_thickness/2."/>
-    <constant name="back_hcal_thickness" value="4400.0*mm"/> <!-- Needs to be taken from hcal.gdml by hand -->
-    <constant name="hadron_calorimeter_thickness" value="em_calorimeter_thickness+back_hcal_thickness"/>
+    <constant name="hadron_calorimeter_thickness" value="5000.0*mm" /><!-- Needs to be taken from hcal.gdml by hand -->
     <constant name="hadron_calorimeter_pos_z" value="ecal_front_z + hadron_calorimeter_thickness/2."/>
 
     <!-- magnet position -->
