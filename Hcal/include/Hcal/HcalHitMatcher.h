@@ -44,10 +44,13 @@ namespace ldmx {
             HcalHitMatcher(const std::string& name, ldmx::Process& process) : ldmx::Analyzer(name, process) {}
 
             /**
-             * Gets strings from ParameterSet class for collection names.
-             * Collection strings that are searched for:
-             *      scoringPlaneHits_e (collection of ecal hits that crossed ecal scoring plane)
-             *      scoringPlaneHits_h (collection of hcal hits that cross hcal scoring plane)
+             * Gets options from ParameterSet class.
+             *      Option                      Default                 
+             *      EcalHitCollectionName       ecalDigis               
+             *      HcalHitCollectionName       hcalDigis               
+             *      EcalScoringPlaneHitsName    EcalScoringPlaneHits    
+             *      HcalScoringPlaneHitsName    HcalScoringPlaneHits
+             *      MaximumMatchDistance        150.0 (Maximum distance allowed for a match in mm)
              */
             virtual void configure(const ldmx::ParameterSet& ps);
             

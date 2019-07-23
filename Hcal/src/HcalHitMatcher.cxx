@@ -38,8 +38,7 @@ namespace ldmx {
         const TClonesArray* ecalScoringPlaneHits = event.getCollection( EcalScoringPlane_ );
         const TClonesArray* simParticles = event.getCollection("SimParticles"); // side-effect is to make TRefs all valid
 
-        std::vector<SimTrackerHit*> simVec;
-        std::vector<SimTrackerHit*> filteredSimVec;//Sim particles are organized from highest to lowest momentum
+        std::vector<ldmx::SimTrackerHit*> simVec;
     
         for (int i = 0; i < ecalScoringPlaneHits->GetEntriesFast(); i++ ) {
             ldmx::SimTrackerHit* ecalSPH = (ldmx::SimTrackerHit*)(ecalScoringPlaneHits->At(i));
@@ -48,15 +47,20 @@ namespace ldmx {
 
         std::sort(simVec.begin(), simVec.end(), compSims);
 
-        SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
-        for (int j = 0; j < simVec.size(); j++) {
-            SimParticle* sP = simVec[j]->getSimParticle();
-            if (sP == lastP) continue; //skip repeats
-            lastP = sP;
-            filteredSimVec.push_back(simVec[j]);
-        }
+        //SimParticles that cross Ecal Scoring Planes
+        std::vector< ldmx::SimParticle* > simParticleCrossEcalSP;
 
-        std::sort(filteredSimVec.begin(), filteredSimVec.end(), compSimsP);
+        ldmx::SimParticle* lastP = 0; //sometimes multiple SP hits from same particle
+        for ( std::vector<ldmx::SimTrackerHit*>::iterator it_simVec = simVec.begin();
+              it_simVec != simVec.end(); ++it_simVec ) {
+
+            ldmx::SimParticle* sP = (*it_simVec)->getSimParticle();
+            if ( sP != lastP ) {
+                //make sure there aren't any repeats
+                lastP = sP;
+                simParticleCrossEcalSP.push_back( sP );
+            }
+        }
 
         //----------This section obtains a list of sim particles that cross the hcal scoring plane---------->
         //Currently it is NOT being used to obtain any information
@@ -117,14 +121,13 @@ namespace ldmx {
         h_Ecal_SummedEnergy_SD[9]->Fill(e_cal_sum_energy);
         h_Ecal_SummedEnergy_SD[ecal_sumESD]->Fill(e_cal_sum_energy);
     
-        h_NumParticles_SD[9]->Fill(filteredSimVec.size());
-        h_NumParticles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
+        h_NumParticles_SD[9]->Fill(simParticleCrossEcalSP.size());
+        h_NumParticles_SD[ecal_sumESD]->Fill(simParticleCrossEcalSP.size());
 
         //Go through all SimParticles that crossed ECAL Scoring Plane
-        for ( const ldmx::SimTrackerHit* sth : filteredSimVec ) {
-            ldmx::SimParticle* sp = sth->getSimParticle();
-            int pdgID = sp->getPdgID();
-            double energy = sp->getEnergy();
+        for ( const ldmx::SimParticle* simPart : simParticleCrossEcalSP ) {
+            int pdgID = simPart->getPdgID();
+            double energy = simPart->getEnergy();
 
             h_Particle_PDGID_All_SD[9]->Fill( pdgID );
             h_Particle_PDGID_All_SD[ecal_sumESD]->Fill( pdgID );
@@ -143,43 +146,9 @@ namespace ldmx {
             if ( ! hcalhit->getNoise() ) { //Only analyze non-noise hits
 
                 numNonNoiseHits_++;
-                int pdgID=0; //PDG of sim particle that matched this hit
-                int simPartNum = -1; //index of sim particle that matched this hcal hit
 
-                double new_dist=9999, dist=9998; //initializing distance variables
-                for(int j=0; j<filteredSimVec.size(); j++) { //Iterate over all sim particles and match one to an Hcal hit
-
-                    SimParticle* sP = filteredSimVec[j]->getSimParticle();
-                    pdgID = sP->getPdgID();
-                    
-                    std::vector<double> simStart = sP->getVertex();
-                    std::vector<double> simEnd = sP->getEndPoint();
-        
-                    TVector3 simStartT = TVector3(simStart[0], simStart[1], simStart[2]);
-                    TVector3 simEndT = TVector3(simEnd[0], simEnd[1], simEnd[2]);
-                    TVector3 hCalPoint = TVector3(hcalhit->getX(), hcalhit->getY(), hcalhit->getZ());
-                    
-                    new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
-                    
-                    h_Particle_HitDistance_All_SD[9]->Fill(new_dist);
-                    h_Particle_HitDistance_All_SD[ecal_sumESD]->Fill(new_dist);
-        
-                    if(simStart[2]<10.0 and sP->getEnergy()>3000.0) {
-                        //discarding original electron?
-                        //check if sim particle is too close to the front of the hcal?
-                        //DO NOTHING (skip this sim particle)
-                    } else if(new_dist < dist) {
-                        dist = new_dist; //Distance to matched particle
-                        simPartNum = j; //Matched particle number in array of sim particles
-                    }
-                    
-                } //iterate over sim particles to match one to current hcal hit
-
-                //check if able to match sim particle(s) to hcal hit
-                if(simPartNum >= 0) {
-                    pdgID = filteredSimVec[simPartNum]->getSimParticle()->getPdgID();
-                }
-
+                //---- Bin HcalHit information that does not depend on mathcin -------------------->
+                
                 double hcalhit_radialdist2 = pow(hcalhit->getX(), 2) + pow(hcalhit->getY(), 2);
                 double hcalhit_radialdist = 0;
                 //check to avoid a floating point error
@@ -211,21 +180,55 @@ namespace ldmx {
                 
                 if(hcalhit->getPE() > max_PE_of_event)
                     max_PE_of_event=hcalhit->getPE();
-                
-                if( dist <= maxMatchDist_ ) {
+
+                //---- Attempt to match this HcalHit to a SimParticle that cross the Ecal SP ----->
+
+                //Iterate over all SimParticles that cross Ecal Scoring Plane to try to find a match
+                //  for this HcalHit
+                double new_dist=9999, dist=9998; //initializing distance variables
+                const ldmx::SimParticle* matchedParticle = nullptr;
+                for ( const ldmx::SimParticle* simPart : simParticleCrossEcalSP ) {
+
+                    std::vector<double> simStart = simPart->getVertex();
+                    std::vector<double> simEnd = simPart->getEndPoint();
+        
+                    TVector3 simStartT = TVector3(simStart[0], simStart[1], simStart[2]);
+                    TVector3 simEndT = TVector3(simEnd[0], simEnd[1], simEnd[2]);
+                    TVector3 hCalPoint = TVector3(hcalhit->getX(), hcalhit->getY(), hcalhit->getZ());
+                    
+                    new_dist = point_line_distance(simStartT, simEndT, hCalPoint);
+                    
+                    h_Particle_HitDistance_All_SD[9]->Fill(new_dist);
+                    h_Particle_HitDistance_All_SD[ecal_sumESD]->Fill(new_dist);
+        
+                    if(simStart[2]<10.0 and simPart->getEnergy()>3000.0) {
+                        //discarding original electron
+                        //DO NOTHING (skip this sim particle)
+                    } else if(new_dist < dist) {
+                        dist = new_dist; //Distance to matched particle
+                        matchedParticle = simPart;
+                    }
+                    
+                } //iterate over sim particles to match one to current hcal hit
+
+                //---- Bin HcalHit/SimParticle information for successfully matched hits --------->
+
+                if( matchedParticle and dist <= maxMatchDist_ ) {
                 
                     numMatchedHits_++;
 
-                    h_Particle_HitDistance_Matched_SD[9]->Fill(new_dist);
-                    h_Particle_HitDistance_Matched_SD[ecal_sumESD]->Fill(new_dist);
+                    h_Particle_HitDistance_Matched_SD[9]->Fill( dist );
+                    h_Particle_HitDistance_Matched_SD[ecal_sumESD]->Fill( dist );
         
                     h_HcalHit_Time_Matched_All_SD[9]->Fill(hcalhit->getTime());
                     h_HcalHit_Time_Matched_All_SD[ecal_sumESD]->Fill(hcalhit->getTime());
                     
+                    int pdgID = matchedParticle->getPdgID();
+
                     h_Particle_PDGID_Matched_SD[9]->Fill(pdgID);
                     h_Particle_PDGID_Matched_SD[ecal_sumESD]->Fill(pdgID);
         
-                    double part_hcalhit_timeDiff = (hcalhit->getTime()) - (filteredSimVec[simPartNum]->getSimParticle()->getTime());
+                    double part_hcalhit_timeDiff = (hcalhit->getTime()) - (matchedParticle->getTime());
                     
                     h_HcalHit_Time_Matched_Tdif_SD[9]->Fill(part_hcalhit_timeDiff);
                     h_HcalHit_Time_Matched_Tdif_SD[ecal_sumESD]->Fill(part_hcalhit_timeDiff);
@@ -244,18 +247,18 @@ namespace ldmx {
                     
                     //protons or neutrons (nucleons) 
                     if( pdgID==2112 or pdgID==2212 ) { 
-                        h_HcalHit_Time_Matched_Nucleons_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+                        h_HcalHit_Time_Matched_Nucleons_SD[9]->Fill(matchedParticle->getTime());
 //                        h_HCalhit_nucleon_time_vs_energy_SD[9]->Fill(
-//                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-//                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                        h_HcalHit_Time_Matched_Nucleons_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getTime());
+//                                matchedParticle->getTime(),
+//                                matchedParticle->getEnergy());
+                        h_HcalHit_Time_Matched_Nucleons_SD[ecal_sumESD]->Fill(matchedParticle->getTime());
 //                        h_HCalhit_nucleon_time_vs_energy_SD[ecal_sumESD]->Fill(
-//                                filteredSimVec[simPartNum]->getSimParticle()->getTime(),
-//                                filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                                matchedParticle->getTime(),
+//                                matchedParticle->getEnergy());
                     }
                     
-                    h_Particle_Energy_Matched_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-                    h_Particle_Energy_Matched_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+                    h_Particle_Energy_Matched_SD[9]->Fill(matchedParticle->getEnergy());
+                    h_Particle_Energy_Matched_SD[ecal_sumESD]->Fill(matchedParticle->getEnergy());
         
                     switch(pdgID) {
                         case 11:
@@ -265,8 +268,8 @@ namespace ldmx {
                         case 22:
                             h_HcalHit_ZbyR_Matched_Photon_SD[9]->Fill(hcalhit->getZ(), hcalhit_radialdist); 
                             h_HcalHit_ZbyR_Matched_Photon_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
-//                            h_HCalhit_photon_energy_SD[9]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
-//                            h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(filteredSimVec[simPartNum]->getSimParticle()->getEnergy());
+//                            h_HCalhit_photon_energy_SD[9]->Fill(matchedParticle->getEnergy());
+//                            h_HCalhit_photon_energy_SD[ecal_sumESD]->Fill(matchedParticle->getEnergy());
                             break;
                         case 2112:
                             h_HcalHit_ZbyR_Matched_Neutron_SD[ecal_sumESD]->Fill(hcalhit->getZ(), hcalhit_radialdist);
@@ -660,7 +663,6 @@ namespace ldmx {
             matchRate = numerator / denominator;
         }
 
-        std::cout << hitRate << std::endl;
         printf( "Number of Events:          %i\n" , numEvents_ );
         printf( "Number of Non Noise Hits:  %i\n" , numNonNoiseHits_ );
         printf( "Number of Matched Hits:    %i\n" , numMatchedHits_ );
