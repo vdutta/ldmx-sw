@@ -22,6 +22,7 @@
 
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
 #include "TClonesArray.h"
 #include "TVector3.h"
 
@@ -106,65 +107,52 @@ namespace ldmx {
             long int numEvents_; //* Number of events analyzed
         
             /**
-             * Same histograms but limiting particles to specific energy regions
-             * These energy regions are specific ranges of standard deviations of the 
-             * total particle energy histogram.
-             * These ranges are approximate.
-             *  Index   Range in Standard Deviations
-             *  0       (-1,+1)
-             *  1       [+1,+2)
-             *  2       (-2,-1]
-             *  3       [+2,inf)
-             *  4       (-3,-2]
-             *  5       (-4,-3]
-             *  6       (-5,-4]
-             *  7       (-6,-5]
-             *  8       (-inf,-6]
-             *  9       (-inf,inf) - all events
+             * The first index/coordinate in all of these histograms is the total (non-noise)
+             * energy deposited in the ECAL.
+             *
+             * This makes it possible to look at specific ranges of ECAL deposited energy
+             * when analyzing the results without having to re-run everytime ranges we are
+             * interested in change.
              */
 
             //Event information (i.e. One Entry per Event)
-            TH1D* h_Ecal_SummedEnergy_SD[10];
-            TH1D* h_NumParticles_SD[10];
-            TH1D* h_EventMaxPE_SD[10];
+            TH1D* h_Ecal_SummedEnergy;
+            TH2D* h_NumParticles;
+            TH2D* h_EventMaxPE;
 
             //SimParticle
-            TH1D* h_Particle_PDGID_All_SD[10]; //All PDG IDs
-            TH1D* h_Particle_PDGID_Matched_SD[10]; //Matched PDG IDs
-            TH1D* h_Particle_HitDistance_All_SD[10]; //Distance between SimParticles and HcalHits
-            TH1D* h_Particle_HitDistance_Matched_SD[10]; //Distance between SimParticles and HcalHits
-            TH1D* h_Particle_Energy_All_SD[10]; //All SimParticle energies
-            TH1D* h_Particle_Energy_Matched_SD[10]; //Matched SimParticle energies
+            TH2D* h_Particle_PDGID_All; //All PDG IDs
+            TH2D* h_Particle_PDGID_Matched; //Matched PDG IDs
+            TH2D* h_Particle_HitDistance_All; //Distance between SimParticles and HcalHits
+            TH2D* h_Particle_HitDistance_Matched; //Distance between SimParticles and HcalHits
+            TH2D* h_Particle_Energy_All; //All SimParticle energies
+            TH2D* h_Particle_Energy_Matched; //Matched SimParticle energies
 
             //Position of HcalHits
-            TH1D* h_HcalHit_Z_SD[10];
-            TH2D* h_HcalHit_ZbyR_All_SD[10];
-            TH2D* h_HcalHit_ZbyR_Unmatched_SD[10];
-            TH2D* h_HcalHit_ZbyR_TimeLess15_SD[10];
-            TH2D* h_HcalHit_ZbyR_TimeGreat40_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_Photon_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_Electron_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_Neutron_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_Other_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_TdifLess15_SD[10];
-            TH2D* h_HcalHit_ZbyR_Matched_TdifGreat40_SD[10];
+            TH2D* h_HcalHit_Z;
+            TH3D* h_HcalHit_ZbyR_All;
+            TH3D* h_HcalHit_ZbyR_Unmatched;
+            TH3D* h_HcalHit_ZbyR_TimeLess15;
+            TH3D* h_HcalHit_ZbyR_TimeGreat40;
+            TH3D* h_HcalHit_ZbyR_Matched_Photon;
+            TH3D* h_HcalHit_ZbyR_Matched_Electron;
+            TH3D* h_HcalHit_ZbyR_Matched_Neutron;
+            TH3D* h_HcalHit_ZbyR_Matched_Other;
+            TH3D* h_HcalHit_ZbyR_Matched_TdifLess15;
+            TH3D* h_HcalHit_ZbyR_Matched_TdifGreat40;
             
             //PEs of HcalHit
-            TH1D* h_HcalHit_PE_All_SD[10];
-            TH1D* h_HcalHit_PE_TimeLess15_SD[10];
-            TH1D* h_HcalHit_PE_TimeGreat40_SD[10];
-            TH1D* h_HcalHit_PE_Matched_TdifLess15_SD[10];
-            TH1D* h_HcalHit_PE_Matched_TdifGreat40_SD[10];
+            TH2D* h_HcalHit_PE_All;
+            TH2D* h_HcalHit_PE_TimeLess15;
+            TH2D* h_HcalHit_PE_TimeGreat40;
+            TH2D* h_HcalHit_PE_Matched_TdifLess15;
+            TH2D* h_HcalHit_PE_Matched_TdifGreat40;
 
             //Time of HcalHit
-            TH1D* h_HcalHit_Time_All_SD[10];
-            TH1D* h_HcalHit_Time_Matched_All_SD[10];
-            TH1D* h_HcalHit_Time_Matched_Nucleons_SD[10];
-            TH1D* h_HcalHit_Time_Matched_Tdif_SD[10];
-
-            //Deprecated for now
-//          TH1D* h_HcalHit_photon_energy_SD[10];
-//          TH2D* h_HcalHit_nucleon_time_vs_energy_SD[10];
+            TH2D* h_HcalHit_Time_All;
+            TH2D* h_HcalHit_Time_Matched_All;
+            TH2D* h_HcalHit_Time_Matched_Nucleons;
+            TH2D* h_HcalHit_Time_Matched_Tdif;
 
     };
 }
