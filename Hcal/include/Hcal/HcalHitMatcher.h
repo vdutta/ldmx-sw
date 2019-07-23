@@ -90,11 +90,14 @@ namespace ldmx {
 
         private:
     
+            ///////////////////////////////
+            // Python Config Options
             std::string EcalHitColl_; //* Name of Ecal Digis Collection
             std::string HcalHitColl_; //* Name of Hcal Digis Collection
             std::string EcalScoringPlane_; //* Name of Ecal Scoring Plane Hits Collection
             std::string HcalScoringPlane_; //* Name of Hcal Scoring Plane Hits Collection
-            
+            double maxMatchDist_; //* Maximum distance (mm) between SimParticle and Hit to allow for a match
+
             long int numNonNoiseHits_; //* Number of Non-Noise Hcal Hits
             long int numMatchedHits_; //* Number of Hcal Hits matched to a sim particle
             long int numEvents_; //* Number of events analyzed

@@ -20,10 +20,12 @@ namespace ldmx {
 
     void HcalHitMatcher::configure(const ldmx::ParameterSet& ps) { 
         
-        EcalHitColl_ = ps.getString("EcalHitCollectionName");
-        HcalHitColl_ = ps.getString("HcalHitCollectionName");
-        EcalScoringPlane_ = ps.getString("EcalScoringPlaneHitsName"); 
-        HcalScoringPlane_ = ps.getString("HcalScoringPlaneHitsName");
+        EcalHitColl_ = ps.getString( "EcalHitCollectionName" , "ecalDigis" );
+        HcalHitColl_ = ps.getString( "HcalHitCollectionName" , "hcalDigis" );
+        EcalScoringPlane_ = ps.getString( "EcalScoringPlaneHitsName" , "EcalScoringPlaneHits" ); 
+        HcalScoringPlane_ = ps.getString( "HcalScoringPlaneHitsName" , "HcalScoringPlaneHits" );
+
+        maxMatchDist_ = ps.getDouble( "MaximumMatchDistance" , 150.0 );
 
         return;
     }
@@ -210,7 +212,7 @@ namespace ldmx {
                 if(hcalhit->getPE() > max_PE_of_event)
                     max_PE_of_event=hcalhit->getPE();
                 
-                if( dist <= 150.0 ) {//must be 150mm or closer to confidentally match an HCal hit to a sim particle
+                if( dist <= maxMatchDist_ ) {
                 
                     numMatchedHits_++;
 
