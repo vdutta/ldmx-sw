@@ -397,35 +397,35 @@ namespace ldmx {
         d_NumParticles->cd();
         h_NumParticles = new TH2D(
                 "NumParticles" ,
-                "Num Particles in Event;Number of SimParticles that Crossed the ECAL Scoring Plane;Count",
+                "Num Particles in Event;X;Number of SimParticles that Crossed the ECAL Scoring Plane;Count",
                 800,0,8000,
                 50,0,50);
 
         d_EventMaxPE->cd();
         h_EventMaxPE = new TH2D(
                 "EventMaxPE",
-                "Maximum PE for all Hits in Event;Maximum PE for all HcalHits in Event;Count",
+                "Maximum PE for all Hits in Event;X;Maximum PE for all HcalHits in Event;Count",
                 800,0,8000,
                 500,0,500);
 
         d_Particle_PDGID_All->cd();
         h_Particle_PDGID_All = new TH2D(
                 "Particle_PDGID_All",
-                "PDG IDs;PDG ID of SimParticle Crossing ECAL Scoring Plane;Count",
+                "PDG IDs;X;PDG ID of SimParticle Crossing ECAL Scoring Plane;Count",
                 800,0,8000,
                 10000,-5000,5000);
 
         d_Particle_PDGID_Matched->cd();
         h_Particle_PDGID_Matched = new TH2D(
                 "Particle_PDGID_Matched",
-                "PDG IDs;PDG ID of SimParticle Matched to HcalHit;Count",
+                "PDG IDs;X;PDG ID of SimParticle Matched to HcalHit;Count",
                 800,0,8000,
                 10000,-5000,5000);
 
        d_Particle_HitDistance_All->cd();
        h_Particle_HitDistance_All = new TH2D(
                "Particle_HitDistance_All",
-               "Any pair of HcalHit and SimParticle crossing ECAL Scoring Plane;Distance between SimParticle and HcalHit;Count",
+               "Any pair of HcalHit and SimParticle crossing ECAL Scoring Plane;X;Distance between SimParticle and HcalHit;Count",
                800,0,8000,
                400, 0, 2000);
        
@@ -439,14 +439,14 @@ namespace ldmx {
        d_Particle_Energy_All->cd();
        h_Particle_Energy_All = new TH2D(
                "Particle_Energy_All",
-               "All Particle Energies;Energy(MeV)(5MeV bin width);Count",
+               "All Particle Energies;X;Energy(MeV)(5MeV bin width);Count",
                800,0,8000,
                800,0,4000);
 
        d_Particle_Energy_Matched->cd();
        h_Particle_Energy_Matched = new TH2D(
                "Particle_Energy_Matched",
-               "Matched Particle Energies;Energy(MeV)(5MeV bin width);Count",
+               "Matched Particle Energies;X;Energy(MeV)(5MeV bin width);Count",
                800,0,8000,
                800,0,4000);
 
@@ -460,56 +460,56 @@ namespace ldmx {
        d_HcalHit_ZbyR_All->cd();
        h_HcalHit_ZbyR_All = new TH3D(
                "HcalHit_ZbyR_All", 
-               "All HcalHit locations;Z depth (mm);radial distance from z-axis (mm)",
+               "All HcalHit locations;X;Z depth (mm);radial distance from z-axis (mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_Unmatched->cd();
        h_HcalHit_ZbyR_Unmatched = new TH3D(
                "HcalHit_ZbyR_Unmatched", 
-               "Hcal unmatched hit locations;Z depth(mm);radial distance from z-axis(mm)",
+               "Hcal unmatched hit locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_TimeLess15->cd();
        h_HcalHit_ZbyR_TimeLess15 = new TH3D(
                "HcalHit_ZbyR_TimeLess15",
-               "HcalHits with Time < 15ns locations;Z depth(mm);radial distance from z-axis(mm)",
+               "HcalHits with Time < 15ns locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_TimeGreat40->cd();
        h_HcalHit_ZbyR_TimeGreat40 = new TH3D(
                "HcalHit_ZbyR_TimeGreat40",
-               "HcalHits with Time > 40ns locations;Z depth(mm);radial distance from z-axis(mm)",
+               "HcalHits with Time > 40ns locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_Matched_Photon->cd();
        h_HcalHit_ZbyR_Matched_Photon = new TH3D(
                "HcalHit_ZbyR_Matched_Photon", 
-               "Hcal photon hit locations;Z depth(mm);radial distance from z-axis(mm)",
+               "Hcal photon hit locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_Matched_Electron->cd();
        h_HcalHit_ZbyR_Matched_Electron = new TH3D(
                "HcalHit_ZbyR_Matched_Electron", 
-               "Hcal electron hit locations;Z depth(mm);radial distance from z-axis(mm)",
+               "Hcal electron hit locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_Matched_Neutron->cd();
        h_HcalHit_ZbyR_Matched_Neutron = new TH3D(
                "HcalHit_ZbyR_Matched_Neutron", 
-               "Hcal neutron hit locations;Z depth(mm);radial distance from z-axis(mm)",
+               "Hcal neutron hit locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_ZbyR_Matched_Other->cd();
        h_HcalHit_ZbyR_Matched_Other = new TH3D(
                "HcalHit_ZbyR_Matched_Other", 
-               "Hcal other particle hit locations;Z depth(mm);radial distance from z-axis(mm)",
+               "Hcal other particle hit locations;X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
@@ -517,7 +517,7 @@ namespace ldmx {
        h_HcalHit_ZbyR_Matched_TdifLess15 = new TH3D(
                "HcalHit_ZbyR_Matched_TdifLess15",
                "Matched HcalHit location with time dif < 15ns"
-                ";Z depth(mm);radial distance from z-axis(mm)",
+                ";X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
@@ -525,70 +525,70 @@ namespace ldmx {
        h_HcalHit_ZbyR_Matched_TdifGreat40 = new TH3D(
                "HcalHit_ZbyR_Matched_TdifGreat40",
                "Matched HcalHit location with time dif > 40ns"
-                ";Z depth(mm);radial distance from z-axis(mm)",
+                ";X;Z depth(mm);radial distance from z-axis(mm)",
                800,0,8000,
                80,0,3200,112,0,4500);
 
        d_HcalHit_PE_All->cd();
        h_HcalHit_PE_All = new TH2D(
                "HcalHit_PE_All",
-               "PEs of all HcalHits;Photoelectrons(PEs);Count",
+               "PEs of all HcalHits;X;Photoelectrons(PEs);Count",
                800,0,8000,
                200,0,200);
 
        d_HcalHit_PE_TimeLess15->cd();
        h_HcalHit_PE_TimeLess15 = new TH2D(
                "HcalHit_PE_TimeLess15",
-              "HcalHits with Time < 15ns;Photoelectrons(PEs);Count",
+              "HcalHits with Time < 15ns;X;Photoelectrons(PEs);Count",
                800,0,8000,
                200,0,200);
 
        d_HcalHit_PE_TimeGreat40->cd();
        h_HcalHit_PE_TimeGreat40 = new TH2D(
                "HcalHit_PE_TimeGreat40",
-               "HcalHits with Time > 40ns;Photoelectrons(PEs);Count",
+               "HcalHits with Time > 40ns;X;Photoelectrons(PEs);Count",
                800,0,8000,
                200,0,200);
 
        d_HcalHit_PE_Matched_TdifLess15->cd();
        h_HcalHit_PE_Matched_TdifLess15 = new TH2D(
                "HcalHit_PE_Matched_TdifLess15",
-               "Matched HcalHit with Time dif < 15ns;Photoelectrons(PEs);Count",
+               "Matched HcalHit with Time dif < 15ns;X;Photoelectrons(PEs);Count",
                800,0,8000,
                200,0,200);
 
        d_HcalHit_PE_Matched_TdifGreat40->cd();
        h_HcalHit_PE_Matched_TdifGreat40 = new TH2D(
                "HcalHit_PE_Matched_TdifGreat40",
-               "Matched HcalHit with Time dif > 40ns;Photoelectrons(PEs);Count",
+               "Matched HcalHit with Time dif > 40ns;X;Photoelectrons(PEs);Count",
                800,0,8000,
                200,0,200);
 
        d_HcalHit_Time_All->cd();
        h_HcalHit_Time_All = new TH2D(
                "HcalHit_Time_All",
-               "Time of All HcalHits;time(ns)(5ns bin width);Count",
+               "Time of All HcalHits;X;time(ns)(5ns bin width);Count",
                800,0,8000,
                100,0,500);
 
        d_HcalHit_Time_Matched_All->cd();
        h_HcalHit_Time_Matched_All = new TH2D(
                "HcalHit_Time_Matched_All", 
-               "Time of Matched HcalHits;Time(ns);Number of particles created", 
+               "Time of Matched HcalHits;X;Time(ns);Number of particles created", 
                800,0,8000,
                500, 0, 500);
 
        d_HcalHit_Time_Matched_Nucleons->cd();
        h_HcalHit_Time_Matched_Nucleons = new TH2D(
                "HcalHit_Time_Matched_Nucleons",
-               "Time of HcalHits Matched to Nucleons;Time(ns);Number of Nucleons created", 
+               "Time of HcalHits Matched to Nucleons;X;Time(ns);Number of Nucleons created", 
                800,0,8000,
                500, 0, 500);
        
        d_HcalHit_Time_Matched_Tdif->cd();
        h_HcalHit_Time_Matched_Tdif = new TH2D(
                "HcalHit_Time_Matched_Tdif",
-               ";Time Difference Between SimParticle and matched HcalHit [ns] (2ns bin width);Count",
+               ";X;Time Difference Between SimParticle and matched HcalHit [ns] (2ns bin width);Count",
                800,0,8000,
                100,0,200);
 
