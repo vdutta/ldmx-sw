@@ -22,6 +22,10 @@
     <variable name="c" value="1"/>  
     <variable name="d" value="1"/>  
 
+    <!--
+        THIS git branch IS NOT IN USE!
+        LOOK AT branch iss577 FOR THE v12 GEOMETRY THAT INCORPORATES THE ECAL MOTHERBOARDS!
+    -->
 
     <!-- 
         If you change any of these heights, you will need to update the 
