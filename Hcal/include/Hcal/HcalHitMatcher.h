@@ -123,11 +123,11 @@ namespace ldmx {
             TH1D* h_EventMaxPE_SD[10];
 
             //SimParticle
-            TH1D* h_Particle_PDGID_All_SD[10]; //All PDG IDs - NOT IMPLEMENTED
+            TH1D* h_Particle_PDGID_All_SD[10]; //All PDG IDs
             TH1D* h_Particle_PDGID_Matched_SD[10]; //Matched PDG IDs
             TH1D* h_Particle_HitDistance_All_SD[10]; //Distance between SimParticles and HcalHits
             TH1D* h_Particle_HitDistance_Matched_SD[10]; //Distance between SimParticles and HcalHits
-            TH1D* h_Particle_Energy_All_SD[10]; //All SimParticle energies - NOT IMPLEMENTED
+            TH1D* h_Particle_Energy_All_SD[10]; //All SimParticle energies
             TH1D* h_Particle_Energy_Matched_SD[10]; //Matched SimParticle energies
 
             //Position of HcalHits

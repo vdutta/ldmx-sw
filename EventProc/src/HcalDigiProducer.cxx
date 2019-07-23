@@ -151,13 +151,13 @@ namespace ldmx {
             double energy = depEnergy; 
 
             // quantize/smear the position
-            HcalID *curDetId = new HcalID();
-            curDetId->setRawValue(detIDraw);
-            curDetId->unpack();
-            int cur_subsection = curDetId->getFieldValue("section");            
-            int cur_layer      = curDetId->getFieldValue("layer");
-            int cur_strip      = curDetId->getFieldValue("strip");
-            float cur_xpos, cur_ypos; 
+            HcalID curDetId;
+            curDetId.setRawValue(detIDraw);
+            curDetId.unpack();
+            int cur_subsection = curDetId.getFieldValue("section");            
+            int cur_layer      = curDetId.getFieldValue("layer");
+            int cur_strip      = curDetId.getFieldValue("strip");
+            float cur_xpos( hcalXpos[detIDraw] ), cur_ypos( hcalYpos[detIDraw] );
 
             if (cur_subsection != 0){ // for sidecal don't worry about attenuation because it's single readout
                 hcalLayerPEs[detIDraw] = random_->Poisson(meanPE+meanNoise_);
@@ -182,25 +182,25 @@ namespace ldmx {
             }
             // std::cout << "depEnergy = " << depEnergy << "\t hcalLayerPEs[detIDraw] = " << hcalLayerPEs[detIDraw] << "\t hcalLayerMinPEs[detIDraw] = " << hcalLayerMinPEs[detIDraw] << std::endl;
 
-            if (cur_subsection == 0){
-                float super_strip_width = SUPER_STRIP_SIZE_*50.0;
-                float total_super_strips = STRIPS_BACK_PER_LAYER_/SUPER_STRIP_SIZE_; // to help the integer round up
-                float total_width = STRIPS_BACK_PER_LAYER_*50.0;
-                if (cur_layer % 2 == 0){ // even layers, vertical
-                    cur_xpos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
-                    cur_ypos = hcalYpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
-                }
-                if (cur_layer % 2 == 1){ // odd layers, horizontal
-                    cur_ypos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
-                    cur_xpos = hcalXpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
-                }
-                if (cur_xpos > total_width/2.) cur_xpos = total_width/2.;
-                if (cur_xpos < -1.*total_width/2.) cur_xpos = -1.*total_width/2.;
-                if (cur_ypos > total_width/2.) cur_ypos = total_width/2.;
-                if (cur_ypos < -1.*total_width/2.) cur_ypos = -1.*total_width/2.;
-                // std::cout << "super_strip_width = " << super_strip_width << "\t total_super_strips = " << total_super_strips << "\t total_width = " << total_width << std::endl;
-            }
-
+//            if (cur_subsection == 0){
+//                float super_strip_width = SUPER_STRIP_SIZE_*50.0;
+//                float total_super_strips = STRIPS_BACK_PER_LAYER_/SUPER_STRIP_SIZE_; // to help the integer round up
+//                float total_width = STRIPS_BACK_PER_LAYER_*50.0;
+//                if (cur_layer % 2 == 0){ // even layers, vertical
+//                    cur_xpos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
+//                    cur_ypos = hcalYpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
+//                }
+//                if (cur_layer % 2 == 1){ // odd layers, horizontal
+//                    cur_ypos = (super_strip_width * (float(cur_strip)+0.5)) - total_width/2.; 
+//                    cur_xpos = hcalXpos[detIDraw] + random_->Gaus(0.,strip_position_resolution_); 
+//                }
+//                if (cur_xpos > total_width/2.) cur_xpos = total_width/2.;
+//                if (cur_xpos < -1.*total_width/2.) cur_xpos = -1.*total_width/2.;
+//                if (cur_ypos > total_width/2.) cur_ypos = total_width/2.;
+//                if (cur_ypos < -1.*total_width/2.) cur_ypos = -1.*total_width/2.;
+//                // std::cout << "super_strip_width = " << super_strip_width << "\t total_super_strips = " << total_super_strips << "\t total_width = " << total_width << std::endl;
+//            }
+//
             if( hcalLayerPEs[detIDraw] >= readoutThreshold_ ){ // > or >= ?
                 
                 HcalHit *hit = (HcalHit*) (hits_->ConstructedAt(ihit));
@@ -209,7 +209,8 @@ namespace ldmx {
                 hit->setPE(hcalLayerPEs[detIDraw]);
                 hit->setMinPE(hcalLayerMinPEs[detIDraw]);
                 hit->setAmplitude(hcalLayerPEs[detIDraw]);
-                hit->setEnergy(energy);
+                hit->setEnergy(hcaldetIDEdep[detIDraw]);
+                //hit->setEnergy(energy);
                 hit->setTime(hcaldetIDTime[detIDraw]);
                 hit->setXpos(hcalXpos[detIDraw]);
                 hit->setYpos(hcalYpos[detIDraw]);
@@ -240,92 +241,92 @@ namespace ldmx {
             }        // end verbose            
         } 
         
-
-        // ------------------------------- Noise simulation -------------------------------
-        // simulate noise hits in back hcal
-        int total_super_strips_back = STRIPS_BACK_PER_LAYER_/SUPER_STRIP_SIZE_;
-        int total_empty_channels = 2*(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
-        std::vector<double> noiseHits_PE = noiseGenerator_->generateNoiseHits( total_empty_channels ); // 2-sided readout
-        int total_zero_channels = total_empty_channels - noiseHits_PE.size();
-        std::vector<double> zeroNoiseHits_PE(total_zero_channels, 0.0);
-        noiseHits_PE.insert( noiseHits_PE.end(), zeroNoiseHits_PE.begin(), zeroNoiseHits_PE.end() );
-        std::random_shuffle ( noiseHits_PE.begin(), noiseHits_PE.end() );
-        // std::vector<double> noiseHits_PE_1 = noiseGenerator_->generateNoiseHits(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
-        // std::vector<double> noiseHits_PE_2 = noiseGenerator_->generateNoiseHits(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
-        // std::cout << "numSigHits_back = " << numSigHits_back << ", ihit = " << ihit << ", total_empty_channels = " << total_empty_channels << std::endl;
-        int ctr_back_noise = 0;
-        // //for( auto noise : noiseHits_PE ){
-        // std::cout << "total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back = " << (total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back) << std::endl;
-        for( unsigned int i = 0; i < noiseHits_PE.size()/2 ; ++i){
-            double cur_noise_pe_1 = noiseHits_PE[i*2];
-            double cur_noise_pe_2 = noiseHits_PE[i*2+1];
-            double total_noise = cur_noise_pe_1 + cur_noise_pe_2;
-            if (total_noise < readoutThreshold_) continue; // do nothing if the noise is 0
-
-            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
-            noiseHit->setPE(total_noise);
-            noiseHit->setMinPE(std::min(cur_noise_pe_1,cur_noise_pe_2));
-            noiseHit->setAmplitude(total_noise);
-            noiseHit->setXpos(0.);
-            noiseHit->setYpos(0.);
-            noiseHit->setZpos(0.);
-            noiseHit->setTime(-999.);
-            noiseHit->setEnergy(total_noise*mev_per_mip_/pe_per_mip_);
-            unsigned int rawID;
-            do{
-	           rawID = generateRandomID(HcalSection::BACK);
-            } while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
-            noiseHit->setID(rawID);
-            noiseHitIDs.insert(rawID);
-            noiseHit->setNoise(true);
-            ihit++;
-            ctr_back_noise++;
-        }
-        // std::cout << "numSigHits_back = " << numSigHits_back << ", ihit = " << ihit << ", ctr_back_noise = " << ctr_back_noise << std::endl;
-
-        // simulate noise hits in side, top/bottom hcal
-        noiseHits_PE = noiseGenerator_->generateNoiseHits((STRIPS_SIDE_TB_PER_LAYER_*NUM_SIDE_TB_HCAL_LAYERS_)*2-numSigHits_side_tb);
-        for( auto noise : noiseHits_PE ){
-            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
-            noiseHit->setPE(noise);
-            noiseHit->setMinPE(noise); // only one readout for sidecal
-            noiseHit->setAmplitude(noise);
-            noiseHit->setXpos(0.);
-            noiseHit->setYpos(0.);
-            noiseHit->setZpos(0.);
-            noiseHit->setTime(-999.);
-            noiseHit->setEnergy(noise*mev_per_mip_/pe_per_mip_);
-            unsigned int rawID;
-            do{
-	        rawID = generateRandomID(HcalSection::TOP);
-            }while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
-            noiseHit->setID(rawID);
-            noiseHitIDs.insert(rawID);
-            noiseHit->setNoise(true);
-            ihit++;
-        }
-
-        // simulate noise hits in side, left/right hcal
-        noiseHits_PE = noiseGenerator_->generateNoiseHits((STRIPS_SIDE_LR_PER_LAYER_*NUM_SIDE_LR_HCAL_LAYERS_)*2-numSigHits_side_lr);
-        for( auto noise : noiseHits_PE ){
-            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
-            noiseHit->setPE(noise);
-            noiseHit->setMinPE(noise); // only one readout for sidecal
-            noiseHit->setAmplitude(noise);
-            noiseHit->setXpos(0.);
-            noiseHit->setYpos(0.);
-            noiseHit->setZpos(0.);
-            noiseHit->setTime(-999.);
-            noiseHit->setEnergy(noise*mev_per_mip_/pe_per_mip_);
-            unsigned int rawID;
-            do{
-	        rawID = generateRandomID(HcalSection::LEFT);
-            }while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
-            noiseHit->setID(rawID);
-            noiseHitIDs.insert(rawID);
-            noiseHit->setNoise(true);
-            ihit++;
-        }
+//
+//        // ------------------------------- Noise simulation -------------------------------
+//        // simulate noise hits in back hcal
+//        int total_super_strips_back = STRIPS_BACK_PER_LAYER_/SUPER_STRIP_SIZE_;
+//        int total_empty_channels = 2*(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
+//        std::vector<double> noiseHits_PE = noiseGenerator_->generateNoiseHits( total_empty_channels ); // 2-sided readout
+//        int total_zero_channels = total_empty_channels - noiseHits_PE.size();
+//        std::vector<double> zeroNoiseHits_PE(total_zero_channels, 0.0);
+//        noiseHits_PE.insert( noiseHits_PE.end(), zeroNoiseHits_PE.begin(), zeroNoiseHits_PE.end() );
+//        std::random_shuffle ( noiseHits_PE.begin(), noiseHits_PE.end() );
+//        // std::vector<double> noiseHits_PE_1 = noiseGenerator_->generateNoiseHits(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
+//        // std::vector<double> noiseHits_PE_2 = noiseGenerator_->generateNoiseHits(total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back);
+//        // std::cout << "numSigHits_back = " << numSigHits_back << ", ihit = " << ihit << ", total_empty_channels = " << total_empty_channels << std::endl;
+//        int ctr_back_noise = 0;
+//        // //for( auto noise : noiseHits_PE ){
+//        // std::cout << "total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back = " << (total_super_strips_back*NUM_BACK_HCAL_LAYERS_-numSigHits_back) << std::endl;
+//        for( unsigned int i = 0; i < noiseHits_PE.size()/2 ; ++i){
+//            double cur_noise_pe_1 = noiseHits_PE[i*2];
+//            double cur_noise_pe_2 = noiseHits_PE[i*2+1];
+//            double total_noise = cur_noise_pe_1 + cur_noise_pe_2;
+//            if (total_noise < readoutThreshold_) continue; // do nothing if the noise is 0
+//
+//            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
+//            noiseHit->setPE(total_noise);
+//            noiseHit->setMinPE(std::min(cur_noise_pe_1,cur_noise_pe_2));
+//            noiseHit->setAmplitude(total_noise);
+//            noiseHit->setXpos(0.);
+//            noiseHit->setYpos(0.);
+//            noiseHit->setZpos(0.);
+//            noiseHit->setTime(-999.);
+//            noiseHit->setEnergy(total_noise*mev_per_mip_/pe_per_mip_);
+//            unsigned int rawID;
+//            do{
+//	           rawID = generateRandomID(HcalSection::BACK);
+//            } while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
+//            noiseHit->setID(rawID);
+//            noiseHitIDs.insert(rawID);
+//            noiseHit->setNoise(true);
+//            ihit++;
+//            ctr_back_noise++;
+//        }
+//        // std::cout << "numSigHits_back = " << numSigHits_back << ", ihit = " << ihit << ", ctr_back_noise = " << ctr_back_noise << std::endl;
+//
+//        // simulate noise hits in side, top/bottom hcal
+//        noiseHits_PE = noiseGenerator_->generateNoiseHits((STRIPS_SIDE_TB_PER_LAYER_*NUM_SIDE_TB_HCAL_LAYERS_)*2-numSigHits_side_tb);
+//        for( auto noise : noiseHits_PE ){
+//            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
+//            noiseHit->setPE(noise);
+//            noiseHit->setMinPE(noise); // only one readout for sidecal
+//            noiseHit->setAmplitude(noise);
+//            noiseHit->setXpos(0.);
+//            noiseHit->setYpos(0.);
+//            noiseHit->setZpos(0.);
+//            noiseHit->setTime(-999.);
+//            noiseHit->setEnergy(noise*mev_per_mip_/pe_per_mip_);
+//            unsigned int rawID;
+//            do{
+//	        rawID = generateRandomID(HcalSection::TOP);
+//            }while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
+//            noiseHit->setID(rawID);
+//            noiseHitIDs.insert(rawID);
+//            noiseHit->setNoise(true);
+//            ihit++;
+//        }
+//
+//        // simulate noise hits in side, left/right hcal
+//        noiseHits_PE = noiseGenerator_->generateNoiseHits((STRIPS_SIDE_LR_PER_LAYER_*NUM_SIDE_LR_HCAL_LAYERS_)*2-numSigHits_side_lr);
+//        for( auto noise : noiseHits_PE ){
+//            HcalHit* noiseHit = (HcalHit*) (hits_->ConstructedAt(ihit));
+//            noiseHit->setPE(noise);
+//            noiseHit->setMinPE(noise); // only one readout for sidecal
+//            noiseHit->setAmplitude(noise);
+//            noiseHit->setXpos(0.);
+//            noiseHit->setYpos(0.);
+//            noiseHit->setZpos(0.);
+//            noiseHit->setTime(-999.);
+//            noiseHit->setEnergy(noise*mev_per_mip_/pe_per_mip_);
+//            unsigned int rawID;
+//            do{
+//	        rawID = generateRandomID(HcalSection::LEFT);
+//            }while( hcaldetIDEdep.find(rawID) != hcaldetIDEdep.end() || noiseHitIDs.find(rawID) != noiseHitIDs.end() );
+//            noiseHit->setID(rawID);
+//            noiseHitIDs.insert(rawID);
+//            noiseHit->setNoise(true);
+//            ihit++;
+//        }
 
         event.add("hcalDigis", hits_);
     }

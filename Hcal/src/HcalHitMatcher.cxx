@@ -118,6 +118,19 @@ namespace ldmx {
         h_NumParticles_SD[9]->Fill(filteredSimVec.size());
         h_NumParticles_SD[ecal_sumESD]->Fill(filteredSimVec.size());
 
+        //Go through all SimParticles that crossed ECAL Scoring Plane
+        for ( const ldmx::SimTrackerHit* sth : filteredSimVec ) {
+            ldmx::SimParticle* sp = sth->getSimParticle();
+            int pdgID = sp->getPdgID();
+            double energy = sp->getEnergy();
+
+            h_Particle_PDGID_All_SD[9]->Fill( pdgID );
+            h_Particle_PDGID_All_SD[ecal_sumESD]->Fill( pdgID );
+
+            h_Particle_Energy_All_SD[9]->Fill( energy );
+            h_Particle_Energy_All_SD[ecal_sumESD]->Fill( energy );
+        }
+
         //----This section matches HCal hits to sim particles and records results----->
         const TClonesArray* hcalHitColl = event.getCollection( HcalHitColl_ );
 
