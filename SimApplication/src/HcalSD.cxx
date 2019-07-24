@@ -10,11 +10,16 @@
 #include "G4SDManager.hh"
 #include "G4Geantino.hh"
 #include "G4ChargedGeantino.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleTypes.hh"
 
 namespace ldmx {
 
     HcalSD::HcalSD(G4String name, G4String theCollectionName, int subdetID, DetectorID* detID) :
-            CalorimeterSD(name, theCollectionName, subdetID, detID) {
+            CalorimeterSD(name, theCollectionName, subdetID, detID),
+            birksc1_(1.29e-2),
+            birksc2_(9.59e-6)
+    {
     }
 
     HcalSD::~HcalSD() {}
@@ -39,11 +44,52 @@ namespace ldmx {
             return false;
         }
 
+        //---------------------------------------------------------------------------------------------------
+        //                Birks' Law 
+        //                ===========
+        //    
+        //                      In the case of Scintillator as active medium, we can
+        //              describe the quenching effects with the Birks' law,
+        //              using the expression and the coefficients taken from
+        //              the paper NIM 80 (1970) 239-244 for the organic
+        //              scintillator NE-102:
+        //                                     S*dE/dr
+        //                    dL/dr = -----------------------------------
+        //                               1 + C1*(dE/dr)
+        //              with:
+        //                    S=1
+        //                    C1 = 1.29 x 10^-2  g*cm^-2*MeV^-1
+        //                    C2 = 9.59 x 10^-6  g^2*cm^-4*MeV^-2
+        //              These are the same values used by ATLAS TileCal
+        //              and CMS HCAL (and also the default in Geant3).
+        //              You can try different values for these parameters,
+        //              to have an idea on the uncertainties due to them,
+        //              by uncommenting one of the lines below.
+        //              To get the "dE/dr" that appears in the formula,
+        //              which has the dimensions
+        //                    [ dE/dr ] = MeV * cm^2 / g
+        //              we have to divide the energy deposit in MeV by the
+        //              product of the step length (in cm) and the density
+        //              of the scintillator:
+
+        G4double birksFactor(1.0);
+        G4double stepLength = aStep->GetStepLength() / CLHEP::cm;    
+        //Do not apply Birks for gamma deposits!
+        if (stepLength > 1.0e-6) //Check, cut if necessary.
+        {
+            G4double rho = aStep->GetPreStepPoint()->GetMaterial()->GetDensity() / (CLHEP::g / CLHEP::cm3);
+            G4double dedx = edep / (rho * stepLength); //[MeV*cm^2/g]
+            birksFactor = 1.0 / (1.0 + birksc1_ * dedx + birksc2_ * dedx * dedx);
+            if (aStep->GetTrack()->GetDefinition() == G4Gamma::GammaDefinition()) birksFactor = 1.0;
+            if (aStep->GetTrack()->GetDefinition() == G4Neutron::NeutronDefinition()) birksFactor = 1.0;  
+        }
+
+
         // Create a new cal hit.
         G4CalorimeterHit* hit = new G4CalorimeterHit();
 
         // Set the edep.
-        hit->setEdep(edep);
+        hit->setEdep(edep*birksFactor);
  
         // Get the scintillator solid box
         G4Box* scint = static_cast<G4Box*>(aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume()->GetSolid());
@@ -66,11 +112,20 @@ namespace ldmx {
         //stripID: back Hcal, segmented along y direction for now every 10 cm -- alternate x-y in the future?
         //         left/right side hcal: segmented along x direction every 10 cm
         //         top/bottom side hcal: segmented along y direction every 10 cm
-        int stripID = -1;        
-        if (section==HcalSection::BACK) stripID = int( (localPosition.y()+scint->GetYHalfLength())/100.0);
-        else if (section==HcalSection::TOP || section==HcalSection::BOTTOM) stripID = int( (localPosition.x()+scint->GetXHalfLength())/100.0);
-        else if (section==HcalSection::LEFT || section==HcalSection::RIGHT) stripID = int( (localPosition.y()+scint->GetYHalfLength())/100.0);
 
+        int stripID = -1;        
+        // Odd layers have bars horizontal
+        // Even layers have bars vertical
+        // 5cm wide bars are HARD-CODED
+        if      (section==HcalSection::BACK && layer % 2 == 1) stripID = int( (localPosition.y()+scint->GetYHalfLength())/50.0);
+        else if (section==HcalSection::BACK && layer % 2 == 0) stripID = int( (localPosition.x()+scint->GetXHalfLength())/50.0);
+        else stripID = int( (localPosition.z()+scint->GetZHalfLength())/50.0);
+
+        // std::cout << "---" << std::endl;
+        // std::cout << "GetXHalfLength = " << scint->GetXHalfLength() << "\t GetYHalfLength = " << scint->GetYHalfLength() << "\t GetZHalfLength = " << scint->GetZHalfLength() << std::endl;
+        // std::cout << "xpos = " << localPosition.x() << "\t ypos = " << localPosition.y() << "\t zpos = " << localPosition.z() << std::endl;
+        // std::cout << "xpos_g = " << position.x() << "\t ypos_g = " << position.y() << "\t zpos_g = " << position.z() << std::endl;
+        // std::cout << "Layer = " << layer << "\t section = " << section << "\t strip = " << stripID << std::endl;
 
         detID_->setFieldValue(1, layer);
         detID_->setFieldValue(2, section);

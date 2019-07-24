@@ -22,14 +22,11 @@ namespace ldmx {
     BDTHelper::BDTHelper(TString importBDTFile) {
 
         // Import the python packages and load the features into xgboost.
-        // FIXME: These debug prints can be removed.
-        TPython::Exec("print 'Importing BDT python packages'");
-        TPython::Exec("print 'importing xgb'; import xgboost as xgb; print xgb");
-        TPython::Exec("print 'importing numpy'; import numpy as np; print np");
-        TPython::Exec("print 'importing pkl'; import pickle as pkl; print pkl");
-        std::cout << "Unpickling bdt from file = " << importBDTFile << std::endl;
-        TPython::Exec("print 'importing model in xgb'; model = pkl.load(open('" + importBDTFile + "','r')); print model");
-        // ; model.dump_model('model.txt')
+        TPython::Exec("print 'Loading xgboost BDT'"); 
+        TPython::Exec("import xgboost as xgb");
+        TPython::Exec("import numpy as np");
+        TPython::Exec("import pickle as pkl");
+        TPython::Exec("model = pkl.load(open('" + importBDTFile + "','r'))");
     }
 
     void BDTHelper::buildFeatureVector(std::vector<float>& bdtFeatures, ldmx::EcalVetoResult& result) {
@@ -48,7 +45,7 @@ namespace ldmx {
         TString cmd = vectorToPredCMD(bdtFeatures);
         TPython::Exec("pred = " + cmd);
         float pred = TPython::Eval("pred");
-        std::cout << "  pred = " << pred << std::endl;
+        //std::cout << "  pred = " << pred << std::endl;
 
         return pred;
     }
@@ -70,7 +67,7 @@ namespace ldmx {
         doBdt_ = ps.getInteger("do_bdt");
         if (doBdt_){
             // Config and init the BDT.
-            bdtFileName_ = ps.getString("bdt_file", "bdt.pkl");
+            bdtFileName_ = ps.getString("bdt_file");
             if (!std::ifstream(bdtFileName_).good()) {
                 EXCEPTION_RAISE("EcalVetoProcessor",
                         "The specified BDT file '" + bdtFileName_ + "' does not exist!");
@@ -78,6 +75,22 @@ namespace ldmx {
 
             BDTHelper_ = new BDTHelper(bdtFileName_);
         }
+
+        cellFileNamexy_ = ps.getString("cellxy_file");
+        if (!std::ifstream(cellFileNamexy_).good()) {
+            EXCEPTION_RAISE("NonFidEcalVetoProcessor",
+                            "The specified x,y cell file '" + cellFileNamexy_ + "' does not exist!");
+        } else {
+            std::ifstream cellxyfile(cellFileNamexy_);
+            float valuex;
+            float valuey;
+            while ( cellxyfile >> valuex >> valuey) {
+                mapsx.push_back(valuex);
+                mapsy.push_back(valuey);
+            }
+        }
+
+
         hexReadout_ = new EcalHexReadout();
         nEcalLayers_ = ps.getInteger("num_ecal_layers");
 
@@ -87,6 +100,9 @@ namespace ldmx {
         ecalLayerTime_.resize(nEcalLayers_, 0);
         cellMap_.resize(nEcalLayers_, std::map<int, float>());
         cellMapTightIso_.resize(nEcalLayers_, std::map<int, float>());
+
+        // Set the collection name as defined in the configuration
+        collectionName_ = ps.getString("collection_name"); 
     }
 
     void EcalVetoProcessor::clearProcessor(){
@@ -120,8 +136,8 @@ namespace ldmx {
         const TClonesArray* ecalDigis = event.getCollection("ecalDigis");
         int nEcalHits = ecalDigis->GetEntriesFast();
 
-        std::cout << "[ EcalVetoProcessor ] : Got " << nEcalHits << " ECal digis in event "
-                << event.getEventHeader()->getEventNumber() << std::endl;
+        //std::cout << "[ EcalVetoProcessor ] : Got " << nEcalHits << " ECal digis in event "
+        //        << event.getEventHeader()->getEventNumber() << std::endl;
 
         int globalCentroid = GetShowerCentroidIDAndRMS(ecalDigis, showerRMS_);
         /* ~~ Fill the hit map ~~ O(n)  */
@@ -202,16 +218,6 @@ namespace ldmx {
         
         // end loop over sim hits
 
-        /*std::cout << "[ EcalVetoProcessor ]:\n" 
-         << "\t EdepRaw[0] : " << EcalLayerEdepRaw_[0] << "\n"
-         << "\t EdepReadout[0] : " << EcalLayerEdepReadout_[0] << "\n"
-         << "\t EdepLayerOuterRaw[0] : " << EcalLayerOuterRaw_[0] << "\n"
-         << "\t EdepLayerOuterReadout[0] : " << EcalLayerOuterReadout_[0] << "\n"
-         << "\t EdepLayerTime[0] : " << EcalLayerTime_[0] << "\n"
-         << "\t Shower Median: " << showerMedianCellId
-         << std::endl;*/
-
-
         // Get the collection of Ecal scoring plane hits. If it doesn't exist,
         // don't bother adding any truth tracking information.
 
@@ -246,13 +252,64 @@ namespace ldmx {
                     recoilP = spHit->getMomentum();
                     recoilPos = spHit->getPosition();
                     if (recoilP[2] <= 0) continue; 
-                    /*std::cout << "[ EcalVetoProcessor ]: " 
-                              << "Recoil momentum: [ " 
-                              << recoilP[0] 
-                              << ", " << recoilP[1]  
-                              << ", " << recoilP[2] << " ]" << std::endl;*/
                     break;
                 } 
+            }
+        }
+
+        /* Code for fiducial region below */
+        
+        std::vector<float> faceXY(2);
+        
+        if (!recoilP.empty() && recoilP[2] != 0) {
+            faceXY[0] = ((223.8 - 220.0) * (recoilP[0] / recoilP[2])) + recoilPos[0];
+            faceXY[1] = ((223.8 - 220.0) * (recoilP[1] / recoilP[2])) + recoilPos[1];
+        } else {
+            faceXY[0] = -9999.0;
+            faceXY[1] = -9999.0;
+        }
+        
+        int inside = 0;
+        int up = 0;
+        int step = 0;
+        int index;
+        float cell_radius = 5.0;
+        
+        std::vector<float>::iterator it;
+        it = std::lower_bound(mapsx.begin(), mapsx.end(), faceXY[0]);
+        
+        index = std::distance( mapsx.begin(), it);
+        
+        if (index == mapsx.size()) {
+            index += -1;
+        }
+        
+        if (!recoilP.empty() && faceXY[0] != -9999.0) {
+            while (true) {
+                std::vector<double> dis(2);
+                
+                dis[0] = faceXY[0] - mapsx[index + step];
+                dis[1] = faceXY[1] - mapsy[index + step];
+                
+                float celldis = sqrt (pow(dis[0],2) + pow(dis[1],2));
+                
+                if (celldis <= cell_radius) {
+                    inside = 1;
+                    break;
+                }
+                
+                if ((abs(dis[0]) > 5 && up == 0) || index + step == mapsx.size()-1) {
+                    up = 1;
+                    step = 0;
+                } else if ((abs(dis[0]) > 5 && up == 1) || (index + step == 0 && up == 1)) {
+                    break;
+                }
+                
+                if (up == 0) {
+                    step += 1;
+                } else {
+                    step += -1;
+                }
             }
         }
 
@@ -264,17 +321,23 @@ namespace ldmx {
             float pred = BDTHelper_->getSinglePred(bdtFeatures_);
             result_.setVetoResult(pred > bdtCutVal_);
             result_.setDiscValue(pred);
-            std::cout << "  pred > bdtCutVal = " << (pred > bdtCutVal_) << std::endl;
+            //std::cout << "  pred > bdtCutVal = " << (pred > bdtCutVal_) << std::endl;
         
             // If the event passes the veto, keep it. Otherwise, 
             // drop the event.
-            if (result_.passesVeto()) { 
+            if (result_.passesVeto() && inside) { 
                 setStorageHint(hint_shouldKeep); 
             } else { 
                 setStorageHint(hint_shouldDrop);
             }
         }
-        event.addToCollection("EcalVeto", result_);
+        
+        if (inside) {
+            setStorageHint(hint_shouldKeep);
+        } else {
+            setStorageHint(hint_shouldDrop);
+        }
+        event.addToCollection(collectionName_, result_);
     }
 
     EcalVetoProcessor::LayerCellPair EcalVetoProcessor::hitToPair(EcalHit* hit) {

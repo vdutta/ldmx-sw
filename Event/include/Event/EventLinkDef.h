@@ -21,6 +21,7 @@
 #pragma link C++ class ldmx::HcalVetoResult+;
 #pragma link C++ class ldmx::EcalHit+;
 #pragma link C++ class ldmx::EcalVetoResult+;
+#pragma link C++ class ldmx::NonFidEcalVetoResult+;
 #pragma link C++ class ldmx::EcalCluster+;
 #pragma link C++ class ldmx::EventConstants+;
 #pragma link C++ class ldmx::EventHeader+;
@@ -30,6 +31,7 @@
 #pragma link C++ class ldmx::SimTrackerHit+;
 #pragma link C++ class ldmx::SimParticle+;
 #pragma link C++ class ldmx::TriggerResult+;
+#pragma link C++ class ldmx::TrackerVetoResult+; 
 #pragma link C++ class ldmx::ClusterAlgoResult+;
 #pragma link C++ class ldmx::PnWeightResult+;
 #pragma link C++ class ldmx::SiStripHit+; 

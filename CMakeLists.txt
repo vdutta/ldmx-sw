@@ -1,5 +1,16 @@
 # minimum cmake version
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 14)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 
 # find XercesC installation
 if(XercesC_DIR)
@@ -51,12 +62,17 @@ include(MacroModule)
 include(MacroExtDeps)
 
 # declare list of modules with correct dependency order
-set(MODULES Event Framework DetDescr Tools EventProc SimCore SimPlugins Biasing SimApplication Configuration Detectors Ecal EventDisplay)
+set(MODULES Event Framework DetDescr Tools EventProc SimCore SimPlugins Biasing SimApplication Configuration Detectors Ecal EventDisplay DQM)
 
 # build each module in the list
 foreach(module ${MODULES})
   message(STATUS "Adding module: ${module}")
   add_subdirectory(${module})
+  if(EXTRA_INC)
+      message(STATUS "Adding include directory: ${EXTRA_INC}")
+      include_directories(${EXTRA_INC}) 
+      unset(EXTRA_INC)
+  endif()
 endforeach()
 
 # configure scripts and copy to installation dir 
