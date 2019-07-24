@@ -55,9 +55,8 @@ namespace ldmx {
                 std::vector<double> widths(3,0);
 
                 for ( unsigned int iC = 0; iC < 3; iC++ ) {
-                   
-                   center[iC] = (boundingbox[iC].second + boundingbox[iC].first)/2.0;
-                   widths[iC] = (boundingbox[iC].second - boundingbox[iC].first)/2.0;
+                   center[iC] =    (boundingbox[iC].second + boundingbox[iC].first)/2.0;
+                   widths[iC] = abs(boundingbox[iC].second - boundingbox[iC].first);
                 }
 
                 return drawRectPrism(

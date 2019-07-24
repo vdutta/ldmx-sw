@@ -173,7 +173,7 @@ namespace ldmx {
             TString digiName;
             digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, hitVec[i]->getZ());
 
-            BoundingBox hcal_hit_bb = HCAL_DETECTOR_GEOMETRY.transformDet2Real( hitVec[i] );
+            BoundingBox hcal_hit_bb = HCAL_DETECTOR_GEOMETRY.getBoundingBox( hitVec[i] );
             TEveGeoShape *hcalDigiHit = drawer_->drawRectPrism(
                     hcal_hit_bb ,
                     0, 0, 0, color, 0, digiName );

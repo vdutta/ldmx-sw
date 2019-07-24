@@ -46,7 +46,7 @@ namespace ldmx {
              * @param hit HcalHit to find real space hit for
              * @return BoundingBox in real space
              */
-            BoundingBox transformDet2Real( HcalHit* hit ) const;
+            BoundingBox getBoundingBox( HcalHit* hit ) const;
             
             /**
              * Calculate real space coordinates of a cluster of hits.
@@ -56,45 +56,7 @@ namespace ldmx {
              * @param hitVec vector of HcalHits to find a "center" for
              * @return BoundingBox in real space
              */
-            BoundingBox transformDet2Real( const std::vector< HcalHit* > &hitVec ) const;
-
-            /**
-             * Get the depth of an input section.
-             *
-             * Depth is the direction perpendicular to the plane of the layers.
-             *
-             * @param section HcalSection that you want the depth of
-             * @return double the depth of section
-             */
-            double getDepth( HcalSection section ) const { return ( nLayers_.at( section ) * thicknessLayer_ ); }
-
-            /**
-             * Get the width of an input section.
-             *
-             * Width is defined as the direction in the plane of the layers,
-             * but perpendicular to the direction of the scintillator strips/bars.
-             *
-             * @param section HcalSection that you want the width of
-             * @return double the widht of section
-             */
-            double getWidth( HcalSection section ) const { return ( nStrips_.at( section ) * widthScint_ ); }
-
-            /**
-             * Get the length of an input section.
-             *
-             * Length is defined as the direction along the strips/bars.
-             *
-             * @param section HcalSection that you want the length of
-             * @return double the length of section
-             */
-            double getLength( HcalSection section ) const { return lengthScint_.at(section); }
-
-            /**
-             * Get the plane of zero'th layer for the input section.
-             *
-             * @return double plane of zero'th layer
-             */
-            double getZeroLayer( HcalSection section ) const { return zeroLayer_.at( section ); }
+            BoundingBox getBoundingBox( const std::vector< HcalHit* > &hitVec ) const;
 
             /**
              * Get bounding box for the input section.

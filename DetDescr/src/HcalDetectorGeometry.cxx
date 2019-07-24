@@ -9,48 +9,49 @@ namespace ldmx {
     
     HcalDetectorGeometry::HcalDetectorGeometry() {
         
+        parityVertical_ = 1;
+        thicknessScint_ = 15.0; 
+
+        widthScint_ = 100.0;
+
+        thicknessLayer_ = 25. + thicknessScint_ + 2*2.; //absorber + scint +2*air
+
         nLayers_[ HcalSection::BACK   ] = 100;
-        nLayers_[ HcalSection::TOP    ] = 17;
-        nLayers_[ HcalSection::BOTTOM ] = 17;
-        nLayers_[ HcalSection::LEFT   ] = 17;
-        nLayers_[ HcalSection::RIGHT  ] = 17;
+        nLayers_[ HcalSection::TOP    ] = 28;
+        nLayers_[ HcalSection::BOTTOM ] = 28;
+        nLayers_[ HcalSection::LEFT   ] = 28;
+        nLayers_[ HcalSection::RIGHT  ] = 28;
         
-        nStrips_[ HcalSection::BACK   ] = 15;
+        nStrips_[ HcalSection::BACK   ] = 30;
         nStrips_[ HcalSection::TOP    ] = 3;
         nStrips_[ HcalSection::BOTTOM ] = 3;
         nStrips_[ HcalSection::LEFT   ] = 3;
         nStrips_[ HcalSection::RIGHT  ] = 3;
          
+        double ecal_z  = 290.;
+        double ecal_xy = 525.;
+        double ecal_front = 200.;
+
         lengthScint_[ HcalSection::BACK   ] = 3000.;
-        lengthScint_[ HcalSection::TOP    ] = (3000.+525.)/2.;
-        lengthScint_[ HcalSection::BOTTOM ] = (3000.+525.)/2.;
-        lengthScint_[ HcalSection::LEFT   ] = (3000.+525.)/2.;
-        lengthScint_[ HcalSection::RIGHT  ] = (3000.+525.)/2.;
+        lengthScint_[ HcalSection::TOP    ] = (3000.+ecal_xy)/2.;
+        lengthScint_[ HcalSection::BOTTOM ] = (3000.+ecal_xy)/2.;
+        lengthScint_[ HcalSection::LEFT   ] = (3000.+ecal_xy)/2.;
+        lengthScint_[ HcalSection::RIGHT  ] = (3000.+ecal_xy)/2.;
          
-        zeroLayer_[ HcalSection::BACK   ] = 200. + 290.;
-        zeroLayer_[ HcalSection::TOP    ] = 525./2.;
-        zeroLayer_[ HcalSection::BOTTOM ] = -525./2.;
-        zeroLayer_[ HcalSection::LEFT   ] = 525./2.;
-        zeroLayer_[ HcalSection::RIGHT  ] = -525./2.;
+        zeroLayer_[ HcalSection::BACK   ] = ecal_front + nStrips_[ HcalSection::TOP ] * widthScint_;
+        zeroLayer_[ HcalSection::TOP    ] = ecal_xy/2.;
+        zeroLayer_[ HcalSection::BOTTOM ] = ecal_xy/2.;
+        zeroLayer_[ HcalSection::LEFT   ] = ecal_xy/2.;
+        zeroLayer_[ HcalSection::RIGHT  ] = ecal_xy/2.;
          
-        zeroStrip_[ HcalSection::BACK   ] = -3000./2.; 
+        zeroStrip_[ HcalSection::BACK   ] = 3000./2.; 
         zeroStrip_[ HcalSection::TOP    ] = 200.;
         zeroStrip_[ HcalSection::BOTTOM ] = 200.;
         zeroStrip_[ HcalSection::LEFT   ] = 200.;
         zeroStrip_[ HcalSection::RIGHT  ] = 200.;
-
-        parityVertical_ = 1;
-
-        uncertaintyTimingPos_ = 200.0;
-
-        thicknessScint_ = 20.0; 
-
-        widthScint_ = 100.0;
-
-        thicknessLayer_ = 50. + thicknessScint_ + 2*2.; //absorber + scint +2*air
     }
 
-    BoundingBox HcalDetectorGeometry::transformDet2Real( HcalHit* hit ) const {
+    BoundingBox HcalDetectorGeometry::getBoundingBox( HcalHit* hit ) const {
         
         //pairs that will go into BoundingBox
         std::pair<double,double> X(0,0), Y(0,0), Z(0,0);
@@ -136,7 +137,7 @@ namespace ldmx {
                 X.second = x + elayer;
     
             } else {
-                std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknown Hcal Section!" << std::endl;
+                std::cerr << "[ HcalDetectorGeometry::getBoundingBox ] : Unknown Hcal Section!" << std::endl;
                 std::cerr << "    Returning a valid BoundingBox but with values that are all zero." << std::endl;
             } //side hcal
         
@@ -149,7 +150,7 @@ namespace ldmx {
         return hbox;
     }
     
-    BoundingBox HcalDetectorGeometry::transformDet2Real( const std::vector<HcalHit*>  &hitVec ) const {
+    BoundingBox HcalDetectorGeometry::getBoundingBox( const std::vector<HcalHit*>  &hitVec ) const {
         
         std::vector<double> pointSum ( 3 , 0.0 ); //sums of weighted coordinates
         std::vector<double> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
@@ -157,7 +158,7 @@ namespace ldmx {
         //calculate real space point for each hit
         for ( HcalHit* hit : hitVec ) {
             
-            BoundingBox box = transformDet2Real( hit );
+            BoundingBox box = getBoundingBox( hit );
             
             //Add weighted values to sums
             double weight;
@@ -190,13 +191,13 @@ namespace ldmx {
         double total_thickness = nLayers_.at( section ) * thicknessLayer_;
         if ( section == HcalSection::BACK ) {
            
-            X.first  = zeroStrip_.at( section );
+            X.first  = -zeroStrip_.at( HcalSection::BACK );
             X.second = X.first + total_strip_width;
 
-            Y.first  = -lengthScint_.at( section )/2.0;
-            Y.second = +lengthScint_.at( section )/2.0;
+            Y.first  = -lengthScint_.at( HcalSection::BACK )/2.0;
+            Y.second =  lengthScint_.at( HcalSection::BACK )/2.0;
 
-            Z.first  = zeroLayer_.at( section );
+            Z.first  = zeroLayer_.at( HcalSection::BACK );
             Z.second = Z.first + total_thickness;
 
         } else {
@@ -206,35 +207,35 @@ namespace ldmx {
 
             if ( section == HcalSection::LEFT ) {
                 
-                X.second = zeroLayer_.at( section );
-                X.first  = X.second - total_thickness;
+                X.first  = zeroLayer_.at( HcalSection::LEFT );
+                X.second = X.first + total_thickness;
 
                 Y.second = zeroLayer_.at( HcalSection::TOP );
-                Y.first  = Y.second - lengthScint_.at( section );
+                Y.first  = Y.second - lengthScint_.at( HcalSection::LEFT );
 
             } else if ( section == HcalSection::RIGHT ) {
 
-                X.first  = zeroLayer_.at( section );
-                X.second = X.first + total_thickness;
+                X.second = -zeroLayer_.at( HcalSection::RIGHT );
+                X.first  = X.second - total_thickness;
 
-                Y.first  = zeroLayer_.at( HcalSection::BOTTOM );
-                Y.second = Y.first + lengthScint_.at( section );
+                Y.first  = -zeroLayer_.at( HcalSection::BOTTOM );
+                Y.second = Y.first + lengthScint_.at( HcalSection::RIGHT );
 
             } else if ( section == HcalSection::TOP ) {
 
-                Y.first  = zeroLayer_.at( section );
+                Y.first  = zeroLayer_.at( HcalSection::TOP );
                 Y.second = Y.first + total_thickness;
 
-                X.second = zeroLayer_.at( HcalSection::RIGHT );
-                X.first  = X.second - lengthScint_.at( section );
+                X.first  = -zeroLayer_.at( HcalSection::RIGHT );
+                X.second = X.first + lengthScint_.at( HcalSection::TOP );
 
             } else if ( section == HcalSection::BOTTOM ) {
 
-                Y.second = zeroLayer_.at( section );
-                Y.first  = Y.first - total_thickness;
+                Y.second = -zeroLayer_.at( HcalSection::BOTTOM );
+                Y.first  = Y.second - total_thickness;
 
-                X.first  = zeroLayer_.at( HcalSection::LEFT );
-                X.second = X.first + lengthScint_.at( section );
+                X.second = zeroLayer_.at( HcalSection::LEFT );
+                X.first  = X.second - lengthScint_.at( HcalSection::BOTTOM );
 
             } else {
                 std::cerr << "[ Warning ] : Unrecognized HcalSection in HcalDetectorGeometry::getBoundingBox." << std::endl;
