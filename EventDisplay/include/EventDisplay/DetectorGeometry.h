@@ -3,6 +3,8 @@
 
 #include "TEveElement.h"
 #include "EventDisplay/EveShapeDrawer.h"
+#include "DetDescr/HcalDetectorGeometry.h"
+#include "DetDescr/HcalID.h" //for HcalSection enum
 
 // Updated to v11 geometry on 7/24/2019
 
@@ -30,6 +32,7 @@ static const double stereo_angle = 0.1*180/M_PI;
 //      preshower_Thickness, layer_X_Thickness, ecal_X_layers
 static const double ecal_z_length = 290.0;
 static const double ecal_front_z = 200.0; // Distance from target to ECAL front face
+static const double ecal_xy  = 525.;
 
 static const std::vector<double> towerXPos = {0, 0, 0, 170*sqrt(3)/2, -170*sqrt(3)/2, -170*sqrt(3)/2, 170*sqrt(3)/2};
 static const std::vector<double> towerYPos = {0, 170, -170, 85, 85, -85, -85};
@@ -40,18 +43,17 @@ static const double layerZPos[] = {2.8, 5.7, 12.05, 16.45, 24.3, 30.2, 39.3, 45.
 //      air_thick, scint_thick
 //      back_numLayersN, back_absoN_thick
 //      back_dx, back_dy, back_dz
-static const double hcal_x_width = 3000.0;
-static const double hcal_y_width = 3000.0;
-static const double hcal_z_length = 4400.0;
-static const double hcal_side_z = 300.0;
-static const double hcal_ecal_xy = 525.0;
-
-static const double air_thick = 2.0;
-static const double abso_thick = 25.0;
-static const double scint_thick = 15.0;
-static const double bar_width = 100.0;
-static const double hcal_front_z = ecal_front_z + hcal_side_z;
-static const double hcal_layer_thick = scint_thick + abso_thick + 2.0*air_thick;
+//static const double hcal_x_width  = HCAL_DETECTOR_GEOMETRY.getWidth(  HcalSection::BACK );
+//static const double hcal_y_width  = HCAL_DETECTOR_GEOMETRY.getLength( HcalSection::BACK );
+//static const double hcal_z_length = HCAL_DETECTOR_GEOMETRY.getDepth( HcalSection::BACK );
+//static const double hcal_side_z   = HCAL_DETECTOR_GEOMETRY.getWidth( HcalSection::TOP );
+//
+//static const double air_thick = 2.0;
+//static const double abso_thick = 25.0;
+//static const double scint_thick = 15.0;
+//static const double bar_width = 100.0;
+//static const double hcal_front_z = ecal_front_z + hcal_side_z;
+//static const double hcal_layer_thick = scint_thick + abso_thick + 2.0*air_thick;
 
 namespace ldmx {
 

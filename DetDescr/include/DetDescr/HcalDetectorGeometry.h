@@ -9,8 +9,8 @@
 
 //STL
 #include <map> //storage maps
-#include <vector> //HitBox
-#include <utility> //HitBox
+#include <vector> //BoundingBox
+#include <utility> //BoundingBox
 #include <cmath> //sqrt
 #include <iostream> //cerr
 
@@ -21,12 +21,12 @@
 namespace ldmx {
     
     /**
-     * @type HitBox
+     * @type BoundingBox
      * @brief Stores the minimum and maximum of each coordinate for a box.
      *
      * This has all of the information needed to define an axis-aligned rectangular prism.
      */
-    typedef std::vector< std::pair< double, double > > HitBox;
+    typedef std::vector< std::pair< double, double > > BoundingBox;
 
     /**
      * @class HcalDetectorGeometry
@@ -44,9 +44,9 @@ namespace ldmx {
              * Calculate real space coordinates from detector location.
              *
              * @param hit HcalHit to find real space hit for
-             * @return HitBox in real space
+             * @return BoundingBox in real space
              */
-            HitBox transformDet2Real( HcalHit* hit ) const;
+            BoundingBox transformDet2Real( HcalHit* hit ) const;
             
             /**
              * Calculate real space coordinates of a cluster of hits.
@@ -54,9 +54,55 @@ namespace ldmx {
              * Determines cluster's coordinates by a weighted mean of the individuals.
              * 
              * @param hitVec vector of HcalHits to find a "center" for
-             * @return HitBox in real space
+             * @return BoundingBox in real space
              */
-            HitBox transformDet2Real( const std::vector< HcalHit* > &hitVec ) const;
+            BoundingBox transformDet2Real( const std::vector< HcalHit* > &hitVec ) const;
+
+            /**
+             * Get the depth of an input section.
+             *
+             * Depth is the direction perpendicular to the plane of the layers.
+             *
+             * @param section HcalSection that you want the depth of
+             * @return double the depth of section
+             */
+            double getDepth( HcalSection section ) const { return ( nLayers_.at( section ) * thicknessLayer_ ); }
+
+            /**
+             * Get the width of an input section.
+             *
+             * Width is defined as the direction in the plane of the layers,
+             * but perpendicular to the direction of the scintillator strips/bars.
+             *
+             * @param section HcalSection that you want the width of
+             * @return double the widht of section
+             */
+            double getWidth( HcalSection section ) const { return ( nStrips_.at( section ) * widthScint_ ); }
+
+            /**
+             * Get the length of an input section.
+             *
+             * Length is defined as the direction along the strips/bars.
+             *
+             * @param section HcalSection that you want the length of
+             * @return double the length of section
+             */
+            double getLength( HcalSection section ) const { return lengthScint_.at(section); }
+
+            /**
+             * Get the plane of zero'th layer for the input section.
+             *
+             * @return double plane of zero'th layer
+             */
+            double getZeroLayer( HcalSection section ) const { return zeroLayer_.at( section ); }
+
+            /**
+             * Get bounding box for the input section.
+             *
+             * @param section HcalSection
+             * @return BoundingBox that bounds section
+             */
+            BoundingBox getBoundingBox( HcalSection section ) const;
         
         private:
             /** Number of layers in each section */

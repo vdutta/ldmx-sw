@@ -25,7 +25,7 @@ namespace ldmx {
     
             TString colName;
             colName.Form("Tower %d", col);
-            TEveGeoShape* hexCol = shapeDrawer_->drawHexPrism(towerXPos[col], towerYPos[col], ecal_front_z+ecal_z_length/2, 0, 0, 0, ecal_z_length, hcal_ecal_xy/(3*sqrt(3)), kBlue, 90, colName);
+            TEveGeoShape* hexCol = shapeDrawer_->drawHexPrism(towerXPos[col], towerYPos[col], ecal_front_z+ecal_z_length/2, 0, 0, 0, ecal_z_length, ecal_xy/(3*sqrt(3)), kBlue, 90, colName);
 
             ecal_->AddElement(hexCol);
         }
@@ -35,22 +35,32 @@ namespace ldmx {
 
     void DetectorGeometry::drawHCAL() {
     
-        TEveGeoShape* backHcal = shapeDrawer_->drawRectPrism(0, 0, hcal_front_z+hcal_z_length/2, hcal_x_width, hcal_y_width, hcal_z_length, 0, 0, 0, kCyan, 90, "Back HCal"); 
+        TEveGeoShape* backHcal = shapeDrawer_->drawRectPrism(
+                HCAL_DETECTOR_GEOMETRY.getBoundingBox( HcalSection::BACK ),
+                0, 0, 0, kCyan, 90, "Back HCal"); 
         hcal_->AddElement(backHcal);
     
-        TEveGeoShape* sideTopHcal = shapeDrawer_->drawRectPrism(-hcal_y_width/4+hcal_ecal_xy/4, -hcal_y_width/4-hcal_ecal_xy/4, hcal_front_z-hcal_side_z/2, (hcal_y_width+hcal_ecal_xy)/2, (hcal_y_width-hcal_ecal_xy)/2, hcal_side_z, 0, 0, 0, kCyan, 90, "Module 1");
+        TEveGeoShape* sideTopHcal = shapeDrawer_->drawRectPrism(
+                HCAL_DETECTOR_GEOMETRY.getBoundingBox( HcalSection::TOP ),
+                0, 0, 0, kCyan, 90, "Module 1");
 
         sidehcal_->AddElement(sideTopHcal);
     
-        TEveGeoShape* sideBottomHcal = shapeDrawer_->drawRectPrism(-hcal_y_width/4-hcal_ecal_xy/4, hcal_y_width/4-hcal_ecal_xy/4, hcal_front_z-hcal_side_z/2, (hcal_y_width-hcal_ecal_xy)/2, (hcal_y_width+hcal_ecal_xy)/2, hcal_side_z, 0, 0, 0, kCyan, 90, "Module 4");
+        TEveGeoShape* sideBottomHcal = shapeDrawer_->drawRectPrism(
+                HCAL_DETECTOR_GEOMETRY.getBoundingBox( HcalSection::BOTTOM ),
+                0, 0, 0, kCyan, 90, "Module 4");
 
         sidehcal_->AddElement(sideBottomHcal);
     
-        TEveGeoShape* sideLeftHcal = shapeDrawer_->drawRectPrism(hcal_y_width/4-hcal_ecal_xy/4, hcal_y_width/4+hcal_ecal_xy/4, hcal_front_z-hcal_side_z/2, (hcal_y_width+hcal_ecal_xy)/2, (hcal_y_width-hcal_ecal_xy)/2, hcal_side_z, 0, 0, 0, kCyan, 90, "Module 2");
+        TEveGeoShape* sideLeftHcal = shapeDrawer_->drawRectPrism(
+                HCAL_DETECTOR_GEOMETRY.getBoundingBox( HcalSection::LEFT ),
+                0, 0, 0, kCyan, 90, "Module 2");
 
         sidehcal_->AddElement(sideLeftHcal);
     
-        TEveGeoShape* sideRightHcal = shapeDrawer_->drawRectPrism(hcal_y_width/4+hcal_ecal_xy/4, -hcal_y_width/4+hcal_ecal_xy/4, hcal_front_z-hcal_side_z/2, (hcal_y_width-hcal_ecal_xy)/2, (hcal_y_width+hcal_ecal_xy)/2, hcal_side_z, 0, 0, 0, kCyan, 90, "Module 3");
+        TEveGeoShape* sideRightHcal = shapeDrawer_->drawRectPrism(
+                HCAL_DETECTOR_GEOMETRY.getBoundingBox( HcalSection::RIGHT ),
+                0, 0, 0, kCyan, 90, "Module 3");
 
         sidehcal_->AddElement(sideRightHcal);
         hcal_->AddElement(sidehcal_);

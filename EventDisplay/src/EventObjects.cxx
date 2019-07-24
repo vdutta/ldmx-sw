@@ -144,23 +144,21 @@ namespace ldmx {
 
     void EventObjects::drawHCALHits(TClonesArray* hits) {
 
-        ldmx::HcalID detID;
-        ldmx::HcalHit* hit;
 
         TEveRGBAPalette* palette = new TEveRGBAPalette(0,100.0);
 
         std::vector<HcalHit*> hitVec;
+        ldmx::HcalHit* hit;
         for (TIter next(hits); hit = (ldmx::HcalHit*)next();) {
             hitVec.push_back(hit);
         }
 
         std::sort(hitVec.begin(), hitVec.end(), compHcalHits);
 
+        ldmx::HcalID detID;
         for (int i = 0; i < hitVec.size(); i++) {
             int pe = hitVec[i]->getPE();
             if (pe == 0) { continue; }
-
-            bool isNoise = hitVec[i]->getZ() == 0;
 
             detID.setRawValue(hitVec[i]->getID());
             detID.unpack();
@@ -175,36 +173,17 @@ namespace ldmx {
             TString digiName;
             digiName.Form("%d PEs, Section %d, Layer %d, Bar %d, Z %1.5g", pe, section, layer, bar, hitVec[i]->getZ());
 
-            TEveGeoShape* hcalDigiHit = 0;
-            //TEveBox* hcalDigiHit2 = 0;
-            //hcalDigiHit2 = drawer_->drawBox(hitVec[i]->getX(), hitVec[i]->getY(), hitVec[i]->getZ()-15, 30, 30, hitVec[i]->getZ()+15, 0, color, 0, digiName);
-            if (section == 0) {
-                if (layer % 2 == 0) {
-                    //horizontal
-                    hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, 0, 0, color, 0, digiName);
+            BoundingBox hcal_hit_bb = HCAL_DETECTOR_GEOMETRY.transformDet2Real( hitVec[i] );
+            TEveGeoShape *hcalDigiHit = drawer_->drawRectPrism(
+                    hcal_hit_bb ,
+                    0, 0, 0, color, 0, digiName );
 
-                } else {
-                    //vertical, once alternating bar orientation in the back is implemented, uncomment
-                    //hcalDigiHit = drawer_->drawBox((bar_width*(0.5-bar)-hcal_y_width/2), hitVec[i]->getY(), (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick, bar_width, 150, (layer-1)*hcal_layer_thick+hcal_front_z+scint_thick+abso_thick, 0, color, 0, digiName);
-                    //hcalDigiHit = drawer_->drawBox(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, color, 0, digiName);
-                    hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), bar_width*(0.5+bar)-hcal_y_width/2, (layer-1)*hcal_layer_thick+hcal_front_z+abso_thick+scint_thick/2, 150, bar_width, scint_thick, 0, 0, 0, color, 0, digiName);
-
-                }
-            } else if (section == 1) {hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), hcal_ecal_xy/2+hcal_layer_thick*layer, ecal_front_z+(bar+1/2)*bar_width, 150, scint_thick, bar_width, 0, 0, 0, color, 0, digiName);
-            } else if (section == 3) {hcalDigiHit = drawer_->drawRectPrism((hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+(bar+1/2)*bar_width, scint_thick, 150, bar_width, 0, 0, 0, color, 0, digiName);
-            } else if (section == 2) {hcalDigiHit = drawer_->drawRectPrism(hitVec[i]->getX(), -(hcal_ecal_xy/2+hcal_layer_thick*layer), ecal_front_z+(bar+1/2)*bar_width, 150, scint_thick, bar_width, 0, 0, 0, color, 0, digiName);
-            } else if (section == 4) {hcalDigiHit = drawer_->drawRectPrism(-(hcal_ecal_xy/2+hcal_layer_thick*layer), hitVec[i]->getY(), ecal_front_z+(bar+1/2)*bar_width, scint_thick, 150, bar_width, 0, 0, 0, color, 0, digiName);
-            }
-
-            if (hcalDigiHit != 0) {
-                if (isNoise) { hcalDigiHit->SetRnrSelf(0); }
+            if ( hcalDigiHit ) {
+                if ( hitVec[i]->getNoise() ) { hcalDigiHit->SetRnrSelf(0); }
                 hcalHits_->AddElement(hcalDigiHit);
-            }
-            //if (hcalDigiHit2 != 0) {
-            //    hcalHits_->AddElement(hcalDigiHit2);
-            //}
+            } // successfully created hcal digi hit
 
-        }
+        } //loop through sorted hit list
 
         hcalHits_->SetPickableRecursively(1);
         hits_->AddElement(hcalHits_);

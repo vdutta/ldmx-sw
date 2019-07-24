@@ -3,6 +3,7 @@
 
 #include "DetDescr/EcalHexReadout.h"
 #include "DetDescr/HcalID.h"
+#include "DetDescr/HcalDetectorGeometry.h"
 #include "Event/EcalHit.h"
 #include "Event/HcalHit.h"
 #include "Event/SimTrackerHit.h"

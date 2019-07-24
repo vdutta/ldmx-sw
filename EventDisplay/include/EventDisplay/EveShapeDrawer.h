@@ -6,6 +6,8 @@
 #include "TGeoShape.h"
 #include "TGeoMatrix.h"
 
+#include "DetDescr/HcalDetectorGeometry.h" //for BoundingBox
+
 #include "TVector3.h"
 #include <math.h>
 #include <iostream>
@@ -45,6 +47,25 @@ namespace ldmx {
                 rectPrism->SetTransMatrix(*locAndOrien);
             
                 return rectPrism;
+            }
+
+            TEveGeoShape* drawRectPrism( BoundingBox boundingbox , Double_t xRot, Double_t yRot, Double_t zRot, Int_t color, Int_t transparency, TString name) {
+                
+                std::vector<double> center(3,0);
+                std::vector<double> widths(3,0);
+
+                for ( unsigned int iC = 0; iC < 3; iC++ ) {
+                   
+                   center[iC] = (boundingbox[iC].second + boundingbox[iC].first)/2.0;
+                   widths[iC] = (boundingbox[iC].second - boundingbox[iC].first)/2.0;
+                }
+
+                return drawRectPrism(
+                        center[0] , center[1] , center[2],
+                        widths[0] , widths[1] , widths[2],
+                        xRot , yRot , zRot,
+                        color, transparency, name
+                        );
             }
 
         private:
