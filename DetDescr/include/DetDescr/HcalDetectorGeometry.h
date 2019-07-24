@@ -9,16 +9,25 @@
 
 //STL
 #include <map> //storage maps
+#include <vector> //HitBox
+#include <utility> //HitBox
 #include <cmath> //sqrt
 #include <iostream> //cerr
 
 //LDMX Framework
 #include "DetDescr/HcalID.h" //HcalSection enum
 #include "Event/HcalHit.h" //hit pointer
-#include "Tools/HitBox.h" //return type
 
 namespace ldmx {
     
+    /**
+     * @type HitBox
+     * @brief Stores the minimum and maximum of each coordinate for a box.
+     *
+     * This has all of the information needed to define an axis-aligned rectangular prism.
+     */
+    typedef std::vector< std::pair< double, double > > HitBox;
+
     /**
      * @class HcalDetectorGeometry
      * @brief Class to translated between detector location (section, layer, strip) and real space.

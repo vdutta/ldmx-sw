@@ -52,7 +52,8 @@ namespace ldmx {
 
     HitBox HcalDetectorGeometry::transformDet2Real( HcalHit* hit ) const {
         
-        HitBox hbox;
+        //pairs that will go into HitBox
+        std::pair<double,double> X,Y,Z;
 
         HcalSection section = (HcalSection)( hit->getSection() );
         int layer = hit->getLayer();
@@ -70,71 +71,90 @@ namespace ldmx {
         if ( section == HcalSection::BACK ) {
             
             z = zeroLayer_.at( section ) + layercenter;
-            hbox.setZ( z - elayer , z , z + elayer ); 
+            Z.first  = z-elayer;
+            Z.second = z+elayer;
             
             //only horizontal layers implemented currently
             if ( false ) { //( (layer ^ parityVertical_) & 1) == 0 ) { //checks for same parity
                 //Vertical Layers
                 
                 x = zeroStrip_.at( section ) + stripcenter;
-                hbox.setX( x - estrip , x , x + estrip );
+                X.first  = x - estrip;
+                X.second = x + estrip;
                 
                 y = hit->getY();
-                hbox.setY( y - uncertaintyTimingPos_ , y , y + uncertaintyTimingPos_ );
+                Y.first  = y - uncertaintyTimingPos_;
+                Y.second = y + uncertaintyTimingPos_;
 
             } else {
                 //Horizontal Layers
                 
                 x = hit->getX();
-                hbox.setX( x - uncertaintyTimingPos_ , x , x + uncertaintyTimingPos_ );
+                X.first  = x - uncertaintyTimingPos_;
+                X.second = x + uncertaintyTimingPos_;
 
                 y = zeroStrip_.at( section ) + stripcenter;
-                hbox.setY( y - estrip , y , y + estrip );
+                Y.first  = y - estrip;
+                Y.second = y + estrip;
 
             } //calculate depending on layer
 
         } else {
             
             z = zeroStrip_.at( section ) + stripcenter;
-            hbox.setZ( z - estrip , z , z + estrip );
+            Z.first  = z - estrip;
+            Z.second = z + estrip;
 
             if ( section == HcalSection::TOP or section == HcalSection::BOTTOM ) {
                 
                 x = hit->getX();
-                hbox.setX( x - uncertaintyTimingPos_ , x , x + uncertaintyTimingPos_ );
+                X.first  = x - uncertaintyTimingPos_;
+                X.second = x + uncertaintyTimingPos_;
                 
                 if ( section == HcalSection::TOP ) {
                     y = zeroLayer_.at( section ) + layercenter;
                 } else {
                     y = zeroLayer_.at( section ) - layercenter;
                 } //top or bottom hcal
-                hbox.setY( y - elayer , y , y + elayer );
+
+                Y.first  = y - elayer;
+                Y.second = y + elayer;
                 
             } else if ( section == HcalSection::LEFT or section == HcalSection::RIGHT ) {
                 
                 y = hit->getY();
-                hbox.setY( y - uncertaintyTimingPos_ , y , y + uncertaintyTimingPos_ );
+                Y.first  = y - uncertaintyTimingPos_;
+                Y.second = y + uncertaintyTimingPos_;
 
                 if ( section == HcalSection::LEFT ) {
                     x = zeroLayer_.at( section ) + layercenter;
                 } else {
                     x = zeroLayer_.at( section ) - layercenter;
                 } //left or right hcal
-                hbox.setX( x - elayer , x , x + elayer );
+
+                X.first  = x - elayer;
+                X.second = x + elayer;
     
             } else {
                 std::cerr << "[ HcalDetectorGeometry::transformDet2Real ] : Unknown Hcal Section!" << std::endl;
+                std::cerr << "    Returning a valid HitBox but with values that are all zero." << std::endl;
+                std::pair<double,double> zeroes(0.0,0.0);
+                HitBox hbox( 3 , zeroes );
                 return hbox;
             } //side hcal
         
         } //calculate depending on section
 
+        HitBox hbox;
+        hbox.push_back( X );
+        hbox.push_back( Y );
+        hbox.push_back( Z );
         return hbox;
     }
     
     HitBox HcalDetectorGeometry::transformDet2Real( const std::vector<HcalHit*>  &hitVec ) const {
         
-        std::vector<double> pointSum( 3 , 0.0 ); //sums of weighted coordinates
+        std::vector<double> pointSum ( 3 , 0.0 ); //sums of weighted coordinates
         std::vector<double> weightSum( 3 , 0.0 ); //sums of weights for each coordinate
         
         //calculate real space point for each hit
@@ -142,21 +162,15 @@ namespace ldmx {
             
             HitBox box = transformDet2Real( hit );
             
-            std::vector< double > boxMin, boxOrigin, boxMax;
-            boxMin = box.getMin();
-            boxOrigin = box.getOrigin();
-            boxMax = box.getMax();
-            
             //Add weighted values to sums
             double weight;
             for ( unsigned int iC = 0; iC < 3; iC++ ) {
                 
-                double cer = std::max( abs(boxMax[iC] - boxOrigin[iC]) , 
-                                       abs(boxOrigin[iC] - boxMin[iC]) );
+                double cer = abs(box[iC].second - box[iC].first)/2.0;
 
                 weight = 1.0 / ( cer*cer );
                 weightSum[ iC ] += weight;
-                pointSum[ iC ] += weight*boxOrigin[iC];
+                pointSum[ iC ] += weight*( ( box[iC].second + box[iC].first )/2.0 );
             }
         } //go through hitVec
         
@@ -165,7 +179,7 @@ namespace ldmx {
         for ( int iC = 0; iC < 3; iC++ ) {
             double c = pointSum[ iC ] / weightSum[ iC ];
             double ec = 1.0 / sqrt( weightSum[ iC ] );
-            hbox.setCoordinate( iC , c - ec , c , c + ec );
+            hbox.emplace_back( c - ec , c + ec );
         }
 
         return hbox;
